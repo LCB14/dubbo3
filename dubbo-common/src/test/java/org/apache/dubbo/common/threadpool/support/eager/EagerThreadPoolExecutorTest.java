@@ -99,6 +99,6 @@ public class EagerThreadPoolExecutorTest {
                 .getExtension("eager")
                 .getExecutor(URL);
         Assertions.assertEquals("EagerThreadPoolExecutor", executorService.getClass()
-            .getSimpleName(), "test spi fail!");
+                .getSimpleName(), "test spi fail!");
     }
 }

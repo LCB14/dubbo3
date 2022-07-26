@@ -45,19 +45,18 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- *
- *         byte 16
- *         0-1 magic code
- *         2 flag
- *         8 - 1-request/0-response
- *         7 - two way
- *         6 - heartbeat
- *         1-5 serialization id
- *         3 status
- *         20 ok
- *         90 error?
- *         4-11 id (long)
- *         12 -15 datalength
+ * byte 16
+ * 0-1 magic code
+ * 2 flag
+ * 8 - 1-request/0-response
+ * 7 - two way
+ * 6 - heartbeat
+ * 1-5 serialization id
+ * 3 status
+ * 20 ok
+ * 90 error?
+ * 4-11 id (long)
+ * 12 -15 datalength
  */
 public class ExchangeCodecTest extends TelnetCodecTest {
     // magic header.
@@ -114,7 +113,7 @@ public class ExchangeCodecTest extends TelnetCodecTest {
         inputBytes.put(new byte[]{MAGIC_HIGH, 0}, TelnetCodec.DecodeResult.NEED_MORE_INPUT);
         inputBytes.put(new byte[]{0, MAGIC_LOW}, TelnetCodec.DecodeResult.NEED_MORE_INPUT);
 
-        for (Map.Entry<byte[], Object> entry: inputBytes.entrySet()) {
+        for (Map.Entry<byte[], Object> entry : inputBytes.entrySet()) {
             testDecode_assertEquals(assemblyDataProtocol(entry.getKey()), entry.getValue());
         }
     }
@@ -150,13 +149,13 @@ public class ExchangeCodecTest extends TelnetCodecTest {
 
     @Test
     public void testInvalidSerializaitonId() throws Exception {
-        byte[] header = new byte[]{MAGIC_HIGH, MAGIC_LOW, (byte)0x8F, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        Object obj =  decode(header);
+        byte[] header = new byte[]{MAGIC_HIGH, MAGIC_LOW, (byte) 0x8F, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        Object obj = decode(header);
         Assertions.assertTrue(obj instanceof Request);
         Request request = (Request) obj;
         Assertions.assertTrue(request.isBroken());
         Assertions.assertTrue(request.getData() instanceof IOException);
-        header = new byte[]{MAGIC_HIGH, MAGIC_LOW, (byte)0x1F, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        header = new byte[]{MAGIC_HIGH, MAGIC_LOW, (byte) 0x1F, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
         obj = decode(header);
         Assertions.assertTrue(obj instanceof Response);

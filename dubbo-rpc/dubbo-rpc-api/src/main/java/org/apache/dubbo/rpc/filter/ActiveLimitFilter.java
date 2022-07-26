@@ -105,7 +105,7 @@ public class ActiveLimitFilter extends ListenableFilter {
             int max = invoker.getUrl().getMethodParameter(methodName, ACTIVES_KEY, 0);
 
             if (t instanceof RpcException) {
-                RpcException rpcException = (RpcException)t;
+                RpcException rpcException = (RpcException) t;
                 if (rpcException.isLimitExceed()) {
                     return;
                 }

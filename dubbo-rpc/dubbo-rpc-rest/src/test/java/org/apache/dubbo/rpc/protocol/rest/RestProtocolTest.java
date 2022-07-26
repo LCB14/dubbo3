@@ -244,7 +244,7 @@ public class RestProtocolTest {
 
     @Test
     public void testRemoteApplicationName() {
-        URL url = URL.valueOf("rest://127.0.0.1:5342/rest/say?version=1.0.0&interface=org.apache.dubbo.rpc.protocol.rest.DemoService").addParameter("application","consumer");
+        URL url = URL.valueOf("rest://127.0.0.1:5342/rest/say?version=1.0.0&interface=org.apache.dubbo.rpc.protocol.rest.DemoService").addParameter("application", "consumer");
         DemoServiceImpl server = new DemoServiceImpl();
         ProviderModel providerModel = new ProviderModel(url.getPathKey(), server, DemoService.class);
         ApplicationModel.initProviderModel(url.getPathKey(), providerModel);

@@ -133,7 +133,7 @@ public class FailbackClusterInvoker<T> extends AbstractClusterInvoker<T> {
             this.invokers = invokers;
             this.retries = retries;
             this.tick = tick;
-            this.lastInvoker=lastInvoker;
+            this.lastInvoker = lastInvoker;
         }
 
         @Override

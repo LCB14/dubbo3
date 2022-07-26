@@ -102,7 +102,7 @@ public class WrapperTest {
         Assertions.assertEquals(instance.getClass(), (Class<?>) w.invokeMethod(instance, "getClass", null, null));
         Assertions.assertEquals(instance.hashCode(), (int) w.invokeMethod(instance, "hashCode", null, null));
         Assertions.assertEquals(instance.toString(), (String) w.invokeMethod(instance, "toString", null, null));
-        Assertions.assertTrue((boolean)w.invokeMethod(instance, "equals", null, new Object[] {instance}));
+        Assertions.assertTrue((boolean) w.invokeMethod(instance, "equals", null, new Object[]{instance}));
     }
 
     @Test

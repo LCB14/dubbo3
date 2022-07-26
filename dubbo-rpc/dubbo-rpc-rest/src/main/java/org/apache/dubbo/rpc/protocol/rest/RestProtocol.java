@@ -239,9 +239,9 @@ public class RestProtocol extends AbstractProxyProtocol {
     }
 
     /**
-     *  getPath() will return: [contextpath + "/" +] path
-     *  1. contextpath is empty if user does not set through ProtocolConfig or ProviderConfig
-     *  2. path will never be empty, it's default value is the interface name.
+     * getPath() will return: [contextpath + "/" +] path
+     * 1. contextpath is empty if user does not set through ProtocolConfig or ProviderConfig
+     * 2. path will never be empty, it's default value is the interface name.
      *
      * @return return path only if user has explicitly gave then a value.
      */

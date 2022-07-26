@@ -101,11 +101,11 @@ public class ApolloDynamicConfiguration implements DynamicConfiguration {
         }
     }
 
-    private String getAddressWithProtocolPrefix (URL url) {
+    private String getAddressWithProtocolPrefix(URL url) {
         String address = url.getBackupAddress();
         if (StringUtils.isNotEmpty(address)) {
             address = Arrays.stream(COMMA_SPLIT_PATTERN.split(address))
-                    .map(addr ->  {
+                    .map(addr -> {
                         if (addr.startsWith(APOLLO_PROTOCOL_PREFIX)) {
                             return addr;
                         }

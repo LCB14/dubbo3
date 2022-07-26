@@ -33,7 +33,7 @@ public class SofaRegistryFactory extends AbstractRegistryFactory {
 
     /**
      * For extension, such as load zone/accessKey/secretKey/...
-     * 
+     *
      * @param url URL
      */
     protected void initEnvironment(URL url) {

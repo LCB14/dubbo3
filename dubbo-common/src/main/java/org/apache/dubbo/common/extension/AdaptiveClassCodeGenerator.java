@@ -55,10 +55,10 @@ public class AdaptiveClassCodeGenerator {
     private static final String CODE_EXT_NAME_ASSIGNMENT = "String extName = %s;\n";
 
     private static final String CODE_EXT_NAME_NULL_CHECK = "if(extName == null) "
-                    + "throw new IllegalStateException(\"Failed to get extension (%s) name from url (\" + url.toString() + \") use keys(%s)\");\n";
+            + "throw new IllegalStateException(\"Failed to get extension (%s) name from url (\" + url.toString() + \") use keys(%s)\");\n";
 
     private static final String CODE_INVOCATION_ARGUMENT_NULL_CHECK = "if (arg%d == null) throw new IllegalArgumentException(\"invocation == null\"); "
-                    + "String methodName = arg%d.getMethodName();\n";
+            + "String methodName = arg%d.getMethodName();\n";
 
 
     private static final String CODE_EXTENSION_ASSIGNMENT = "%s extension = (%<s)%s.getExtensionLoader(%s.class).getExtension(extName);\n";
@@ -168,8 +168,8 @@ public class AdaptiveClassCodeGenerator {
     private String generateMethodArguments(Method method) {
         Class<?>[] pts = method.getParameterTypes();
         return IntStream.range(0, pts.length)
-                        .mapToObj(i -> String.format(CODE_METHOD_ARGUMENT, pts[i].getCanonicalName(), i))
-                        .collect(Collectors.joining(", "));
+                .mapToObj(i -> String.format(CODE_METHOD_ARGUMENT, pts[i].getCanonicalName(), i))
+                .collect(Collectors.joining(", "));
     }
 
     /**
@@ -199,8 +199,10 @@ public class AdaptiveClassCodeGenerator {
         Adaptive adaptiveAnnotation = method.getAnnotation(Adaptive.class);
         StringBuilder code = new StringBuilder(512);
         if (adaptiveAnnotation == null) {
+            // 代理接口中，未被@Adaptive注解修饰的方法，生成的代理类实现直接抛出异常
             return generateUnsupported(method);
         } else {
+            // 获取当前被@Adaptive注解修饰的方法参数中，参数类型为URL的参数在所有参数中的次序号。
             int urlTypeIndex = getUrlTypeIndex(method);
 
             // found parameter in URL type
@@ -245,8 +247,10 @@ public class AdaptiveClassCodeGenerator {
         // TODO: refactor it
         String getNameCode = null;
         for (int i = value.length - 1; i >= 0; --i) {
+            // value.length 大于 1 时，才会走到 else 分支。
             if (i == value.length - 1) {
                 if (null != defaultExtName) {
+                    // 通过下面源码阅读可知，可以在 @Adaptive 注解中通过 @Adaptive("protocol") 来明确指定拓展实现类名称在URL中的取值属性。
                     if (!"protocol".equals(value[i])) {
                         if (hasInvocation) {
                             getNameCode = String.format("url.getMethodParameter(methodName, \"%s\", \"%s\")", value[i], defaultExtName);
@@ -259,6 +263,7 @@ public class AdaptiveClassCodeGenerator {
                 } else {
                     if (!"protocol".equals(value[i])) {
                         if (hasInvocation) {
+                            // 此处可能导致 getNameCode 值为 null
                             getNameCode = String.format("url.getMethodParameter(methodName, \"%s\", \"%s\")", value[i], defaultExtName);
                         } else {
                             getNameCode = String.format("url.getParameter(\"%s\")", value[i]);
@@ -317,8 +322,8 @@ public class AdaptiveClassCodeGenerator {
     private String generateInvocationArgumentNullCheck(Method method) {
         Class<?>[] pts = method.getParameterTypes();
         return IntStream.range(0, pts.length).filter(i -> CLASSNAME_INVOCATION.equals(pts[i].getName()))
-                        .mapToObj(i -> String.format(CODE_INVOCATION_ARGUMENT_NULL_CHECK, i, i))
-                        .findFirst().orElse("");
+                .mapToObj(i -> String.format(CODE_INVOCATION_ARGUMENT_NULL_CHECK, i, i))
+                .findFirst().orElse("");
     }
 
     /**
@@ -360,7 +365,7 @@ public class AdaptiveClassCodeGenerator {
 
         // getter method not found, throw
         throw new IllegalStateException("Failed to create adaptive class for interface " + type.getName()
-                        + ": not found url parameter or url attribute in parameters of method " + method.getName());
+                + ": not found url parameter or url attribute in parameters of method " + method.getName());
 
     }
 

@@ -151,8 +151,8 @@ class AbstractMethodBuilderTest {
     void build() {
         MethodBuilder builder = new MethodBuilder();
         builder.id("id").prefix("prefix").timeout(1).retries(2).actives(3).loadbalance("mockloadbalance").async(true)
-            .sent(false).mock("mock").merger("merger").cache("cache").validation("validation")
-            .appendParameter("default.num", "one");
+                .sent(false).mock("mock").merger("merger").cache("cache").validation("validation")
+                .appendParameter("default.num", "one");
 
         MethodConfig config = builder.build();
         MethodConfig config2 = builder.build();
@@ -191,5 +191,6 @@ class AbstractMethodBuilderTest {
         }
     }
 
-    private static class MethodConfig extends AbstractMethodConfig { }
+    private static class MethodConfig extends AbstractMethodConfig {
+    }
 }

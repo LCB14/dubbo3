@@ -136,14 +136,14 @@ public class JValidator implements Validator {
     /**
      * try to generate methodParameterClass.
      *
-     * @param clazz interface class
-     * @param method invoke method
+     * @param clazz              interface class
+     * @param method             invoke method
      * @param parameterClassName generated parameterClassName
      * @return Class<?> generated methodParameterClass
      * @throws Exception
      */
     private static Class<?> generateMethodParameterClass(Class<?> clazz, Method method, String parameterClassName)
-        throws Exception {
+            throws Exception {
         ClassPool pool = ClassGenerator.getClassPool(clazz.getClassLoader());
         synchronized (parameterClassName.intern()) {
             CtClass ctClass = null;
@@ -167,16 +167,16 @@ public class JValidator implements Validator {
                     for (Annotation annotation : annotations) {
                         if (annotation.annotationType().isAnnotationPresent(Constraint.class)) {
                             javassist.bytecode.annotation.Annotation ja = new javassist.bytecode.annotation.Annotation(
-                                classFile.getConstPool(), pool.getCtClass(annotation.annotationType().getName()));
+                                    classFile.getConstPool(), pool.getCtClass(annotation.annotationType().getName()));
                             Method[] members = annotation.annotationType().getMethods();
                             for (Method member : members) {
                                 if (Modifier.isPublic(member.getModifiers())
-                                    && member.getParameterTypes().length == 0
-                                    && member.getDeclaringClass() == annotation.annotationType()) {
+                                        && member.getParameterTypes().length == 0
+                                        && member.getDeclaringClass() == annotation.annotationType()) {
                                     Object value = member.invoke(annotation);
                                     if (null != value) {
                                         MemberValue memberValue = createMemberValue(
-                                            classFile.getConstPool(), pool.get(member.getReturnType().getName()), value);
+                                                classFile.getConstPool(), pool.get(member.getReturnType().getName()), value);
                                         ja.addMemberValue(member.getName(), memberValue);
                                     }
                                 }
@@ -277,7 +277,7 @@ public class JValidator implements Validator {
         Set<ConstraintViolation<?>> violations = new HashSet<>();
         Method method = clazz.getMethod(methodName, parameterTypes);
         Class<?>[] methodClasses;
-        if (method.isAnnotationPresent(MethodValidated.class)){
+        if (method.isAnnotationPresent(MethodValidated.class)) {
             methodClasses = method.getAnnotation(MethodValidated.class).value();
             groups.addAll(Arrays.asList(methodClasses));
         }
@@ -290,7 +290,7 @@ public class JValidator implements Validator {
 
         Object parameterBean = getMethodParameterBean(clazz, method, arguments);
         if (parameterBean != null) {
-            violations.addAll(validator.validate(parameterBean, classgroups ));
+            violations.addAll(validator.validate(parameterBean, classgroups));
         }
 
         for (Object arg : arguments) {

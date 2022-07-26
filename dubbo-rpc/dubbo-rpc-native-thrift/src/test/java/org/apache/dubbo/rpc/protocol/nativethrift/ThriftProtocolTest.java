@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
 public class ThriftProtocolTest {
 
     @Test
-    public void testThriftProtocol() throws TException{
+    public void testThriftProtocol() throws TException {
         DemoServiceImpl server = new DemoServiceImpl();
         ProxyFactory proxyFactory = ExtensionLoader.getExtensionLoader(ProxyFactory.class).getAdaptiveExtension();
         Protocol protocol = ExtensionLoader.getExtensionLoader(Protocol.class).getAdaptiveExtension();
@@ -50,7 +50,7 @@ public class ThriftProtocolTest {
     }
 
     @Test
-    public void testThriftProtocolMultipleServices() throws TException{
+    public void testThriftProtocolMultipleServices() throws TException {
 
         ProxyFactory proxyFactory = ExtensionLoader.getExtensionLoader(ProxyFactory.class).getAdaptiveExtension();
         Protocol protocol = ExtensionLoader.getExtensionLoader(Protocol.class).getAdaptiveExtension();

@@ -130,7 +130,7 @@ public class MockProviderRpcExceptionTest {
             return "something3";
         }
 
-        public String getSomething4(){
+        public String getSomething4() {
             throw new RpcException("getSomething4|RpcException");
         }
 
@@ -176,7 +176,7 @@ public class MockProviderRpcExceptionTest {
             return "something3mock";
         }
 
-        public String getSomething4(){
+        public String getSomething4() {
             return "something4mock";
         }
 

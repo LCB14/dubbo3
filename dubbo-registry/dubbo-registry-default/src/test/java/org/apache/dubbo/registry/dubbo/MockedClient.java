@@ -33,7 +33,6 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * MockedClient
- *
  */
 public class MockedClient implements ExchangeClient {
 
@@ -87,7 +86,7 @@ public class MockedClient implements ExchangeClient {
     public CompletableFuture<Object> request(Object msg, int timeout) throws RemotingException {
         this.invoked = msg;
         return new CompletableFuture<Object>() {
-            public Object get()  throws InterruptedException, ExecutionException {
+            public Object get() throws InterruptedException, ExecutionException {
                 return received;
             }
 

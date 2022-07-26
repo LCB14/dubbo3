@@ -191,7 +191,7 @@ public class GenericFilter extends ListenableFilter {
                                 GENERIC_SERIALIZATION_PROTOBUF +
                                 "] serialize result failed.", e);
                     }
-                } else if(ProtocolUtils.isGenericReturnRawResult(generic)) {
+                } else if (ProtocolUtils.isGenericReturnRawResult(generic)) {
                     return;
                 } else {
                     appResponse.setValue(PojoUtils.generalize(appResponse.getValue()));

@@ -121,7 +121,7 @@ public class MockClusterInvokerTest {
         url = url.addParameter(MOCK_KEY, "force:return null");
 
         URL mockUrl = URL.valueOf("mock://localhost/" + IHelloService.class.getName()
-                + "?getSomething.mock=return aa&getSomething3xx.mock=return xx")
+                        + "?getSomething.mock=return aa&getSomething3xx.mock=return xx")
                 .addParameters(url.getParameters());
 
         Protocol protocol = new MockProtocol();
@@ -153,7 +153,7 @@ public class MockClusterInvokerTest {
         url = url.addParameter(MOCK_KEY, "force");
         Invoker<IHelloService> cluster = getClusterInvoker(url);
         URL mockUrl = URL.valueOf("mock://localhost/" + IHelloService.class.getName()
-                + "?getSomething.mock=return aa&getSomething3xx.mock=return xx&sayHello.mock=return ")
+                        + "?getSomething.mock=return aa&getSomething3xx.mock=return xx&sayHello.mock=return ")
                 .addParameters(url.getParameters());
 
         Protocol protocol = new MockProtocol();
@@ -708,7 +708,7 @@ public class MockClusterInvokerTest {
             return "something3";
         }
 
-        public String getSomething4(){
+        public String getSomething4() {
             throw new RpcException("getSomething4|RpcException");
         }
 
@@ -754,7 +754,7 @@ public class MockClusterInvokerTest {
             return "something3mock";
         }
 
-        public String getSomething4(){
+        public String getSomething4() {
             return "something4mock";
         }
 

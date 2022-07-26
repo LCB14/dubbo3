@@ -48,6 +48,7 @@ import static org.apache.dubbo.monitor.Constants.COUNT_PROTOCOL;
 import static org.apache.dubbo.common.constants.CommonConstants.MONITOR_KEY;
 import static org.apache.dubbo.rpc.Constants.INPUT_KEY;
 import static org.apache.dubbo.rpc.Constants.OUTPUT_KEY;
+
 /**
  * MonitorFilter. (SPI, Singleton, ThreadSafe)
  */
@@ -60,6 +61,7 @@ public class MonitorFilter extends ListenableFilter {
     public MonitorFilter() {
         super.listener = new MonitorListener();
     }
+
     /**
      * The Concurrent counter
      */

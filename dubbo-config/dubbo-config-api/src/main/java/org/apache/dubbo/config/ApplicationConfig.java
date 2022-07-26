@@ -345,6 +345,7 @@ public class ApplicationConfig extends AbstractConfig {
 
     /**
      * The format is the same as the springboot, including: getQosEnableCompatible(), getQosPortCompatible(), getQosAcceptForeignIpCompatible().
+     *
      * @return
      */
     @Parameter(key = QOS_ENABLE_COMPATIBLE, excluded = true)

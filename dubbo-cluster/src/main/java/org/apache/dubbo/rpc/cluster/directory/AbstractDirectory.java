@@ -37,7 +37,6 @@ import static org.apache.dubbo.common.constants.RegistryConstants.REGISTRY_PROTO
 
 /**
  * Abstract implementation of Directory: Invoker list returned from this Directory's list method have been filtered by Routers
- *
  */
 public abstract class AbstractDirectory<T> implements Directory<T> {
 

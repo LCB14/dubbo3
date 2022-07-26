@@ -160,7 +160,7 @@ public class ConfigManager {
 
         if (providers.containsKey(key) && !providerConfig.equals(providers.get(key))) {
             logger.warn("Duplicate ProviderConfig found, there already has one default ProviderConfig or more than two ProviderConfigs have the same id, " +
-                                                    "you can try to give each ProviderConfig a different id. " + providerConfig);
+                    "you can try to give each ProviderConfig a different id. " + providerConfig);
         } else {
             providers.put(key, providerConfig);
         }
@@ -189,7 +189,7 @@ public class ConfigManager {
 
         if (consumers.containsKey(key) && !consumerConfig.equals(consumers.get(key))) {
             logger.warn("Duplicate ConsumerConfig found, there already has one default ConsumerConfig or more than two ConsumerConfigs have the same id, " +
-                                                    "you can try to give each ConsumerConfig a different id. " + consumerConfig);
+                    "you can try to give each ConsumerConfig a different id. " + consumerConfig);
         } else {
             consumers.put(key, consumerConfig);
         }
@@ -232,7 +232,7 @@ public class ConfigManager {
 
         if (protocols.containsKey(key) && !protocolConfig.equals(protocols.get(key))) {
             logger.warn("Duplicate ProtocolConfig found, there already has one default ProtocolConfig or more than two ProtocolConfigs have the same id, " +
-                                                    "you can try to give each ProtocolConfig a different id. " + protocolConfig);
+                    "you can try to give each ProtocolConfig a different id. " + protocolConfig);
         } else {
             protocols.put(key, protocolConfig);
         }
@@ -275,7 +275,7 @@ public class ConfigManager {
 
         if (registries.containsKey(key) && !registryConfig.equals(registries.get(key))) {
             logger.warn("Duplicate RegistryConfig found, there already has one default RegistryConfig or more than two RegistryConfigs have the same id, " +
-                                                    "you can try to give each RegistryConfig a different id. " + registryConfig);
+                    "you can try to give each RegistryConfig a different id. " + registryConfig);
         } else {
             registries.put(key, registryConfig);
         }

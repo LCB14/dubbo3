@@ -149,6 +149,7 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
                 }
             }
         }
+
         if (getApplication() == null
                 && (getProvider() == null || getProvider().getApplication() == null)) {
             Map<String, ApplicationConfig> applicationConfigMap = applicationContext == null ? null : BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, ApplicationConfig.class, false, false);
@@ -165,6 +166,7 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
                 }
             }
         }
+
         if (getModule() == null
                 && (getProvider() == null || getProvider().getModule() == null)) {
             Map<String, ModuleConfig> moduleConfigMap = applicationContext == null ? null : BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, ModuleConfig.class, false, false);
@@ -306,6 +308,7 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
                 }
             }
         }
+
         if (StringUtils.isEmpty(getPath())) {
             if (StringUtils.isNotEmpty(beanName)
                     && StringUtils.isNotEmpty(getInterface())
@@ -313,6 +316,12 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
                 setPath(beanName);
             }
         }
+
+        /**
+         * supportedApplicationListener 表示当前的 Spring 容器是否支持 ApplicationListener，这个值初始为 false。
+         * 在 Spring 容器将自己设置到 ServiceBean 中时，ServiceBean 的 setApplicationContext 方法会检测 Spring 容器
+         * 是否支持 ApplicationListener。若支持，则将 supportedApplicationListener 置为 true。
+         */
         if (!supportedApplicationListener) {
             export();
         }

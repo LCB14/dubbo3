@@ -17,6 +17,7 @@
 package org.apache.dubbo.registry.sofa;
 
 /**
+ *
  */
 public interface HelloService {
 

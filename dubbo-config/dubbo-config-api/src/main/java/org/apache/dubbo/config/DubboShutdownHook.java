@@ -42,7 +42,7 @@ public class DubboShutdownHook extends Thread {
     /**
      * Has it already been destroyed or not?
      */
-    private final AtomicBoolean destroyed= new AtomicBoolean(false);
+    private final AtomicBoolean destroyed = new AtomicBoolean(false);
 
     private DubboShutdownHook(String name) {
         super(name);

@@ -51,7 +51,6 @@ import static org.apache.dubbo.common.constants.CommonConstants.HOST_KEY;
 
 /**
  * ConditionRouter
- *
  */
 public class ConditionRouter extends AbstractRouter {
     public static final String NAME = "condition";

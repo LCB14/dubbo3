@@ -533,7 +533,7 @@ public class ThriftCodec implements Codec2 {
         RequestData rd = CACHED_REQUEST.get(response.getId());
 
         String resultClassName = ExtensionLoader.getExtensionLoader(ClassNameGenerator.class).getExtension(
-                channel.getUrl().getParameter(ThriftConstants.CLASS_NAME_GENERATOR_KEY, ThriftClassNameGenerator.NAME))
+                        channel.getUrl().getParameter(ThriftConstants.CLASS_NAME_GENERATOR_KEY, ThriftClassNameGenerator.NAME))
                 .generateResultClassName(rd.serviceName, rd.methodName);
 
         if (StringUtils.isEmpty(resultClassName)) {

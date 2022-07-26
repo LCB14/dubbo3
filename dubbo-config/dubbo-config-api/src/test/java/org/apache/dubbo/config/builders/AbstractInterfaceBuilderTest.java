@@ -254,13 +254,13 @@ class AbstractInterfaceBuilderTest {
 
         InterfaceBuilder builder = new InterfaceBuilder();
         builder.id("id").prefix("prefix").local(true).stub(false).monitor("123").proxy("mockproxyfactory").cluster("mockcluster")
-            .filter("mockfilter").listener("mockinvokerlistener").owner("owner").connections(1)
-            .layer("layer").application(applicationConfig).module(moduleConfig)
-            .addRegistry(registryConfig).registryIds("registryIds")
-            .onconnect("onconnet").ondisconnect("ondisconnect")
-            .metadataReportConfig(metadataReportConfig)
-            .configCenter(configCenterConfig)
-            .callbacks(2).scope("scope");
+                .filter("mockfilter").listener("mockinvokerlistener").owner("owner").connections(1)
+                .layer("layer").application(applicationConfig).module(moduleConfig)
+                .addRegistry(registryConfig).registryIds("registryIds")
+                .onconnect("onconnet").ondisconnect("ondisconnect")
+                .metadataReportConfig(metadataReportConfig)
+                .configCenter(configCenterConfig)
+                .callbacks(2).scope("scope");
 
         InterfaceConfig config = builder.build();
         InterfaceConfig config2 = builder.build();
@@ -306,5 +306,6 @@ class AbstractInterfaceBuilderTest {
         }
     }
 
-    private static class InterfaceConfig extends AbstractInterfaceConfig { }
+    private static class InterfaceConfig extends AbstractInterfaceConfig {
+    }
 }

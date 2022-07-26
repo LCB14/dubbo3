@@ -36,7 +36,7 @@ public class ThriftUtilsTest {
                 $__DemoStub.echoString_args.class.getName(),
                 ExtensionLoader.getExtensionLoader(ClassNameGenerator.class)
                         .getExtension(DubboClassNameGenerator.NAME).generateArgsClassName(
-                        org.apache.dubbo.rpc.gen.dubbo.Demo.class.getName(), "echoString"));
+                                org.apache.dubbo.rpc.gen.dubbo.Demo.class.getName(), "echoString"));
 
     }
 
@@ -51,7 +51,7 @@ public class ThriftUtilsTest {
         Assertions.assertEquals($__DemoStub.echoString_result.class.getName(),
                 ExtensionLoader.getExtensionLoader(ClassNameGenerator.class)
                         .getExtension(DubboClassNameGenerator.NAME).generateResultClassName(
-                        org.apache.dubbo.rpc.gen.dubbo.Demo.class.getName(), "echoString"));
+                                org.apache.dubbo.rpc.gen.dubbo.Demo.class.getName(), "echoString"));
 
     }
 
@@ -65,8 +65,8 @@ public class ThriftUtilsTest {
         Assertions.assertEquals(org.apache.dubbo.rpc.gen.thrift.Demo.echoString_args.class.getName(),
                 ExtensionLoader.getExtensionLoader(ClassNameGenerator.class)
                         .getExtension(ThriftClassNameGenerator.NAME).generateArgsClassName(
-                        org.apache.dubbo.rpc.gen.thrift.Demo.Iface.class.getName(),
-                        "echoString"));
+                                org.apache.dubbo.rpc.gen.thrift.Demo.Iface.class.getName(),
+                                "echoString"));
 
     }
 
@@ -80,8 +80,8 @@ public class ThriftUtilsTest {
         Assertions.assertEquals(org.apache.dubbo.rpc.gen.thrift.Demo.echoString_result.class.getName(),
                 ExtensionLoader.getExtensionLoader(ClassNameGenerator.class)
                         .getExtension(ThriftClassNameGenerator.NAME).generateResultClassName(
-                        org.apache.dubbo.rpc.gen.thrift.Demo.Iface.class.getName(),
-                        "echoString"));
+                                org.apache.dubbo.rpc.gen.thrift.Demo.Iface.class.getName(),
+                                "echoString"));
 
     }
 

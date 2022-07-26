@@ -40,8 +40,8 @@ public class XmlRpcProxyFactoryBean extends UrlBasedRemoteAccessor
         FactoryBean<Object>,
         ApplicationContextAware {
 
-    private Object				proxyObject			= null;
-    private XmlRpcClient xmlRpcClient	= null;
+    private Object proxyObject = null;
+    private XmlRpcClient xmlRpcClient = null;
 //    private Map<String, String> extraHttpHeaders	= new HashMap<String, String>();
 
 
@@ -89,8 +89,8 @@ public class XmlRpcProxyFactoryBean extends UrlBasedRemoteAccessor
                 ? invocation.getMethod().getGenericReturnType()
                 : invocation.getMethod().getReturnType();
 
-        return xmlRpcClient.execute(replace(method.getDeclaringClass().getName())+"."
-                +invocation.getMethod().getName(),invocation.getArguments());
+        return xmlRpcClient.execute(replace(method.getDeclaringClass().getName()) + "."
+                + invocation.getMethod().getName(), invocation.getArguments());
 
 //        // get arguments
 //        Object arguments = ReflectionUtil.parseArguments(
@@ -136,7 +136,7 @@ public class XmlRpcProxyFactoryBean extends UrlBasedRemoteAccessor
     }
 
     public static final String replace(String name) {
-        return name.replaceAll("\\.","_");
+        return name.replaceAll("\\.", "_");
     }
 
 }

@@ -37,8 +37,9 @@ public class RandomLoadBalance extends AbstractLoadBalance {
 
     /**
      * Select one invoker between a list using a random criteria
-     * @param invokers List of possible invokers
-     * @param url URL
+     *
+     * @param invokers   List of possible invokers
+     * @param url        URL
      * @param invocation Invocation
      * @param <T>
      * @return The selected invoker

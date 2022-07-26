@@ -167,6 +167,7 @@ public interface EtcdClient {
 
     /**
      * Get the value of the specified key.
+     *
      * @param key the specified key
      * @return null if the value is not found
      */
@@ -174,7 +175,8 @@ public interface EtcdClient {
 
     /**
      * Put the key value pair to etcd
-     * @param key the specified key
+     *
+     * @param key   the specified key
      * @param value the paired value
      * @return true if put success
      */

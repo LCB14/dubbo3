@@ -86,7 +86,7 @@ public final class Version {
 
     /**
      * Check the framework release version number to decide if it's 2.6.3 or higher
-     *
+     * <p>
      * Because response attachments feature is firstly introduced in 2.6.3
      * and moreover we have no other approach to know the framework's version, so we use
      * isSupportResponseAttachment to decide if it's v2.6.3.

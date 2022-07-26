@@ -136,7 +136,7 @@ public class ClassHelper {
     }
 
     public static Object convertPrimitive(Class<?> type, String value) {
-        return ClassUtils.convertPrimitive(type,value);
+        return ClassUtils.convertPrimitive(type, value);
     }
 
 
@@ -148,6 +148,6 @@ public class ClassHelper {
      * @return
      */
     public static boolean isTypeMatch(Class<?> type, String value) {
-    return ClassUtils.isTypeMatch(type,value);
+        return ClassUtils.isTypeMatch(type, value);
     }
 }

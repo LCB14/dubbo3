@@ -31,7 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * StatusTest
- *
  */
 public class RegistryStatusCheckerTest {
 

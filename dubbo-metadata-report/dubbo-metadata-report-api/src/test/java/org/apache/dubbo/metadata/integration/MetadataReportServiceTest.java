@@ -95,7 +95,7 @@ public class MetadataReportServiceTest {
 
         String value = jTestMetadataReport4Test.store.get(JTestMetadataReport4Test.getProviderKey(publishUrl));
         FullServiceDefinition fullServiceDefinition = toServiceDefinition(value);
-        Map<String,String> map = fullServiceDefinition.getParameters();
+        Map<String, String> map = fullServiceDefinition.getParameters();
         Assertions.assertEquals(map.get("application"), "vicpubp");
         Assertions.assertEquals(map.get("version"), "1.0.3");
         Assertions.assertEquals(map.get("interface"), "org.apache.dubbo.metadata.integration.InterfaceNameTestService");

@@ -90,7 +90,7 @@ public class AnnotationUtils {
             String interfaceClassName = getAttribute(attributes, "interfaceName");
             Assert.hasText(interfaceClassName,
                     "@Reference interfaceName() must be present when reference a generic service!");
-                return interfaceClassName;
+            return interfaceClassName;
         }
         return resolveServiceInterfaceClass(attributes, defaultInterfaceClass).getName();
     }

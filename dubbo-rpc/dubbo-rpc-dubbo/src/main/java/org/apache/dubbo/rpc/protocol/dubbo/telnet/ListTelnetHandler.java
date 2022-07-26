@@ -119,7 +119,7 @@ public class ListTelnetHandler implements TelnetHandler {
 
     private void printSpecifiedProvidedService(String service, StringBuilder buf, boolean detail) {
         for (ProviderModel provider : ApplicationModel.allProviderModels()) {
-            if (isProviderMatched(service,provider)) {
+            if (isProviderMatched(service, provider)) {
                 buf.append(provider.getServiceName()).append(" (as provider):\r\n");
                 for (ProviderMethodModel method : provider.getAllMethods()) {
                     printMethod(method.getMethod(), buf, detail);
@@ -130,7 +130,7 @@ public class ListTelnetHandler implements TelnetHandler {
 
     private void printSpecifiedReferredService(String service, StringBuilder buf, boolean detail) {
         for (ConsumerModel consumer : ApplicationModel.allConsumerModels()) {
-            if (isConsumerMatcher(service,consumer)) {
+            if (isConsumerMatcher(service, consumer)) {
                 buf.append(consumer.getServiceName()).append(" (as consumer):\r\n");
                 for (ConsumerMethodModel method : consumer.getAllMethods()) {
                     printMethod(method.getMethod(), buf, detail);
@@ -154,7 +154,7 @@ public class ListTelnetHandler implements TelnetHandler {
                 || service.equalsIgnoreCase(provider.getServiceInterfaceClass().getSimpleName());
     }
 
-    private boolean isConsumerMatcher(String service,ConsumerModel consumer) {
+    private boolean isConsumerMatcher(String service, ConsumerModel consumer) {
         return service.equalsIgnoreCase(consumer.getServiceName())
                 || service.equalsIgnoreCase(consumer.getServiceInterfaceClass().getName())
                 || service.equalsIgnoreCase(consumer.getServiceInterfaceClass().getSimpleName());

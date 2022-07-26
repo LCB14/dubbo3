@@ -146,5 +146,6 @@ class AbstractReferenceBuilderTest {
         }
     }
 
-    private static class ReferenceConfig extends AbstractReferenceConfig { }
+    private static class ReferenceConfig extends AbstractReferenceConfig {
+    }
 }

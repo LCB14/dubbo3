@@ -19,8 +19,10 @@ package org.apache.dubbo.rpc;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
+
 import org.junit.jupiter.api.Test;
 import com.alibaba.dubbo.rpc.RpcContext;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RpcContextTest {

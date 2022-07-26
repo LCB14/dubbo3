@@ -49,7 +49,6 @@ public class ProtocolFilterWrapper implements Protocol {
     }
 
 
-
     private static <T> Invoker<T> buildInvokerChain(final Invoker<T> invoker, String key, String group) {
         Invoker<T> last = invoker;
         List<Filter> filters = ExtensionLoader.getExtensionLoader(Filter.class).getActivateExtension(invoker.getUrl(), key, group);
@@ -138,7 +137,7 @@ public class ProtocolFilterWrapper implements Protocol {
     /**
      * Register callback for each filter may be better, just like {@link java.util.concurrent.CompletionStage}, each callback
      * registration generates a new CompletionStage whose status is determined by the original CompletionStage.
-     *
+     * <p>
      * If bridging status between filters is proved to not has significant performance drop, consider revert to the following commit:
      * https://github.com/apache/dubbo/pull/4127
      */

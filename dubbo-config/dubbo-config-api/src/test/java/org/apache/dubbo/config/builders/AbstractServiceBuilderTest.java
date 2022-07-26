@@ -101,7 +101,7 @@ class AbstractServiceBuilderTest {
         builder.token(true);
         Assertions.assertEquals("true", builder.build().getToken());
         builder.token(false);
-        Assertions.assertEquals("false",builder.build().getToken());
+        Assertions.assertEquals("false", builder.build().getToken());
         builder.token((Boolean) null);
         Assertions.assertNull(builder.build().getToken());
     }
@@ -119,7 +119,7 @@ class AbstractServiceBuilderTest {
         builder.accesslog(true);
         Assertions.assertEquals("true", builder.build().getAccesslog());
         builder.accesslog(false);
-        Assertions.assertEquals("false",builder.build().getAccesslog());
+        Assertions.assertEquals("false", builder.build().getAccesslog());
         builder.accesslog((Boolean) null);
         Assertions.assertNull(builder.build().getAccesslog());
     }

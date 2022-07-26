@@ -829,7 +829,7 @@ public final class StringUtils {
         if (str != null && !isEmpty(str)) {
             int sz = str.length();
 
-            for(int i = 0; i < sz; ++i) {
+            for (int i = 0; i < sz; ++i) {
                 if (!Character.isUpperCase(str.charAt(i))) {
                     return false;
                 }

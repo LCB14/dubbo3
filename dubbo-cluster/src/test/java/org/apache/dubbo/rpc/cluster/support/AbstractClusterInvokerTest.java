@@ -151,7 +151,7 @@ public class AbstractClusterInvokerTest {
         // setup attachment
         RpcContext.getContext().setAttachment(attachKey, attachValue);
         Map<String, String> attachments = RpcContext.getContext().getAttachments();
-        Assertions.assertTrue( attachments != null && attachments.size() == 1,"set attachment failed!");
+        Assertions.assertTrue(attachments != null && attachments.size() == 1, "set attachment failed!");
 
         cluster = new AbstractClusterInvoker(dic) {
             @Override
@@ -159,7 +159,7 @@ public class AbstractClusterInvokerTest {
                     throws RpcException {
                 // attachment will be bind to invocation
                 String value = invocation.getAttachment(attachKey);
-                Assertions.assertTrue(value != null && value.equals(attachValue),"binding attachment failed!");
+                Assertions.assertTrue(value != null && value.equals(attachValue), "binding attachment failed!");
                 return null;
             }
         };
@@ -171,7 +171,7 @@ public class AbstractClusterInvokerTest {
     @Test
     public void testSelect_Invokersize0() throws Exception {
         LoadBalance l = cluster.initLoadBalance(invokers, invocation);
-        Assertions.assertNotNull(l,"cluster.initLoadBalance returns null!");
+        Assertions.assertNotNull(l, "cluster.initLoadBalance returns null!");
         {
             Invoker invoker = cluster.select(l, null, null, null);
             Assertions.assertNull(invoker);
@@ -189,7 +189,7 @@ public class AbstractClusterInvokerTest {
         invokers.clear();
         invokers.add(invoker1);
         LoadBalance l = cluster.initLoadBalance(invokers, invocation);
-        Assertions.assertNotNull(l,"cluster.initLoadBalance returns null!");
+        Assertions.assertNotNull(l, "cluster.initLoadBalance returns null!");
         Invoker invoker = cluster.select(l, null, invokers, null);
         Assertions.assertEquals(invoker1, invoker);
     }
@@ -200,7 +200,7 @@ public class AbstractClusterInvokerTest {
         invokers.add(invoker2);
         invokers.add(invoker4);
         LoadBalance l = cluster.initLoadBalance(invokers, invocation);
-        Assertions.assertNotNull(l,"cluster.initLoadBalance returns null!");
+        Assertions.assertNotNull(l, "cluster.initLoadBalance returns null!");
         {
             selectedInvokers.clear();
             selectedInvokers.add(invoker4);
@@ -441,7 +441,7 @@ public class AbstractClusterInvokerTest {
             Long count = entry.getValue().get();
 //            System.out.println(count);
             if (entry.getKey().isAvailable())
-                Assertions.assertTrue(count > runs / invokers.size(),"count should > avg");
+                Assertions.assertTrue(count > runs / invokers.size(), "count should > avg");
         }
 
         Assertions.assertEquals(runs, counter.get(invoker2).get() + counter.get(invoker4).get());

@@ -34,7 +34,6 @@ import static org.apache.dubbo.rpc.Constants.CALLBACK_INSTANCES_LIMIT_KEY;
 
 /**
  * SimpleRegistryExporter
- *
  */
 public class SimpleRegistryExporter {
 

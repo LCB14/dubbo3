@@ -82,10 +82,10 @@ public class ClusterUtils {
         if (localMap != null && localMap.size() > 0) {
             Map<String, String> copyOfLocalMap = new HashMap<>(localMap);
 
-            if(map.containsKey(GROUP_KEY)){
+            if (map.containsKey(GROUP_KEY)) {
                 copyOfLocalMap.remove(GROUP_KEY);
             }
-            if(map.containsKey(VERSION_KEY)){
+            if (map.containsKey(VERSION_KEY)) {
                 copyOfLocalMap.remove(VERSION_KEY);
             }
 

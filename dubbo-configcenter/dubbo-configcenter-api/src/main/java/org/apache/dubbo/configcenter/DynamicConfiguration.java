@@ -128,12 +128,12 @@ public interface DynamicConfiguration extends Configuration {
                 .getDynamicConfiguration(null));
     }
 
-     /**
+    /**
      * The format is '{interfaceName}:[version]:[group]'
      *
      * @return
      */
-     static String getRuleKey(URL url) {
+    static String getRuleKey(URL url) {
         return url.getColonSeparatedKey();
     }
 }

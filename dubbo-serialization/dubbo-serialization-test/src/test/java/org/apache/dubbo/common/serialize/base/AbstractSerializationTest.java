@@ -294,7 +294,7 @@ public abstract class AbstractSerializationTest {
                 byteArrayOutputStream.toByteArray());
         ObjectInput deserialize = serialization.deserialize(url, byteArrayInputStream);
 
-        assertEquals(1.28F,deserialize.readFloat());
+        assertEquals(1.28F, deserialize.readFloat());
 
         try {
             deserialize.readFloat();
@@ -315,7 +315,7 @@ public abstract class AbstractSerializationTest {
                 byteArrayOutputStream.toByteArray());
         ObjectInput deserialize = serialization.deserialize(url, byteArrayInputStream);
 
-        assertEquals(1.28,deserialize.readDouble());
+        assertEquals(1.28, deserialize.readDouble());
 
         try {
             deserialize.readDouble();
@@ -1130,7 +1130,7 @@ public abstract class AbstractSerializationTest {
         try {
             ObjectInput deserialize = serialization.deserialize(url, byteArrayInputStream);
             @SuppressWarnings("unused") // local variable, convenient for debug
-                    Object read = deserialize.readObject();
+            Object read = deserialize.readObject();
             fail();
         } catch (IOException expected) {
             System.out.println(expected);
@@ -1154,7 +1154,7 @@ public abstract class AbstractSerializationTest {
         try {
             ObjectInput deserialize = serialization.deserialize(url, byteArrayInputStream);
             @SuppressWarnings("unused") // local variable, convenient for debug
-                    Object read = deserialize.readObject(MediaContent.class);
+            Object read = deserialize.readObject(MediaContent.class);
             fail();
         } catch (IOException expected) {
             System.out.println(expected);

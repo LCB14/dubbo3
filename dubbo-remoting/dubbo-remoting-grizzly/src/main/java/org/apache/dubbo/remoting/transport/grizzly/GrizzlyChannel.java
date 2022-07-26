@@ -37,8 +37,6 @@ import static org.apache.dubbo.common.constants.CommonConstants.TIMEOUT_KEY;
 
 /**
  * GrizzlyChannel
- *
- *
  */
 final class GrizzlyChannel extends AbstractChannel {
 

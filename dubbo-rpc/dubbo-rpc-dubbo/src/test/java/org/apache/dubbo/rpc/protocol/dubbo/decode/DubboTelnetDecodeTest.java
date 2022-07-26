@@ -164,13 +164,13 @@ public class DubboTelnetDecodeTest {
      * |               telnet(incomplete)                 |
      * +--------------------------------------------------+
      * <p>
-     *
+     * <p>
      * Second ByteBuf:
      * +--------------------------++----------------------+
      * |  telnet(the remaining)   ||   dubbo(complete)    |
      * +--------------------------++----------------------+
-     *                            ||
-     *                        Magic Code
+     * ||
+     * Magic Code
      *
      * @throws InterruptedException
      */
@@ -236,7 +236,7 @@ public class DubboTelnetDecodeTest {
      * |               telnet(incomplete)                 |
      * +--------------------------------------------------+
      * <p>
-     *
+     * <p>
      * Second ByteBuf (secondByteBuf):
      * +--------------------------------------------------+
      * |  telnet(the remaining)   |   telnet(complete)    |
@@ -306,8 +306,8 @@ public class DubboTelnetDecodeTest {
      * +-------------------------++-----------------------+
      * |  dubbo(the remaining)   ||    dubbo(complete)    |
      * +-------------------------++-----------------------+
-     *                           ||
-     *                       Magic Code
+     * ||
+     * Magic Code
      *
      * @throws InterruptedException
      */

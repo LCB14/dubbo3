@@ -142,7 +142,8 @@ public interface Logger {
 
     /**
      * Is debug logging currently enabled?
-     * 
+     *  
+     *
      * @return true if debug is enabled
      */
     boolean isDebugEnabled();

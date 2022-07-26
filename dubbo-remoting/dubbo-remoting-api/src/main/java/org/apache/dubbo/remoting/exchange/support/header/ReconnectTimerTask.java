@@ -50,7 +50,7 @@ public class ReconnectTimerTask extends AbstractTimerTask {
                 } catch (Exception e) {
                     logger.error("Fail to connect to " + channel, e);
                 }
-            // check pong at client
+                // check pong at client
             } else if (lastRead != null && now - lastRead > idleTimeout) {
                 logger.warn("Reconnect to channel " + channel + ", because heartbeat read idle time out: "
                         + idleTimeout + "ms");

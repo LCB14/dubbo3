@@ -107,7 +107,7 @@ public class GenericServiceTest {
 
         FullServiceDefinition fullServiceDefinition = ServiceDefinitionBuilder.buildFullDefinition(DemoService.class);
         MethodDefinition methodDefinition = getMethod("complexCompute", fullServiceDefinition.getMethods());
-        Map mapObject = createComplexObject(fullServiceDefinition,var1, var2, l, var3, var4, testEnum);
+        Map mapObject = createComplexObject(fullServiceDefinition, var1, var2, l, var3, var4, testEnum);
         ComplexObject complexObject = map2bean(mapObject);
 
         Invoker<GenericService> invoker = protocol.refer(GenericService.class, url);

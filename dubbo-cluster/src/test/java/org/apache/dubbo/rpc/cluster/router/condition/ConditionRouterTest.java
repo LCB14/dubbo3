@@ -120,7 +120,6 @@ public class ConditionRouterTest {
                 FORCE_KEY, String.valueOf(true)));
 
 
-
         List<Invoker<String>> filteredInvokers1 = router1.route(invokers, URL.valueOf("consumer://" + LOCAL_HOST + "/com.foo.BarService"), new RpcInvocation());
         List<Invoker<String>> filteredInvokers2 = router2.route(invokers, URL.valueOf("consumer://" + LOCAL_HOST + "/com.foo.BarService"), new RpcInvocation());
         List<Invoker<String>> filteredInvokers3 = router3.route(invokers, URL.valueOf("consumer://" + LOCAL_HOST + "/com.foo.BarService"), new RpcInvocation());

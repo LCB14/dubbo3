@@ -17,6 +17,7 @@
 package org.apache.dubbo.config.spring.beans.factory.annotation;
 
 import java.util.Collections;
+
 import org.apache.dubbo.common.logger.Logger;
 import org.apache.dubbo.common.logger.LoggerFactory;
 import org.apache.dubbo.common.utils.ArrayUtils;
@@ -456,10 +457,10 @@ public class ServiceAnnotationBeanPostProcessor implements BeanDefinitionRegistr
     }
 
     private List convertMethodConfigs(Object methodsAnnotation) {
-        if (methodsAnnotation == null){
+        if (methodsAnnotation == null) {
             return Collections.EMPTY_LIST;
         }
-        return MethodConfig.constructMethodConfig((Method[])methodsAnnotation);
+        return MethodConfig.constructMethodConfig((Method[]) methodsAnnotation);
     }
 
     private ManagedList<RuntimeBeanReference> toRuntimeBeanReferences(String... beanNames) {

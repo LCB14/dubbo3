@@ -30,7 +30,7 @@ import java.util.Properties;
 
 /**
  * Log4jContainer. (SPI, Singleton, ThreadSafe)
- *
+ * <p>
  * The container class implementation for Log4j
  */
 public class Log4jContainer implements Container {

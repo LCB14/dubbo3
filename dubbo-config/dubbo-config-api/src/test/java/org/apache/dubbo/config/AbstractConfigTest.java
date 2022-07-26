@@ -356,7 +356,7 @@ public class AbstractConfigTest {
     }
 
     @Test
-    public void testRefreshProperties() throws Exception{
+    public void testRefreshProperties() throws Exception {
         try {
             Environment.getInstance().setExternalConfigMap(new HashMap<>());
             OverrideConfig overrideConfig = new OverrideConfig();

@@ -32,7 +32,7 @@ import static org.apache.dubbo.common.constants.CommonConstants.TIMEOUT_KEY;
  * <p>
  * mvn clean test -Dtest=*PerformanceClientTest -Dserver=10.20.153.187:9911
  */
-public class ChanelHandlerTest  {
+public class ChanelHandlerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ChanelHandlerTest.class);
 

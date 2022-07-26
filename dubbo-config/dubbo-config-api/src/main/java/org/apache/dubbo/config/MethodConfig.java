@@ -135,13 +135,13 @@ public class MethodConfig extends AbstractMethodConfig {
 
         this.setReturn(method.isReturn());
 
-        if(!"".equals(method.oninvoke())){
+        if (!"".equals(method.oninvoke())) {
             this.setOninvoke(method.oninvoke());
         }
-        if(!"".equals(method.onreturn())){
+        if (!"".equals(method.onreturn())) {
             this.setOnreturn(method.onreturn());
         }
-        if(!"".equals(method.onthrow())){
+        if (!"".equals(method.onthrow())) {
             this.setOnthrow(method.onthrow());
         }
 

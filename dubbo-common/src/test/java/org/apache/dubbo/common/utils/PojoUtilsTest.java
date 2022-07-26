@@ -136,7 +136,7 @@ public class PojoUtilsTest {
 
     @Test
     public void test_has_no_nullary_constructor_pojo() {
-        assertObject(new User(1,"fibbery"));
+        assertObject(new User(1, "fibbery"));
     }
 
     @Test
@@ -696,7 +696,7 @@ public class PojoUtilsTest {
         assertTrue(personInfo.isMale());
         assertFalse(personInfo.isFemale());
     }
-  
+
     @Test
     public void testRealizeCollectionWithNullElement() {
         LinkedList<String> listStr = new LinkedList<>();

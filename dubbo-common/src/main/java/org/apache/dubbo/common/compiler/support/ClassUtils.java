@@ -431,7 +431,7 @@ public class ClassUtils {
         }
         return map;
     }
-    
+
     /**
      * get simple class name from qualified class name
      */
@@ -439,7 +439,7 @@ public class ClassUtils {
         if (null == qualifiedName) {
             return null;
         }
-        
+
         int i = qualifiedName.lastIndexOf('.');
         return i < 0 ? qualifiedName : qualifiedName.substring(i + 1);
     }

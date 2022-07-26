@@ -66,7 +66,7 @@ public class IOUtils {
         return write(is, os, buff);
     }
 
-    public static long write (final InputStream input, final OutputStream output, final byte[] buffer) throws IOException {
+    public static long write(final InputStream input, final OutputStream output, final byte[] buffer) throws IOException {
         long count = 0;
         int n;
         while (EOF != (n = input.read(buffer))) {

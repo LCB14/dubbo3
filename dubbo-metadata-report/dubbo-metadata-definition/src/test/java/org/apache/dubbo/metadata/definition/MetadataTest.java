@@ -40,6 +40,7 @@ import org.junit.jupiter.api.Test;
 public class MetadataTest {
 
     /**
+     *
      */
     @Test
     public void testInnerClassType() {
@@ -67,6 +68,7 @@ public class MetadataTest {
     }
 
     /**
+     *
      */
     @Test
     public void testRawMap() {

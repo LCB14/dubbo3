@@ -43,7 +43,7 @@ import static org.apache.dubbo.remoting.Constants.DEFAULT_BUFFER_SIZE;
  * <p>
  * mvn clean test -Dtest=*PerformanceServerTest -Dport=9911
  */
-public class PerformanceServerTest  {
+public class PerformanceServerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(PerformanceServerTest.class);
     private static ExchangeServer server = null;

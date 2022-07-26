@@ -44,7 +44,6 @@ import static org.apache.dubbo.remoting.Constants.SERIALIZATION_KEY;
  * </pre>
  *
  * @see Filter
- *
  */
 public class CompatibleFilter extends ListenableFilter {
 

@@ -29,7 +29,6 @@ import static org.apache.dubbo.common.serialize.Constants.PROTOBUF_JSON_SERIALIZ
 /**
  * This serizalization is use for google protobuf generic reference.
  * The entity be transported between client and server by json string.
- *
  */
 public class GenericProtobufSerialization implements Serialization {
 

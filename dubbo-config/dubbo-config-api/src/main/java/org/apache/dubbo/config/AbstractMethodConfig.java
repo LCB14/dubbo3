@@ -70,7 +70,7 @@ public abstract class AbstractMethodConfig extends AbstractConfig {
 
     /**
      * The name of mock class which gets called when a service fails to execute
-     *
+     * <p>
      * note that: the mock doesn't support on the provider side，and the mock is executed when a non-business exception
      * occurs after a remote service call
      */

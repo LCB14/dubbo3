@@ -52,7 +52,6 @@ import static org.apache.dubbo.rpc.Constants.CALLBACK_INSTANCES_LIMIT_KEY;
 
 /**
  * DubboRegistryFactory
- *
  */
 public class DubboRegistryFactory extends AbstractRegistryFactory {
 

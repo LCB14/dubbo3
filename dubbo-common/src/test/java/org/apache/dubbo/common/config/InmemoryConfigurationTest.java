@@ -88,7 +88,7 @@ class InmemoryConfigurationTest {
      * Clean.
      */
     @AfterEach
-    public void clean(){
+    public void clean() {
 
     }
 

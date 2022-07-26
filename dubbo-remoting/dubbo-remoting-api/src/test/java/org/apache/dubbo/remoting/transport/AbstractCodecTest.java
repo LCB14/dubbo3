@@ -29,7 +29,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class AbstractCodecTest  {
+public class AbstractCodecTest {
 
     public void test_checkPayload_default8M() throws Exception {
         Channel channel = mock(Channel.class);

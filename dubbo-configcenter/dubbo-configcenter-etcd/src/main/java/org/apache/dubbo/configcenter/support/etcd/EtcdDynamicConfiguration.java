@@ -118,7 +118,7 @@ public class EtcdDynamicConfiguration implements DynamicConfiguration {
     }
 
     private void recover() {
-        for (EtcdConfigWatcher watcher: watchListenerMap.values()) {
+        for (EtcdConfigWatcher watcher : watchListenerMap.values()) {
             watcher.watch();
         }
     }

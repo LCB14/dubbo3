@@ -101,6 +101,10 @@ public class ExtensionLoader<T> {
 
     private ExtensionLoader(Class<?> type) {
         this.type = type;
+        /**
+         * 除了ExtensionFactory.class拓展点，不支持依赖注入和AOP外，其它拓展点都有可能支持。
+         * @see org.apache.dubbo.common.extension.ExtensionLoader#injectExtension(java.lang.Object)
+         */
         objectFactory = (type == ExtensionFactory.class ? null : ExtensionLoader.getExtensionLoader(ExtensionFactory.class).getAdaptiveExtension());
     }
 
@@ -334,9 +338,11 @@ public class ExtensionLoader<T> {
         if (StringUtils.isEmpty(name)) {
             throw new IllegalArgumentException("Extension name == null");
         }
+
         if ("true".equals(name)) {
             return getDefaultExtension();
         }
+
         final Holder<Object> holder = getOrCreateHolder(name);
         Object instance = holder.get();
         if (instance == null) {
@@ -519,20 +525,35 @@ public class ExtensionLoader<T> {
 
     @SuppressWarnings("unchecked")
     private T createExtension(String name) {
+        // 从配置文件中加载所有的拓展类，可得到“配置项名称”到“配置类”的映射关系表
         Class<?> clazz = getExtensionClasses().get(name);
         if (clazz == null) {
             throw findException(name);
         }
+
         try {
             T instance = (T) EXTENSION_INSTANCES.get(clazz);
             if (instance == null) {
                 EXTENSION_INSTANCES.putIfAbsent(clazz, clazz.newInstance());
                 instance = (T) EXTENSION_INSTANCES.get(clazz);
             }
+
+            // SPI - 依赖注入
             injectExtension(instance);
+
+            /**
+             * SPI - AOP
+             * cachedWrapperClasses 初始化位置
+             * @see ExtensionLoader#loadClass(Map, java.net.URL, Class, String)
+             * @see org.apache.dubbo.common.extension.ExtensionLoader#cacheWrapperClass
+             */
             Set<Class<?>> wrapperClasses = cachedWrapperClasses;
             if (CollectionUtils.isNotEmpty(wrapperClasses)) {
                 for (Class<?> wrapperClass : wrapperClasses) {
+                    /**
+                     * 将当前 instance 作为参数传给 Wrapper 的构造方法，并通过反射创建 Wrapper 实例。
+                     * 然后向 Wrapper 实例中注入依赖，最后将 Wrapper 实例再次赋值给 instance 变量。
+                     */
                     instance = injectExtension((T) wrapperClass.getConstructor(type).newInstance(instance));
                 }
             }
@@ -544,7 +565,6 @@ public class ExtensionLoader<T> {
     }
 
     private T injectExtension(T instance) {
-
         if (objectFactory == null) {
             return instance;
         }
@@ -554,19 +574,27 @@ public class ExtensionLoader<T> {
                 if (!isSetter(method)) {
                     continue;
                 }
+
                 /**
                  * Check {@link DisableInject} to see if we need auto injection for this property
                  */
                 if (method.getAnnotation(DisableInject.class) != null) {
                     continue;
                 }
+
                 Class<?> pt = method.getParameterTypes()[0];
+                // set 注入方法的参数类型不能是基本类型、String、Boolean、Character、Number、Date等类型。
                 if (ReflectUtils.isPrimitives(pt)) {
                     continue;
                 }
 
                 try {
+                    // 获取setXxx方法名称的xxx部分。
                     String property = getSetterProperty(method);
+                    /**
+                     * @see SpiExtensionFactory#getExtension(Class, String)
+                     * 正因为调用的是 getAdaptiveExtension 方法，dubbo spi 的依赖注入才不存在循环依赖问题。
+                     */
                     Object object = objectFactory.getExtension(pt, property);
                     if (object != null) {
                         method.invoke(instance, object);
@@ -633,17 +661,21 @@ public class ExtensionLoader<T> {
 
     /**
      * synchronized in getExtensionClasses
-     * */
+     */
     private Map<String, Class<?>> loadExtensionClasses() {
         cacheDefaultExtensionName();
 
         Map<String, Class<?>> extensionClasses = new HashMap<>();
+
         loadDirectory(extensionClasses, DUBBO_INTERNAL_DIRECTORY, type.getName());
         loadDirectory(extensionClasses, DUBBO_INTERNAL_DIRECTORY, type.getName().replace("org.apache", "com.alibaba"));
+
         loadDirectory(extensionClasses, DUBBO_DIRECTORY, type.getName());
         loadDirectory(extensionClasses, DUBBO_DIRECTORY, type.getName().replace("org.apache", "com.alibaba"));
+
         loadDirectory(extensionClasses, SERVICES_DIRECTORY, type.getName());
         loadDirectory(extensionClasses, SERVICES_DIRECTORY, type.getName().replace("org.apache", "com.alibaba"));
+
         return extensionClasses;
     }
 
@@ -674,6 +706,7 @@ public class ExtensionLoader<T> {
         try {
             Enumeration<java.net.URL> urls;
             ClassLoader classLoader = findClassLoader();
+            // 根据文件名加载所有的同名文件
             if (classLoader != null) {
                 urls = classLoader.getResources(fileName);
             } else {
@@ -696,8 +729,10 @@ public class ExtensionLoader<T> {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(resourceURL.openStream(), StandardCharsets.UTF_8))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
+                    // 定位 # 字符
                     final int ci = line.indexOf('#');
                     if (ci >= 0) {
+                        // 截取 # 之前的字符串，# 之后的内容为注释，需要忽略
                         line = line.substring(0, ci);
                     }
                     line = line.trim();
@@ -731,12 +766,21 @@ public class ExtensionLoader<T> {
                     type + ", class line: " + clazz.getName() + "), class "
                     + clazz.getName() + " is not subtype of interface.");
         }
+
+        /**
+         * 被 @Adaptive 修饰的拓展类以及 wrapper 类型不会被放入 extensionClasses 集合。
+         * 即通过ExtensionLoader.getExtensionLoader(xxx.class).getExtensionClasses();
+         * 获取的xxx.class拓展接口的所有实现类集合中是不包含上述条件修饰的类。
+         */
         if (clazz.isAnnotationPresent(Adaptive.class)) {
             cacheAdaptiveClass(clazz);
         } else if (isWrapperClass(clazz)) {
             cacheWrapperClass(clazz);
         } else {
+            // 检测 clazz 是否有默认的构造方法，如果没有，则抛出异常
             clazz.getConstructor();
+
+            // 通过下面源码可以了解，在编辑 Dubbo SPI 的拓展实现文件时，文件内容不用xxx=yyy.zzz的形式，可以直接yyy.zzz，但需要在拓展类上添加 @Extension 注解，并在注解中指定名称。
             if (StringUtils.isEmpty(name)) {
                 name = findAnnotationName(clazz);
                 if (name.length() == 0) {
@@ -745,6 +789,7 @@ public class ExtensionLoader<T> {
             }
 
             String[] names = NAME_SEPARATOR.split(name);
+
             if (ArrayUtils.isNotEmpty(names)) {
                 cacheActivateClass(clazz, names[0]);
                 for (String n : names) {
@@ -828,6 +873,7 @@ public class ExtensionLoader<T> {
      */
     private boolean isWrapperClass(Class<?> clazz) {
         try {
+            // 检查拓展类是否是wrapper类型
             clazz.getConstructor(type);
             return true;
         } catch (NoSuchMethodException e) {
@@ -859,10 +905,13 @@ public class ExtensionLoader<T> {
     }
 
     private Class<?> getAdaptiveExtensionClass() {
+        // 通过 SPI 获取所有的拓展类，如果拓展接口存在被@Adaptive修饰的拓展实现类，则cachedAdaptiveClass不为空，也就不用走动态代理生成的逻辑了。
         getExtensionClasses();
+
         if (cachedAdaptiveClass != null) {
             return cachedAdaptiveClass;
         }
+
         return cachedAdaptiveClass = createAdaptiveExtensionClass();
     }
 

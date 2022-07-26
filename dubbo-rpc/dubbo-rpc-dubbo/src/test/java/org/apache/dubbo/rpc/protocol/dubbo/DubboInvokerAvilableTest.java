@@ -97,10 +97,10 @@ public class DubboInvokerAvilableTest {
 
         long start = System.currentTimeMillis();
 
-        try{
+        try {
             System.setProperty(SHUTDOWN_WAIT_KEY, "2000");
             protocol.destroy();
-        }finally {
+        } finally {
             System.getProperties().remove(SHUTDOWN_WAIT_KEY);
         }
 

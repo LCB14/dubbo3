@@ -406,7 +406,7 @@ public class ReflectUtilsTest {
     }
 
     @Test
-    public void testGetReturnTypes () throws Exception{
+    public void testGetReturnTypes() throws Exception {
         Class clazz = TypeClass.class;
 
         Type[] types = ReflectUtils.getReturnTypes(clazz.getMethod("getFuture"));

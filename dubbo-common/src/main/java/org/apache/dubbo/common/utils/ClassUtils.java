@@ -93,6 +93,7 @@ public class ClassUtils {
         } catch (Throwable ex) {
             // Cannot access thread context ClassLoader - falling back to system class loader...
         }
+
         if (cl == null) {
             // No thread context class loader -> use class loader of this class.
             cl = clazz.getClassLoader();

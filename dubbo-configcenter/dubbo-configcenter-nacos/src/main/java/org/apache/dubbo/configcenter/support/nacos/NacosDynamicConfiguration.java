@@ -161,7 +161,7 @@ public class NacosDynamicConfiguration implements DynamicConfiguration {
     @Override
     public String getRule(String key, String group, long timeout) throws IllegalStateException {
         try {
-            long nacosTimeout = timeout < 0 ?  DEFAULT_TIMEOUT : timeout;
+            long nacosTimeout = timeout < 0 ? DEFAULT_TIMEOUT : timeout;
             if (StringUtils.isEmpty(group)) {
                 group = DEFAULT_GROUP;
             }

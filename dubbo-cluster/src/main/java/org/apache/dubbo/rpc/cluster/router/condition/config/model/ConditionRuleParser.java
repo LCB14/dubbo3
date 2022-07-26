@@ -23,17 +23,17 @@ import org.yaml.snakeyaml.constructor.Constructor;
 
 /**
  * %YAML1.2
- *
+ * <p>
  * scope: application
  * runtime: true
  * force: false
  * conditions:
- *   - >
- *     method!=sayHello =>
- *   - >
- *     ip=127.0.0.1
- *     =>
- *     1.1.1.1
+ * - >
+ * method!=sayHello =>
+ * - >
+ * ip=127.0.0.1
+ * =>
+ * 1.1.1.1
  */
 public class ConditionRuleParser {
 

@@ -90,8 +90,8 @@ public class ProtostuffObjectOutputTest {
     @Test
     public void testCustomizeDateList() throws IOException, ClassNotFoundException {
         java.sql.Date originTime = new java.sql.Date(System.currentTimeMillis());
-        java.sql.Date yesterdayTime = new java.sql.Date(System.currentTimeMillis() + 30*60*1000);
-        java.sql.Date beforeTime = new java.sql.Date(System.currentTimeMillis() + 30*60*1000*4);
+        java.sql.Date yesterdayTime = new java.sql.Date(System.currentTimeMillis() + 30 * 60 * 1000);
+        java.sql.Date beforeTime = new java.sql.Date(System.currentTimeMillis() + 30 * 60 * 1000 * 4);
         List<java.sql.Date> list = new ArrayList<>();
 
         list.add(originTime);
@@ -175,7 +175,8 @@ public class ProtostuffObjectOutputTest {
 
         public List<SerializablePerson> personList;
 
-        public SerializablePersonList() {}
+        public SerializablePersonList() {
+        }
 
         public SerializablePersonList(List<SerializablePerson> list) {
             this.personList = list;
@@ -197,7 +198,7 @@ public class ProtostuffObjectOutputTest {
                 return false;
             if (list.personList.size() != this.personList.size())
                 return false;
-            for (int i =0; i < this.personList.size(); i++) {
+            for (int i = 0; i < this.personList.size(); i++) {
                 if (!this.personList.get(i).equals(list.personList.get(i)))
                     return false;
             }
@@ -210,7 +211,8 @@ public class ProtostuffObjectOutputTest {
 
         List<LocalTime> timeList;
 
-        public LocalTimeList() {}
+        public LocalTimeList() {
+        }
 
         public LocalTimeList(List<LocalTime> timeList) {
             this.timeList = timeList;
@@ -232,7 +234,7 @@ public class ProtostuffObjectOutputTest {
                 return false;
             if (timeList.timeList.size() != this.timeList.size())
                 return false;
-            for (int i =0; i < this.timeList.size(); i++) {
+            for (int i = 0; i < this.timeList.size(); i++) {
                 if (!this.timeList.get(i).equals(timeList.timeList.get(i)))
                     return false;
             }

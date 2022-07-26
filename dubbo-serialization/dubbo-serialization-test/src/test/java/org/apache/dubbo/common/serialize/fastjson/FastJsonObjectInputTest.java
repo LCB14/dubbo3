@@ -21,6 +21,7 @@ import com.alibaba.fastjson.JSONObject;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.List;
+
 import org.apache.dubbo.common.serialize.model.Organization;
 import org.apache.dubbo.common.serialize.model.Person;
 

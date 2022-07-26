@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
         application = "${demo.service.application}",
         protocol = "${demo.service.protocol}",
         registry = "${demo.service.registry}",
-        methods = @Method(timeout = 100,name = "sayName")
+        methods = @Method(timeout = 100, name = "sayName")
 )
 @Service
 @Transactional

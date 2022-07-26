@@ -33,7 +33,6 @@ import static org.springframework.util.StringUtils.trimArrayElements;
 
 /**
  * @link BeanDefinitionParser}
- *
  * @see ServiceAnnotationBeanPostProcessor
  * @see ReferenceAnnotationBeanPostProcessor
  * @since 2.5.9

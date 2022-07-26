@@ -42,7 +42,7 @@ public class HttpServiceImpl implements HttpService {
         throw new MyException("custom exception");
     }
 
-    static class MyException extends RuntimeException{
+    static class MyException extends RuntimeException {
 
         private static final long serialVersionUID = -3051041116483629056L;
 

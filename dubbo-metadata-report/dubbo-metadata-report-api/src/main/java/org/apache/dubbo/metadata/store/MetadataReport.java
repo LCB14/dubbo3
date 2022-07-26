@@ -23,6 +23,7 @@ import org.apache.dubbo.metadata.identifier.MetadataIdentifier;
 import java.util.Map;
 
 /**
+ *
  */
 public interface MetadataReport {
 

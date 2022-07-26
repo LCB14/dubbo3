@@ -33,7 +33,6 @@ import static org.apache.dubbo.common.constants.RegistryConstants.EMPTY_PROTOCOL
 
 /**
  * Configurator. (SPI, Prototype, ThreadSafe)
- *
  */
 public interface Configurator extends Comparable<Configurator> {
 
@@ -56,7 +55,7 @@ public interface Configurator extends Comparable<Configurator> {
     /**
      * Convert override urls to map for use when re-refer. Send all rules every time, the urls will be reassembled and
      * calculated
-     *
+     * <p>
      * URL contract:
      * <ol>
      * <li>override://0.0.0.0/...( or override://ip:port...?anyhost=true)&para1=value1... means global rules

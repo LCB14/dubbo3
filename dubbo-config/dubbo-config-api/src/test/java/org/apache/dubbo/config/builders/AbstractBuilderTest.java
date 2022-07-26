@@ -121,5 +121,6 @@ class AbstractBuilderTest {
         }
     }
 
-    private static class Config extends AbstractConfig { }
+    private static class Config extends AbstractConfig {
+    }
 }

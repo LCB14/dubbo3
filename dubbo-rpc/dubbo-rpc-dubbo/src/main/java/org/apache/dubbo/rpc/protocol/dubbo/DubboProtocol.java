@@ -303,7 +303,9 @@ public class DubboProtocol extends AbstractProtocol {
             }
         }
 
+        // 启动NettyServer
         openServer(url);
+
         optimizeSerialization(url);
 
         return exporter;

@@ -24,6 +24,7 @@ import org.aopalliance.intercept.MethodInvocation;
 @Deprecated
 public class RmiRemoteInvocation extends org.apache.dubbo.rpc.protocol.rmi.RmiRemoteInvocation {
     private static final long serialVersionUID = 1L;
+
     /**
      * executed on consumer side
      *

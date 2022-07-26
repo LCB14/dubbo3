@@ -206,7 +206,7 @@ public class RegistryDirectoryTest {
         serviceUrls.add(new URL(EMPTY_PROTOCOL, ANYHOST_VALUE, 0, service, CATEGORY_KEY, PROVIDERS_CATEGORY));
         registryDirectory.notify(serviceUrls);
         Assertions.assertFalse(registryDirectory.isAvailable(),
-            "invokers size=0 ,then the registry directory is not available");
+                "invokers size=0 ,then the registry directory is not available");
         try {
             registryDirectory.list(invocation);
             fail("forbid must throw RpcException");
@@ -709,11 +709,11 @@ public class RegistryDirectoryTest {
 
         //The parameters are different and must be rereferenced.
         Assertions.assertNotSame(map.get(SERVICEURL.getAddress()), map2.get(SERVICEURL.getAddress()),
-            "object should not same");
+                "object should not same");
 
         //The parameters can not be rereferenced
         Assertions.assertSame(map.get(SERVICEURL2.getAddress()), map2.get(SERVICEURL2.getAddress()),
-            "object should not same");
+                "object should not same");
     }
 
     /**

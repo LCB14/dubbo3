@@ -6,7 +6,8 @@
             targetNamespace="http://code.alibabatech.com/schema/dubbo">
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
-    <xsd:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans.xsd"/>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans/spring-beans.xsd"/>
     <xsd:import namespace="http://www.springframework.org/schema/tool"/>
 
     <xsd:annotation>
@@ -387,7 +388,7 @@
                 <xsd:documentation><![CDATA[ The application monitor. ]]></xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="shutwait" type="xsd:string" >
+        <xsd:attribute name="shutwait" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation><![CDATA[ The application shutDown-wait time. ]]></xsd:documentation>
             </xsd:annotation>
@@ -655,7 +656,8 @@
         </xsd:attribute>
         <xsd:attribute name="cluster" type="xsd:string" use="optional">
             <xsd:annotation>
-                <xsd:documentation><![CDATA[ The config center cluster, it's real meaning may very on different Config Center products. ]]></xsd:documentation>
+                <xsd:documentation>
+                    <![CDATA[ The config center cluster, it's real meaning may very on different Config Center products. ]]></xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="namespace" type="xsd:string" use="optional">
@@ -898,7 +900,8 @@
                 </xsd:attribute>
                 <xsd:attribute name="threadpool" type="xsd:string">
                     <xsd:annotation>
-                        <xsd:documentation><![CDATA[ Consumer threadpool: cached, fixed, limited, eager]]></xsd:documentation>
+                        <xsd:documentation>
+                            <![CDATA[ Consumer threadpool: cached, fixed, limited, eager]]></xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="corethreads" type="xsd:string">

@@ -19,6 +19,7 @@ package org.apache.dubbo.registry.sofa;
 import com.alipay.sofa.registry.server.test.TestRegistryMain;
 
 /**
+ *
  */
 public class HelloServiceImpl implements HelloService {
 

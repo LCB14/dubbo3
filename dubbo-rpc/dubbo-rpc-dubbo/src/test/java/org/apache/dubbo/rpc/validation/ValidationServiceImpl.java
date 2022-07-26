@@ -32,7 +32,7 @@ public class ValidationServiceImpl implements ValidationService {
     public void delete(long id, String operator) {
     }
 
-    public void relatedQuery(ValidationParameter parameter){
+    public void relatedQuery(ValidationParameter parameter) {
 
     }
 

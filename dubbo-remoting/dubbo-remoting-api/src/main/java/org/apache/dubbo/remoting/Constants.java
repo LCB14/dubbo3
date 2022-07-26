@@ -41,7 +41,7 @@ public interface Constants {
      */
     String ACCEPTS_KEY = "accepts";
 
-	int DEFAULT_ACCEPTS = 0;
+    int DEFAULT_ACCEPTS = 0;
 
     String CONNECT_QUEUE_CAPACITY = "connect.queue.capacity";
 

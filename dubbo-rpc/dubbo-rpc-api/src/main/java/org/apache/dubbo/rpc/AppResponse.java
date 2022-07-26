@@ -28,7 +28,7 @@ import java.util.function.BiConsumer;
  *     <li>AsyncRpcResult is the object that is actually passed in the call chain</li>
  *     <li>AppResponse only simply represents the business result</li>
  * </ul>
- *
+ * <p>
  *  The relationship between them can be described as follow, an abstraction of the definition of AsyncRpcResult:
  *  <pre>
  *  {@code

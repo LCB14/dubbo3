@@ -38,6 +38,10 @@ public class AdaptiveExtensionFactory implements ExtensionFactory {
         for (String name : loader.getSupportedExtensions()) {
             list.add(loader.getExtension(name));
         }
+        /**
+         * AdaptiveExtensionFactory 不会被放入 factories，因此不用担心getExtension会出现死递归问题。
+         * @see ExtensionLoader#loadClass(Map, URL, Class, String)
+         */
         factories = Collections.unmodifiableList(list);
     }
 

@@ -211,7 +211,7 @@ public abstract class AbstractServiceBuilder<T extends AbstractServiceConfig, B 
         return getThis();
     }
 
-    public  B serialization(String serialization) {
+    public B serialization(String serialization) {
         this.serialization = serialization;
         return getThis();
     }

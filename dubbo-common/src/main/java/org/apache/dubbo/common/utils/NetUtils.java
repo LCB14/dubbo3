@@ -272,7 +272,7 @@ public class NetUtils {
                             Optional<InetAddress> addressOp = toValidAddress(addresses.nextElement());
                             if (addressOp.isPresent()) {
                                 try {
-                                    if(addressOp.get().isReachable(100)){
+                                    if (addressOp.get().isReachable(100)) {
                                         return addressOp.get();
                                     }
                                 } catch (IOException e) {
@@ -372,7 +372,7 @@ public class NetUtils {
                 InetAddress address = (InetAddress) addresses.nextElement();
                 if (preferIpv6 && address instanceof Inet6Address) {
                     try {
-                        if(address.isReachable(100)){
+                        if (address.isReachable(100)) {
                             multicastSocket.setInterface(address);
                             interfaceSet = true;
                             break;
@@ -382,7 +382,7 @@ public class NetUtils {
                     }
                 } else if (!preferIpv6 && address instanceof Inet4Address) {
                     try {
-                        if(address.isReachable(100)){
+                        if (address.isReachable(100)) {
                             multicastSocket.setInterface(address);
                             interfaceSet = true;
                             break;

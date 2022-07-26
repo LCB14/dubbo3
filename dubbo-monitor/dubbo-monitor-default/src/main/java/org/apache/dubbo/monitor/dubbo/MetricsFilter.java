@@ -136,7 +136,7 @@ public class MetricsFilter implements Filter {
         method.append(")");
         Class<?> returnType = RpcUtils.getReturnType(invocation);
         String typeName = null;
-        if(returnType != null) {
+        if (returnType != null) {
             typeName = returnType.getTypeName();
             typeName = typeName.substring(typeName.lastIndexOf(".") + 1);
         }

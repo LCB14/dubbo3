@@ -640,7 +640,7 @@ public class URLTest {
     }
 
     @Test
-    public void testUserNamePasswordContainsAt(){
+    public void testUserNamePasswordContainsAt() {
         // Test username or password contains "@"
         URL url = URL.valueOf("ad@min:hello@1234@10.20.130.230:20880/context/path?version=1.0.0&application=morgan");
         assertNull(url.getProtocol());
@@ -656,7 +656,7 @@ public class URLTest {
 
 
     @Test
-    public void testIpV6Address(){
+    public void testIpV6Address() {
         // Test username or password contains "@"
         URL url = URL.valueOf("ad@min111:haha@1234@2001:0db8:85a3:08d3:1319:8a2e:0370:7344:20880/context/path?version=1.0.0&application=morgan");
         assertNull(url.getProtocol());
@@ -671,7 +671,7 @@ public class URLTest {
     }
 
     @Test
-    public void testIpV6AddressWithScopeId(){
+    public void testIpV6AddressWithScopeId() {
         URL url = URL.valueOf("2001:0db8:85a3:08d3:1319:8a2e:0370:7344%5/context/path?version=1.0.0&application=morgan");
         assertNull(url.getProtocol());
         assertEquals("2001:0db8:85a3:08d3:1319:8a2e:0370:7344%5", url.getHost());
@@ -689,7 +689,7 @@ public class URLTest {
     }
 
     @Test
-    public void testGetServiceKey () {
+    public void testGetServiceKey() {
         URL url1 = URL.valueOf("10.20.130.230:20880/context/path?interface=org.apache.dubbo.test.interfaceName");
         Assertions.assertEquals("org.apache.dubbo.test.interfaceName", url1.getServiceKey());
 

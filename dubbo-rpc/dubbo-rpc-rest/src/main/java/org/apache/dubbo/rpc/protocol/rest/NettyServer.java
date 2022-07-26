@@ -39,7 +39,6 @@ import static org.apache.dubbo.rpc.protocol.rest.Constants.DEFAULT_KEEP_ALIVE;
 
 /**
  * Netty server can't support @Context injection of servlet objects since it's not a servlet container
- *
  */
 public class NettyServer extends BaseRestServer {
 
