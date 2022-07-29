@@ -252,7 +252,18 @@ public class AdaptiveClassCodeGenerator {
                 if (null != defaultExtName) {
                     // 通过下面源码阅读可知，可以在 @Adaptive 注解中通过 @Adaptive("protocol") 来明确指定拓展实现类名称在URL中的取值属性。
                     if (!"protocol".equals(value[i])) {
+                        /**
+                         * 为什么方法带有Invocation类型参数，就使用 getMethodParameter，否则使用 getParameter 方法获取拓展名呢？
+                         *
+                         */
                         if (hasInvocation) {
+                            /**
+                             * methodName 初始化位置
+                             * @see org.apache.dubbo.common.extension.AdaptiveClassCodeGenerator#generateMethod(java.lang.reflect.Method)
+                             *
+                             * value[i] 初始化位置
+                             * @see AdaptiveClassCodeGenerator#getMethodAdaptiveValue(Adaptive)
+                             */
                             getNameCode = String.format("url.getMethodParameter(methodName, \"%s\", \"%s\")", value[i], defaultExtName);
                         } else {
                             getNameCode = String.format("url.getParameter(\"%s\", \"%s\")", value[i], defaultExtName);
