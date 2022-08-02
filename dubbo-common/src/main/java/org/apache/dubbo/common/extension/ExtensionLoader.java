@@ -905,7 +905,7 @@ public class ExtensionLoader<T> {
     }
 
     private Class<?> getAdaptiveExtensionClass() {
-        // 通过 SPI 获取所有的拓展类，如果拓展接口存在被@Adaptive修饰的拓展实现类，则cachedAdaptiveClass不为空，也就不用走动态代理生成的逻辑了。
+        // 获取所有的拓展类，如果拓展接口存在被@Adaptive修饰的拓展实现类，则cachedAdaptiveClass不为空，也就不用走动态代理生成的逻辑了。
         getExtensionClasses();
 
         if (cachedAdaptiveClass != null) {

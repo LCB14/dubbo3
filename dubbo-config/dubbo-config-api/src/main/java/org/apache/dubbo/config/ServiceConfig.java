@@ -40,6 +40,7 @@ import org.apache.dubbo.rpc.ProxyFactory;
 import org.apache.dubbo.rpc.cluster.ConfiguratorFactory;
 import org.apache.dubbo.rpc.model.ApplicationModel;
 import org.apache.dubbo.rpc.model.ProviderModel;
+import org.apache.dubbo.rpc.proxy.javassist.JavassistProxyFactory;
 import org.apache.dubbo.rpc.service.GenericService;
 import org.apache.dubbo.rpc.support.ProtocolUtils;
 
@@ -299,13 +300,13 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         // 连接配置中心并获取远程配置，刷新配置实例属性
         startConfigCenter();
 
-        // 检测 provider、protocol、application、registry是否为空，为空则新建一个，并通过系统变量为其初始化
+        // 对 ProviderConfig、ProtocolConfig、ApplicationConfig等配置类进行检测，为空则尝试创建，若无法创建则抛出异常
         checkDefault();
         checkProtocol();
         checkApplication();
 
         // if protocol is not injvm checkRegistry
-        // 如果协议不是injvm，表示服务调用不在仅限于本机jvm调用，需要注册到远程注册中心
+        // 如果协议不是 injvm，表示服务调用不在仅限于本机jvm调用，需要注册到远程注册中心，因此需要 check 远程注册中心相关的配置
         if (!isOnlyInJvm()) {
             checkRegistry();
         }
@@ -356,7 +357,6 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                 throw new IllegalStateException(e.getMessage(), e);
             }
 
-            // 检测本地存根类是否可赋值给接口类，若不可赋值则会抛出异常，提醒使用者本地存根类类型不合法
             if (!interfaceClass.isAssignableFrom(localClass)) {
                 throw new IllegalStateException("The local implementation class " + localClass.getName() + " not implement interface " + interfaceName);
             }
@@ -378,6 +378,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                 throw new IllegalStateException("The stub implementation class " + stubClass.getName() + " not implement interface " + interfaceName);
             }
         }
+
         checkStubAndLocal(interfaceClass);
         checkMock(interfaceClass);
     }
@@ -482,6 +483,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void doExportUrls() {
         // 加载注册中心信息并将其表示为URL
+        // registry://127.0.0.1:2181/org.apache.dubbo.registry.RegistryService?application=demo-provider&dubbo=2.0.2&pid=4660&qos.port=22222&registry=zookeeper&timestamp=1659428754449
         List<URL> registryURLs = loadRegistries(true);
 
         // 生成不同协议版本的服务URL
@@ -511,6 +513,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         map.put(SIDE_KEY, PROVIDER_SIDE);
 
         appendRuntimeParameters(map);
+
         appendParameters(map, metrics);
         appendParameters(map, application);
         appendParameters(map, module);
@@ -519,6 +522,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         appendParameters(map, provider);
         appendParameters(map, protocolConfig);
         appendParameters(map, this);
+
         if (CollectionUtils.isNotEmpty(methods)) {
             // 读取导出服务上的针对某个方法设置的配置参数
             for (MethodConfig method : methods) {
@@ -593,6 +597,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                 map.put(METHODS_KEY, StringUtils.join(new HashSet<String>(Arrays.asList(methods)), ","));
             }
         }
+
         if (!ConfigUtils.isEmpty(token)) {
             if (ConfigUtils.isDefault(token)) {
                 map.put(TOKEN_KEY, UUID.randomUUID().toString());
@@ -600,26 +605,30 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                 map.put(TOKEN_KEY, token);
             }
         }
+
         // export service
         String host = this.findConfigedHosts(protocolConfig, registryURLs, map);
         Integer port = this.findConfigedPorts(protocolConfig, name, map);
         URL url = new URL(name, host, port, getContextPath(protocolConfig).map(p -> p + "/" + path).orElse(path), map);
 
-        if (ExtensionLoader.getExtensionLoader(ConfiguratorFactory.class)
-                .hasExtension(url.getProtocol())) {
-            url = ExtensionLoader.getExtensionLoader(ConfiguratorFactory.class)
-                    .getExtension(url.getProtocol()).getConfigurator(url).configure(url);
+        // dubbo://192.168.20.233:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bean.name=org.apache.dubbo.demo.DemoService&bind.ip=192.168.20.233&bind.port=20880&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello&pid=4791&qos.port=22222&release=&side=provider&timestamp=1659430702816
+        if (ExtensionLoader.getExtensionLoader(ConfiguratorFactory.class).hasExtension(url.getProtocol())) {
+            // 加载 ConfiguratorFactory，并生成 Configurator 实例，然后通过实例配置 url, 可以认为是 dubbo 框架对外提供拼接 url 的拓展点
+            url = ExtensionLoader.getExtensionLoader(ConfiguratorFactory.class).getExtension(url.getProtocol()).getConfigurator(url).configure(url);
         }
 
         String scope = url.getParameter(SCOPE_KEY);
         // don't export when none is configured
+        // scope = none，不导出服务
         if (!SCOPE_NONE.equalsIgnoreCase(scope)) {
-
             // export to local if the config is not remote (export to remote only when config is remote)
+            // scope != remote，导出到本地
             if (!SCOPE_REMOTE.equalsIgnoreCase(scope)) {
                 exportLocal(url);
             }
+
             // export to remote if the config is not local (export to local only when config is local)
+            // scope != local，导出到远程
             if (!SCOPE_LOCAL.equalsIgnoreCase(scope)) {
                 if (CollectionUtils.isNotEmpty(registryURLs)) {
                     for (URL registryURL : registryURLs) {
@@ -648,15 +657,23 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                             registryURL = registryURL.addParameter(PROXY_KEY, proxy);
                         }
 
-                        // 生成一个当前服务接口的代理对象，Invoker表示服务提供者的代理，可以通过Invoker的invoker方法执行相关服务
-                        // ref 表示提供服务接口的具体实现类
+                        /**
+                         * ref - 表示提供服务接口的具体实现类信息；
+                         * interfaceClass - 表示服务接口信息；
+                         * registryURL.addParameterAndEncoded(EXPORT_KEY, url.toFullString()) - 执行结果如下:
+                         * registry://127.0.0.1:2181/org.apache.dubbo.registry.RegistryService?application=demo-provider&dubbo=2.0.2&export=dubbo://192.168.20.233:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bean.name=org.apache.dubbo.demo.DemoService&bind.ip=192.168.20.233&bind.port=20880&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello&pid=5025&qos.port=22222&release=&side=provider&timestamp=1659432631915&pid=5025&qos.port=22222&registry=zookeeper&timestamp=165943263190
+                         * 即将url作为export属性值拼接到registryURL之后。
+                         *
+                         * getInvoker方法表示根据url信息生成一个指定服务接口的代理对象，Invoker实例表示服务提供者的代理，可以通过Invoker的invoker方法执行相关服务调用。
+                         * @see JavassistProxyFactory#getInvoker(Object, Class, URL)
+                         */
                         Invoker<?> invoker = PROXY_FACTORY.getInvoker(ref, (Class) interfaceClass, registryURL.addParameterAndEncoded(EXPORT_KEY, url.toFullString()));
 
                         // DelegateProviderMetaDataInvoker 用于包装服务提供者代理对象和服务提供者配置信息
                         DelegateProviderMetaDataInvoker wrapperInvoker = new DelegateProviderMetaDataInvoker(invoker, this);
 
                         /**
-                         * @see org.apache.dubbo.registry.integration.RegistryProtocol.export
+                         * @see org.apache.dubbo.registry.integration.RegistryProtocol#export(org.apache.dubbo.rpc.Invoker)
                          */
                         Exporter<?> exporter = protocol.export(wrapperInvoker);
                         exporters.add(exporter);
@@ -672,6 +689,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                     Exporter<?> exporter = protocol.export(wrapperInvoker);
                     exporters.add(exporter);
                 }
+
                 /**
                  * @since 2.7.0
                  * ServiceData Store
@@ -695,8 +713,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                 .setHost(LOCALHOST_VALUE)
                 .setPort(0)
                 .build();
-        Exporter<?> exporter = protocol.export(
-                PROXY_FACTORY.getInvoker(ref, (Class) interfaceClass, local));
+        Exporter<?> exporter = protocol.export(PROXY_FACTORY.getInvoker(ref, (Class) interfaceClass, local));
         exporters.add(exporter);
         logger.info("Export dubbo service " + interfaceClass.getName() + " to local registry url : " + local);
     }
