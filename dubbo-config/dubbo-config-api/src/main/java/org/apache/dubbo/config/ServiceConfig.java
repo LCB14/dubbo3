@@ -299,6 +299,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         // 连接配置中心并获取远程配置，刷新配置实例属性
         startConfigCenter();
 
+        // 检测 provider、protocol、application、registry是否为空，为空则新建一个，并通过系统变量为其初始化
         checkDefault();
         checkProtocol();
         checkApplication();
@@ -327,8 +328,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
             }
         } else {
             try {
-                interfaceClass = Class.forName(interfaceName, true, Thread.currentThread()
-                        .getContextClassLoader());
+                interfaceClass = Class.forName(interfaceName, true, Thread.currentThread().getContextClassLoader());
             } catch (ClassNotFoundException e) {
                 throw new IllegalStateException(e.getMessage(), e);
             }
@@ -366,12 +366,14 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
             if (Boolean.TRUE.toString().equals(stub)) {
                 stub = interfaceName + "Stub";
             }
+
             Class<?> stubClass;
             try {
                 stubClass = ClassUtils.forNameWithThreadContextClassLoader(stub);
             } catch (ClassNotFoundException e) {
                 throw new IllegalStateException(e.getMessage(), e);
             }
+
             if (!interfaceClass.isAssignableFrom(stubClass)) {
                 throw new IllegalStateException("The stub implementation class " + stubClass.getName() + " not implement interface " + interfaceName);
             }
@@ -858,6 +860,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
     }
 
     private void completeCompoundConfigs() {
+        // 当 ProtocolConfig 和 ServiceConfig 某属性没有配置时，采用此缺省值，可选
         if (provider != null) {
             if (application == null) {
                 setApplication(provider.getApplication());
@@ -879,6 +882,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
             }
         }
 
+        // 用于配置当前模块信息，可选
         if (module != null) {
             if (registries == null) {
                 setRegistries(module.getRegistries());
@@ -888,6 +892,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
             }
         }
 
+        // 用于配置当前应用信息，不管该应用是提供者还是消费者
         if (application != null) {
             if (registries == null) {
                 setRegistries(application.getRegistries());
@@ -906,8 +911,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         if (provider != null) {
             return;
         }
-        setProvider(
-                ConfigManager.getInstance()
+        setProvider(ConfigManager.getInstance()
                         .getDefaultProvider()
                         .orElseGet(() -> {
                             ProviderConfig providerConfig = new ProviderConfig();
