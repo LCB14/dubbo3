@@ -122,6 +122,7 @@ public abstract class Wrapper {
     }
 
     private static Wrapper makeWrapper(Class<?> c) {
+        // 检测 c 是否为基本类型，若是则抛出异常
         if (c.isPrimitive()) {
             throw new IllegalArgumentException("Can not create wrapper for primitive type: " + c);
         }
@@ -133,24 +134,90 @@ public abstract class Wrapper {
         StringBuilder c2 = new StringBuilder("public Object getPropertyValue(Object o, String n){ ");
         StringBuilder c3 = new StringBuilder("public Object invokeMethod(Object o, String n, Class[] p, Object[] v) throws " + InvocationTargetException.class.getName() + "{ ");
 
+        /**
+         * public void setPropertyValue(Object o, String n, Object v) {
+         *         org.apache.dubbo.demo.provider.DemoServiceImpl w;
+         *         try {
+         *             w = ((org.apache.dubbo.demo.provider.DemoServiceImpl) $1);
+         *         } catch (Throwable e) {
+         *             throw new IllegalArgumentException(e);
+         *         }
+         */
         c1.append(name).append(" w; try{ w = ((").append(name).append(")$1); }catch(Throwable e){ throw new IllegalArgumentException(e); }");
+        /**
+         * public Object getPropertyValue(Object o, String n) {
+         *         org.apache.dubbo.demo.provider.DemoServiceImpl w;
+         *         try {
+         *             w = ((org.apache.dubbo.demo.provider.DemoServiceImpl) $1);
+         *         } catch (Throwable e) {
+         *             throw new IllegalArgumentException(e);
+         *         }
+         */
         c2.append(name).append(" w; try{ w = ((").append(name).append(")$1); }catch(Throwable e){ throw new IllegalArgumentException(e); }");
+        /**
+         * public Object invokeMethod(Object o, String n, Class[] p, Object[] v) throws java.lang.reflect.InvocationTargetException {
+         *         org.apache.dubbo.demo.provider.DemoServiceImpl w;
+         *         try {
+         *             w = ((org.apache.dubbo.demo.provider.DemoServiceImpl) $1);
+         *         } catch (Throwable e) {
+         *             throw new IllegalArgumentException(e);
+         *         }
+         */
         c3.append(name).append(" w; try{ w = ((").append(name).append(")$1); }catch(Throwable e){ throw new IllegalArgumentException(e); }");
 
-        Map<String, Class<?>> pts = new HashMap<>(); // <property name, property types>
-        Map<String, Method> ms = new LinkedHashMap<>(); // <method desc, Method instance>
-        List<String> mns = new ArrayList<>(); // method names.
-        List<String> dmns = new ArrayList<>(); // declaring method names.
+        // <property name, property types>
+        Map<String, Class<?>> pts = new HashMap<>();
+        // <method desc, Method instance>
+        // ms 用于存储方法描述信息（可理解为方法签名）及 Method 实例
+        Map<String, Method> ms = new LinkedHashMap<>();
+        // method names.
+        List<String> mns = new ArrayList<>();
+        // declaring method names.
+        // dmns 用于存储“定义在当前类中的方法”的名称
+        List<String> dmns = new ArrayList<>();
 
         // get all public field.
         for (Field f : c.getFields()) {
             String fn = f.getName();
             Class<?> ft = f.getType();
+            // 忽略关键字 static 或 transient 修饰的变量
             if (Modifier.isStatic(f.getModifiers()) || Modifier.isTransient(f.getModifiers())) {
                 continue;
             }
 
+            /**
+             * public void setPropertyValue(Object o, String n, Object v) {
+             *         org.apache.dubbo.demo.provider.DemoServiceImpl w;
+             *         try {
+             *             w = ((org.apache.dubbo.demo.provider.DemoServiceImpl) $1);
+             *         } catch (Throwable e) {
+             *             throw new IllegalArgumentException(e);
+             *         }
+             *         if ($2.equals("name")) {
+             *             w.name = (java.lang.String) $3;
+             *             return;
+             *         }
+             *         if ($2.equals("age")) {
+             *             w.age = (java.lang.Integer) $3;
+             *             return;
+             *         }
+             */
             c1.append(" if( $2.equals(\"").append(fn).append("\") ){ w.").append(fn).append("=").append(arg(ft, "$3")).append("; return; }");
+            /**
+             * public Object getPropertyValue (Object o, String n){
+             *             org.apache.dubbo.demo.provider.DemoServiceImpl w;
+             *             try {
+             *                 w = ((org.apache.dubbo.demo.provider.DemoServiceImpl) $1);
+             *             } catch (Throwable e) {
+             *                 throw new IllegalArgumentException(e);
+             *             }
+             *             if ($2.equals("name")) {
+             *                 return ($w) w.name;
+             *             }
+             *             if ($2.equals("age")) {
+             *                 return ($w) w.age;
+             *             }
+             */
             c2.append(" if( $2.equals(\"").append(fn).append("\") ){ return ($w)w.").append(fn).append("; }");
             pts.put(fn, ft);
         }
@@ -208,6 +275,24 @@ public abstract class Wrapper {
             c3.append(" }");
         }
 
+        /**
+         * public Object invokeMethod(Object o, String n, Class[] p, Object[] v) throws java.lang.reflect.InvocationTargetException {
+         *         org.apache.dubbo.demo.provider.DemoServiceImpl w;
+         *         try {
+         *             w = ((org.apache.dubbo.demo.provider.DemoServiceImpl) $1);
+         *         } catch (Throwable e) {
+         *             throw new IllegalArgumentException(e);
+         *         }
+         *         try {
+         *             if ("sayHello".equals($2) && $3.length == 1) {
+         *                 return ($w) w.sayHello((java.lang.String) $4[0]);
+         *             }
+         *         } catch (Throwable e) {
+         *             throw new java.lang.reflect.InvocationTargetException(e);
+         *         }
+         *         throw new org.apache.dubbo.common.bytecode.NoSuchMethodException("Not found method \"" + $2 + "\" in class org.apache.dubbo.demo.provider.DemoServiceImpl.");
+         * }
+         */
         c3.append(" throw new " + NoSuchMethodException.class.getName() + "(\"Not found method \\\"\"+$2+\"\\\" in class " + c.getName() + ".\"); }");
 
         // deal with get/set method.
@@ -230,7 +315,57 @@ public abstract class Wrapper {
                 pts.put(pn, pt);
             }
         }
+        /**
+         *  public void setPropertyValue(Object o, String n, Object v) {
+         *         org.apache.dubbo.demo.provider.DemoServiceImpl w;
+         *         try {
+         *             w = ((org.apache.dubbo.demo.provider.DemoServiceImpl) $1);
+         *         } catch (Throwable e) {
+         *             throw new IllegalArgumentException(e);
+         *         }
+         *         if ($2.equals("name")) {
+         *             w.name = (java.lang.String) $3;
+         *             return;
+         *         }
+         *         if ($2.equals("age")) {
+         *             w.age = (java.lang.Integer) $3;
+         *             return;
+         *         }
+         *         if ($2.equals("age")) {
+         *             w.setAge((java.lang.Integer) $3);
+         *             return;
+         *         }
+         *         if ($2.equals("name")) {
+         *             w.setName((java.lang.String) $3);
+         *             return;
+         *         }
+         *         throw new org.apache.dubbo.common.bytecode.NoSuchPropertyException("Not found property \"" + $2 + "\" field or setter method in class org.apache.dubbo.demo.provider.DemoServiceImpl.");
+         * }
+         */
         c1.append(" throw new " + NoSuchPropertyException.class.getName() + "(\"Not found property \\\"\"+$2+\"\\\" field or setter method in class " + c.getName() + ".\"); }");
+        /**
+         * public Object getPropertyValue(Object o, String n) {
+         *         org.apache.dubbo.demo.provider.DemoServiceImpl w;
+         *         try {
+         *             w = ((org.apache.dubbo.demo.provider.DemoServiceImpl) $1);
+         *         } catch (Throwable e) {
+         *             throw new IllegalArgumentException(e);
+         *         }
+         *         if ($2.equals("name")) {
+         *             return ($w) w.name;
+         *         }
+         *         if ($2.equals("age")) {
+         *             return ($w) w.age;
+         *         }
+         *         if ($2.equals("age")) {
+         *             return ($w) w.getAge();
+         *         }
+         *         if ($2.equals("name")) {
+         *             return ($w) w.getName();
+         *         }
+         *         throw new org.apache.dubbo.common.bytecode.NoSuchPropertyException("Not found property \"" + $2 + "\" field or setter method in class org.apache.dubbo.demo.provider.DemoServiceImpl.");
+         * }
+         */
         c2.append(" throw new " + NoSuchPropertyException.class.getName() + "(\"Not found property \\\"\"+$2+\"\\\" field or setter method in class " + c.getName() + ".\"); }");
 
         // make class
@@ -240,10 +375,14 @@ public abstract class Wrapper {
         cc.setSuperClass(Wrapper.class);
 
         cc.addDefaultConstructor();
-        cc.addField("public static String[] pns;"); // property name array.
-        cc.addField("public static " + Map.class.getName() + " pts;"); // property type map.
-        cc.addField("public static String[] mns;"); // all method name array.
-        cc.addField("public static String[] dmns;"); // declared method name array.
+        // property name array.
+        cc.addField("public static String[] pns;");
+        // property type map.
+        cc.addField("public static " + Map.class.getName() + " pts;");
+        // all method name array.
+        cc.addField("public static String[] mns;");
+        // declared method name array.
+        cc.addField("public static String[] dmns;");
         for (int i = 0, len = ms.size(); i < len; i++) {
             cc.addField("public static Class[] mts" + i + ";");
         }
