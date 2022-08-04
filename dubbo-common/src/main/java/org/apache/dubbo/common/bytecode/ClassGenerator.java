@@ -51,7 +51,8 @@ public final class ClassGenerator {
 
     private static final AtomicLong CLASS_NAME_COUNTER = new AtomicLong(0);
     private static final String SIMPLE_NAME_TAG = "<init>";
-    private static final Map<ClassLoader, ClassPool> POOL_MAP = new ConcurrentHashMap<ClassLoader, ClassPool>(); //ClassLoader - ClassPool
+    //ClassLoader - ClassPool
+    private static final Map<ClassLoader, ClassPool> POOL_MAP = new ConcurrentHashMap<ClassLoader, ClassPool>();
     private ClassPool mPool;
     private CtClass mCtc;
     private String mClassName;
@@ -60,8 +61,10 @@ public final class ClassGenerator {
     private List<String> mFields;
     private List<String> mConstructors;
     private List<String> mMethods;
-    private Map<String, Method> mCopyMethods; // <method desc,method instance>
-    private Map<String, Constructor<?>> mCopyConstructors; // <constructor desc,constructor instance>
+    // <method desc,method instance>
+    private Map<String, Method> mCopyMethods;
+    // <constructor desc,constructor instance>
+    private Map<String, Constructor<?>> mCopyConstructors;
     private boolean mDefaultConstructor = false;
 
     private ClassGenerator() {
@@ -303,7 +306,8 @@ public final class ClassGenerator {
             if (mSuperClass != null) {
                 mCtc.setSuperclass(ctcs);
             }
-            mCtc.addInterface(mPool.get(DC.class.getName())); // add dynamic class tag.
+            // add dynamic class tag.
+            mCtc.addInterface(mPool.get(DC.class.getName()));
             if (mInterfaces != null) {
                 for (String cl : mInterfaces) {
                     mCtc.addInterface(mPool.get(cl));

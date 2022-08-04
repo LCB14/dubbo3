@@ -173,7 +173,7 @@ public abstract class Wrapper {
         // method names.
         List<String> mns = new ArrayList<>();
         // declaring method names.
-        // dmns 用于存储“定义在当前类中的方法”的名称
+        // dmns 用于存储“定义在当前类（相对于父类）中的方法”的名称
         List<String> dmns = new ArrayList<>();
 
         // get all public field.
@@ -238,6 +238,7 @@ public abstract class Wrapper {
                 int len = m.getParameterTypes().length;
                 c3.append(" && ").append(" $3.length == ").append(len);
 
+                // 判断是否存在重载方法，如果存在则需进一步判断每个位置上的参数类型是否匹配。
                 boolean override = false;
                 for (Method m2 : methods) {
                     if (m != m2 && m.getName().equals(m2.getName())) {
@@ -300,14 +301,17 @@ public abstract class Wrapper {
         for (Map.Entry<String, Method> entry : ms.entrySet()) {
             String md = entry.getKey();
             Method method = entry.getValue();
+            // 匹配以 get 开头的方法
             if ((matcher = ReflectUtils.GETTER_METHOD_DESC_PATTERN.matcher(md)).matches()) {
                 String pn = propertyName(matcher.group(1));
                 c2.append(" if( $2.equals(\"").append(pn).append("\") ){ return ($w)w.").append(method.getName()).append("(); }");
                 pts.put(pn, method.getReturnType());
+            // 匹配以 is/has/can 开头的方法
             } else if ((matcher = ReflectUtils.IS_HAS_CAN_METHOD_DESC_PATTERN.matcher(md)).matches()) {
                 String pn = propertyName(matcher.group(1));
                 c2.append(" if( $2.equals(\"").append(pn).append("\") ){ return ($w)w.").append(method.getName()).append("(); }");
                 pts.put(pn, method.getReturnType());
+            // 匹配以 set 开头的方法
             } else if ((matcher = ReflectUtils.SETTER_METHOD_DESC_PATTERN.matcher(md)).matches()) {
                 Class<?> pt = method.getParameterTypes()[0];
                 String pn = propertyName(matcher.group(1));
