@@ -47,12 +47,17 @@ public class Transporters {
         if (handlers == null || handlers.length == 0) {
             throw new IllegalArgumentException("handlers == null");
         }
+
         ChannelHandler handler;
         if (handlers.length == 1) {
             handler = handlers[0];
         } else {
             handler = new ChannelHandlerDispatcher(handlers);
         }
+
+        /**
+         * @see org.apache.dubbo.remoting.transport.netty4.NettyTransporter#bind(org.apache.dubbo.common.URL, org.apache.dubbo.remoting.ChannelHandler)
+         */
         return getTransporter().bind(url, handler);
     }
 

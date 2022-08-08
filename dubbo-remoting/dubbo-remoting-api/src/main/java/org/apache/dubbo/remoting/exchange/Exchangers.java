@@ -24,6 +24,7 @@ import org.apache.dubbo.remoting.Constants;
 import org.apache.dubbo.remoting.RemotingException;
 import org.apache.dubbo.remoting.exchange.support.ExchangeHandlerDispatcher;
 import org.apache.dubbo.remoting.exchange.support.Replier;
+import org.apache.dubbo.remoting.exchange.support.header.HeaderExchanger;
 import org.apache.dubbo.remoting.transport.ChannelHandlerAdapter;
 
 /**
@@ -66,7 +67,12 @@ public class Exchangers {
         if (handler == null) {
             throw new IllegalArgumentException("handler == null");
         }
+
         url = url.addParameterIfAbsent(Constants.CODEC_KEY, "exchange");
+
+        /**
+         * @see HeaderExchanger#bind(URL, ExchangeHandler)
+         */
         return getExchanger(url).bind(url, handler);
     }
 
