@@ -22,6 +22,7 @@ import org.apache.dubbo.remoting.ChannelHandler;
 import org.apache.dubbo.remoting.Dispatcher;
 import org.apache.dubbo.remoting.exchange.support.header.HeartbeatHandler;
 import org.apache.dubbo.remoting.transport.MultiMessageHandler;
+import org.apache.dubbo.remoting.transport.dispatcher.all.AllDispatcher;
 
 public class ChannelHandlers {
 
@@ -31,6 +32,7 @@ public class ChannelHandlers {
     }
 
     public static ChannelHandler wrap(ChannelHandler handler, URL url) {
+        // dubbo://192.168.20.233:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bean.name=org.apache.dubbo.demo.DemoService&bind.ip=192.168.20.233&bind.port=20880&channel.readonly.sent=true&codec=dubbo&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false&heartbeat=60000&interface=org.apache.dubbo.demo.DemoService&methods=sayHello&pid=20754&qos.port=22222&release=&side=provider&threadname=DubboServerHandler-192.168.20.233:20880&timestamp=1660026876760
         return ChannelHandlers.getInstance().wrapInternal(handler, url);
     }
 
@@ -43,7 +45,13 @@ public class ChannelHandlers {
     }
 
     protected ChannelHandler wrapInternal(ChannelHandler handler, URL url) {
-        return new MultiMessageHandler(new HeartbeatHandler(ExtensionLoader.getExtensionLoader(Dispatcher.class)
-                .getAdaptiveExtension().dispatch(handler, url)));
+        return new MultiMessageHandler(
+                new HeartbeatHandler(
+                        /**
+                         * @see AllDispatcher#dispatch(ChannelHandler, URL)
+                         */
+                        ExtensionLoader.getExtensionLoader(Dispatcher.class).getAdaptiveExtension().dispatch(handler, url)
+                )
+        );
     }
 }
