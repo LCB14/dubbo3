@@ -70,6 +70,7 @@ public abstract class AbstractZookeeperClient<TargetDataListener, TargetChildLis
 
     @Override
     public void create(String path, boolean ephemeral) {
+        // 根据 ephemeral 的值决定创建临时还是持久节点
         if (!ephemeral) {
             if (persistentExistNodePath.contains(path)) {
                 return;
@@ -79,13 +80,18 @@ public abstract class AbstractZookeeperClient<TargetDataListener, TargetChildLis
                 return;
             }
         }
+
         int i = path.lastIndexOf('/');
         if (i > 0) {
+            // 递归创建上一级路径
             create(path.substring(0, i), false);
         }
+
         if (ephemeral) {
+            // 创建临时节点
             createEphemeral(path);
         } else {
+            // 创建永久节点
             createPersistent(path);
             persistentExistNodePath.add(path);
         }

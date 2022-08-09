@@ -31,6 +31,7 @@ import org.apache.dubbo.registry.NotifyListener;
 import org.apache.dubbo.registry.Registry;
 import org.apache.dubbo.registry.RegistryFactory;
 import org.apache.dubbo.registry.RegistryService;
+import org.apache.dubbo.registry.support.FailbackRegistry;
 import org.apache.dubbo.registry.support.ProviderConsumerRegTable;
 import org.apache.dubbo.registry.support.ProviderInvokerWrapper;
 import org.apache.dubbo.rpc.Exporter;
@@ -182,7 +183,14 @@ public class RegistryProtocol implements Protocol {
     }
 
     public void register(URL registryUrl, URL registeredProviderUrl) {
+        /**
+         * @see org.apache.dubbo.registry.zookeeper.ZookeeperRegistry
+         */
         Registry registry = registryFactory.getRegistry(registryUrl);
+
+        /**
+         * @see FailbackRegistry#register(URL)
+         */
         registry.register(registeredProviderUrl);
     }
 
@@ -224,14 +232,22 @@ public class RegistryProtocol implements Protocol {
          * @see org.apache.dubbo.registry.zookeeper.ZookeeperRegistry
          */
         final Registry registry = getRegistry(originInvoker);
-        // 获取已注册的服务提供者 URL，比如：dubbo://192.168.20.233:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bean.name=org.apache.dubbo.demo.DemoService&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello&pid=16058&release=&side=provider&timestamp=1659941439341
+        /**
+         * 获取已注册的服务提供者 URL
+         * providerUrl->dubbo://192.168.20.233:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bean.name=org.apache.dubbo.demo.DemoService&bind.ip=192.168.20.233&bind.port=20880&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello&pid=21489&qos.port=22222&release=&side=provider&timestamp=1660034231340
+         * registryUrl->zookeeper://127.0.0.1:2181/org.apache.dubbo.registry.RegistryService?application=demo-provider&dubbo=2.0.2&export=dubbo://192.168.20.233:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bean.name=org.apache.dubbo.demo.DemoService&bind.ip=192.168.20.233&bind.port=20880&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello&pid=21489&qos.port=22222&release=&side=provider&timestamp=1660034231340&pid=21489&qos.port=22222&timestamp=1660034231329
+         */
         final URL registeredProviderUrl = getRegisteredProviderUrl(providerUrl, registryUrl);
         ProviderInvokerWrapper<T> providerInvokerWrapper = ProviderConsumerRegTable.registerProvider(originInvoker, registryUrl, registeredProviderUrl);
 
         //to judge if we need to delay publish
         boolean register = providerUrl.getParameter(REGISTER_KEY, true);
         if (register) {
-            // 向注册中心注册服务
+            /**
+             * 向注册中心注册服务,主要包含两步：
+             * 1、获取注册中心实例；
+             * 2、向注册中心注册服务。
+             */
             register(registryUrl, registeredProviderUrl);
             providerInvokerWrapper.setReg(true);
         }
@@ -314,7 +330,12 @@ public class RegistryProtocol implements Protocol {
      * @return
      */
     private Registry getRegistry(final Invoker<?> originInvoker) {
+        // zookeeper://127.0.0.1:2181/org.apache.dubbo.registry.RegistryService?application=demo-provider&dubbo=2.0.2&export=dubbo://192.168.20.233:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bean.name=org.apache.dubbo.demo.DemoService&bind.ip=192.168.20.233&bind.port=20880&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello&pid=21163&qos.port=22222&release=&side=provider&timestamp=1660029600003&pid=21163&qos.port=22222&timestamp=1660029599994
         URL registryUrl = getRegistryUrl(originInvoker);
+        /**
+         * registryFactory 初始化位置(拓展加载Protocol时，通过set注入的方式):
+         * @see RegistryProtocol#setRegistryFactory(RegistryFactory)
+         */
         return registryFactory.getRegistry(registryUrl);
     }
 
