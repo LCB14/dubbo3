@@ -214,6 +214,7 @@ public class AdaptiveClassCodeGenerator {
                 code.append(generateUrlAssignmentIndirectly(method));
             }
 
+            // 如果@Adaptice注解未指定value值，就使用被代理接口的名称（例如接口名称为：xY，处理后：x.y）作为value值
             String[] value = getMethodAdaptiveValue(adaptiveAnnotation);
 
             boolean hasInvocation = hasInvocationArgument(method);
@@ -254,15 +255,18 @@ public class AdaptiveClassCodeGenerator {
                     if (!"protocol".equals(value[i])) {
                         /**
                          * Dubbo 生成拓展名逻辑, 为什么受 Invocation 类型参数影响?
-                         *
+                         * 如果包含Invocation类型参数，代理方法中生成的拓展名需要包含getMethodName()返回的方法名。
                          */
                         if (hasInvocation) {
                             /**
-                             * methodName 初始化位置
-                             * @see org.apache.dubbo.common.extension.AdaptiveClassCodeGenerator#generateMethod(java.lang.reflect.Method)
+                             * methodName 初始化位置如下，来源于Invocation类型参数的getMethodName()方法
+                             * @see AdaptiveClassCodeGenerator#generateInvocationArgumentNullCheck(Method)
                              *
-                             * value[i] 初始化位置
+                             * value[i] 初始化位置如下，来源于@Adaptive注解指定或被代理接口名称的转换（代理接口：xY，转换成 x.y ）
                              * @see AdaptiveClassCodeGenerator#getMethodAdaptiveValue(Adaptive)
+                             *
+                             * defaultExtName 值来源于cachedDefaultName，cachedDefaultName来源于@SPI注解中指定
+                             * @see org.apache.dubbo.common.extension.ExtensionLoader#createAdaptiveExtensionClass()
                              */
                             getNameCode = String.format("url.getMethodParameter(methodName, \"%s\", \"%s\")", value[i], defaultExtName);
                         } else {
