@@ -589,6 +589,11 @@ public abstract class AbstractConfig implements Serializable {
 
     public void refresh() {
         try {
+            /**
+             * 数据参考：
+             * getPrefix() -> dubbo.application
+             * getId()     -> demo-provider
+             */
             CompositeConfiguration compositeConfiguration = Environment.getInstance().getConfiguration(getPrefix(), getId());
             Configuration config = new ConfigConfigurationAdapter(this);
             if (Environment.getInstance().isConfigCenterFirst()) {
