@@ -278,7 +278,7 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
             // TODO there may have duplicate refresh
             this.configCenter.refresh();
 
-            // 与远程配置中心建立连接并获取相关配置信息
+            // 环境准备，与远程配置中心建立连接并获取相关配置信息
             prepareEnvironment();
         }
         ConfigManager.getInstance().refreshAll();

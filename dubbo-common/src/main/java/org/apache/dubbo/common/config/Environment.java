@@ -55,6 +55,12 @@ public class Environment {
     }
 
     public SystemConfiguration getSystemConfig(String prefix, String id) {
+        /**
+         * 数据参考
+         * prefix -> dubbo.application
+         * id -> demo-provider
+         * toKey(prefix, id) -> dubbo.applicationdemo-provider.
+         */
         return systemConfigs.computeIfAbsent(toKey(prefix, id), k -> new SystemConfiguration(prefix, id));
     }
 
