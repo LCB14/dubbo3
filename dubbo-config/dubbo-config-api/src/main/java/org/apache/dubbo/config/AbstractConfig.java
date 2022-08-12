@@ -399,6 +399,7 @@ public abstract class AbstractConfig implements Serializable {
         } catch (NoSuchMethodException e) {
             getter = clazz.getMethod("is" + propertyName);
         }
+
         Parameter parameter = getter.getAnnotation(Parameter.class);
         if (parameter != null && StringUtils.isNotEmpty(parameter.key()) && parameter.useKeyAsProperty()) {
             propertyName = parameter.key();
@@ -590,21 +591,26 @@ public abstract class AbstractConfig implements Serializable {
     public void refresh() {
         try {
             /**
-             * 数据参考：
+             * 数据参考：<dubbo:application name="demo-provider" valid="true" prefix="dubbo.application" id="demo-provider" />
              * getPrefix() -> dubbo.application
              * getId()     -> demo-provider
              */
             CompositeConfiguration compositeConfiguration = Environment.getInstance().getConfiguration(getPrefix(), getId());
             Configuration config = new ConfigConfigurationAdapter(this);
             if (Environment.getInstance().isConfigCenterFirst()) {
-                // The sequence would be: SystemConfiguration -> AppExternalConfiguration -> ExternalConfiguration -> AbstractConfig -> PropertiesConfiguration
+                // The sequence would be: SystemConfiguration -> EnvironmentConfiguration -> AppExternalConfiguration -> ExternalConfiguration -> AbstractConfig -> PropertiesConfiguration
                 compositeConfiguration.addConfiguration(4, config);
             } else {
-                // The sequence would be: SystemConfiguration -> AbstractConfig -> AppExternalConfiguration -> ExternalConfiguration -> PropertiesConfiguration
+                // The sequence would be: SystemConfiguration -> EnvironmentConfiguration -> AbstractConfig -> AppExternalConfiguration -> ExternalConfiguration -> PropertiesConfiguration
                 compositeConfiguration.addConfiguration(2, config);
             }
 
             // loop methods, get override value and set the new value back to method
+            /**
+             * 1、截取set方法除"set"部分外的字符串并结合@Parameter注解给定的参数值，生成配置相关的key；
+             * 2、循环遍历不同渠道配置，查找是否设置与步骤1生成的key相关联的value值；
+             * 3、利用反射把步骤2获取的value值，通过set方法进行注入，完成远程配置的赋值操作；
+             */
             Method[] methods = getClass().getMethods();
             for (Method method : methods) {
                 if (MethodUtils.isSetter(method)) {
@@ -624,6 +630,7 @@ public abstract class AbstractConfig implements Serializable {
                     if (StringUtils.isNotEmpty(value)) {
                         Map<String, String> map = invokeGetParameters(getClass(), this);
                         map = map == null ? new HashMap<>() : map;
+                        // StringUtils.parseParameters(value) 将字符串形式（'[{a:b},{c:d}]'）的map，转换成真正的map实例
                         map.putAll(convert(StringUtils.parseParameters(value), ""));
                         invokeSetParameters(getClass(), this, map);
                     }

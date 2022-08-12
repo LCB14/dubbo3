@@ -593,7 +593,7 @@ public class ExtensionLoader<T> {
                     // 获取setXxx方法名称的xxx部分。
                     String property = getSetterProperty(method);
                     /**
-                     * @see SpiExtensionFactory#getExtension(Class, String)
+                     * @see org.apache.dubbo.common.extension.factory.SpiExtensionFactory#getExtension(java.lang.Class, java.lang.String)
                      * 正因为调用的是 getAdaptiveExtension 方法，dubbo spi 的依赖注入才不存在循环依赖问题。
                      */
                     Object object = objectFactory.getExtension(pt, property);

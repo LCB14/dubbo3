@@ -285,12 +285,17 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
     }
 
     private void prepareEnvironment() {
+        // 数据参考：<dubbo:config-center check="true" group="dubbo" timeout="3000" configFile="dubbo.properties" highestPriority="false" address="zookeeper://127.0.0.1:2181" protocol="zookeeper" namespace="dubbo" valid="true" prefix="dubbo.config-center" />
         if (configCenter.isValid()) {
             if (!configCenter.checkOrUpdateInited()) {
                 return;
             }
 
             // 通过url信息与指定配置中心建立连接并获取相关配置信息
+            /**
+             * configCenter.toUrl() 数据参考：
+             * zookeeper://127.0.0.1:2181/ConfigCenterConfig?check=true&config-file=dubbo.properties&group=dubbo&highest-priority=false&namespace=dubbo&timeout=3000
+             */
             DynamicConfiguration dynamicConfiguration = getDynamicConfiguration(configCenter.toUrl());
             String configContent = dynamicConfiguration.getProperties(configCenter.getConfigFile(), configCenter.getGroup());
 
@@ -312,6 +317,9 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
     }
 
     private DynamicConfiguration getDynamicConfiguration(URL url) {
+        /**
+         * @see org.apache.dubbo.configcenter.support.zookeeper.ZookeeperDynamicConfigurationFactory
+         */
         DynamicConfigurationFactory factory = ExtensionLoader
                 .getExtensionLoader(DynamicConfigurationFactory.class)
                 .getExtension(url.getProtocol());

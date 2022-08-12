@@ -78,6 +78,9 @@ public interface Configuration {
         return value != null ? value : defaultValue;
     }
 
+    /**
+     * @see CompositeConfiguration#getInternalProperty(String)
+     */
     Object getInternalProperty(String key);
 
     /**

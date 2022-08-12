@@ -23,6 +23,7 @@ import org.apache.dubbo.common.utils.CollectionUtils;
 import org.apache.dubbo.common.utils.StringUtils;
 import org.apache.dubbo.config.support.Parameter;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -402,6 +403,10 @@ public class ApplicationConfig extends AbstractConfig {
         this.shutwait = shutwait;
     }
 
+    /**
+     * @Parameter 注解处理逻辑
+     * @see AbstractConfig#extractPropertyName(Class, Method)
+     */
     @Override
     @Parameter(excluded = true)
     public boolean isValid() {

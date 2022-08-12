@@ -72,6 +72,7 @@ public class CompositeConfiguration implements Configuration {
                 logger.error("Error when trying to get value for key " + key + " from " + config + ", will continue to try the next one.");
             }
         }
+
         if (firstMatchingConfiguration != null) {
             return firstMatchingConfiguration.getProperty(key);
         } else {
