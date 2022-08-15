@@ -274,13 +274,18 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
             ConfigManager.getInstance().getConfigCenter().ifPresent(cc -> this.configCenter = cc);
         }
 
+        /**
+         * 进入该分支的时机，参考
+         * @see org.apache.dubbo.config.AbstractInterfaceConfig#checkRegistry()
+         *  @see org.apache.dubbo.config.AbstractInterfaceConfig#useRegistryForConfigIfNecessary()
+         */
         if (this.configCenter != null) {
             // TODO there may have duplicate refresh
             this.configCenter.refresh();
-
             // 环境准备，与远程配置中心建立连接并获取相关配置信息
             prepareEnvironment();
         }
+
         ConfigManager.getInstance().refreshAll();
     }
 
@@ -291,8 +296,8 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
                 return;
             }
 
-            // 通过url信息与指定配置中心建立连接并获取相关配置信息
             /**
+             * 通过url信息与指定配置中心建立连接并获取相关配置信息
              * configCenter.toUrl() 数据参考：
              * zookeeper://127.0.0.1:2181/ConfigCenterConfig?check=true&config-file=dubbo.properties&group=dubbo&highest-priority=false&namespace=dubbo&timeout=3000
              */
@@ -302,11 +307,11 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
             String appGroup = application != null ? application.getName() : null;
             String appConfigContent = null;
             if (StringUtils.isNotEmpty(appGroup)) {
-                appConfigContent = dynamicConfiguration.getProperties(StringUtils.isNotEmpty(configCenter.getAppConfigFile()) ? configCenter.getAppConfigFile() : configCenter.getConfigFile()
-                        , appGroup);
+                appConfigContent = dynamicConfiguration.getProperties(StringUtils.isNotEmpty(configCenter.getAppConfigFile()) ? configCenter.getAppConfigFile() : configCenter.getConfigFile(), appGroup);
             }
+
             try {
-                // 保存配置信息
+                // 更新配置信息
                 Environment.getInstance().setConfigCenterFirst(configCenter.isHighestPriority());
                 Environment.getInstance().updateExternalConfigurationMap(parseProperties(configContent));
                 Environment.getInstance().updateAppExternalConfigurationMap(parseProperties(appConfigContent));
@@ -320,9 +325,7 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
         /**
          * @see org.apache.dubbo.configcenter.support.zookeeper.ZookeeperDynamicConfigurationFactory
          */
-        DynamicConfigurationFactory factory = ExtensionLoader
-                .getExtensionLoader(DynamicConfigurationFactory.class)
-                .getExtension(url.getProtocol());
+        DynamicConfigurationFactory factory = ExtensionLoader.getExtensionLoader(DynamicConfigurationFactory.class).getExtension(url.getProtocol());
         DynamicConfiguration configuration = factory.getDynamicConfiguration(url);
         Environment.getInstance().setDynamicConfiguration(configuration);
         return configuration;
@@ -769,10 +772,7 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
             return;
         }
         ConfigManager configManager = ConfigManager.getInstance();
-        setApplication(
-                configManager
-                        .getApplication()
-                        .orElseGet(() -> {
+        setApplication(configManager.getApplication().orElseGet(() -> {
                             ApplicationConfig applicationConfig = new ApplicationConfig();
                             applicationConfig.refresh();
                             return applicationConfig;

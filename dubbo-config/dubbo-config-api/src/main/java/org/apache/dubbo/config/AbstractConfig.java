@@ -607,7 +607,7 @@ public abstract class AbstractConfig implements Serializable {
 
             // loop methods, get override value and set the new value back to method
             /**
-             * 1、截取set方法除"set"部分外的字符串并结合@Parameter注解给定的参数值，生成配置相关的key；
+             * 1、截取set方法除"set"部分外的字符串并结合@Parameter注解给定的参数值，生成 dubbo 服务配置相关的key；
              * 2、循环遍历不同渠道配置，查找是否设置与步骤1生成的key相关联的value值；
              * 3、利用反射把步骤2获取的value值，通过set方法进行注入，完成远程配置的赋值操作；
              */

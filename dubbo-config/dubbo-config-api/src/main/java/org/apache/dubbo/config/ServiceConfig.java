@@ -312,7 +312,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
             checkRegistry();
         }
 
-        // 刷新ServiceConfig
+        // 刷新各个渠道配置
         this.refresh();
 
         checkMetadataReport();
@@ -882,7 +882,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
     }
 
     private void completeCompoundConfigs() {
-        // 当 ProtocolConfig 和 ServiceConfig 某属性没有配置时，采用此缺省值，可选
+        // <dubbo:provider/> 服务提供方配置，当 ProtocolConfig 和 ServiceConfig 某属性没有配置时，采用此缺省值，可选
         if (provider != null) {
             if (application == null) {
                 setApplication(provider.getApplication());
@@ -904,7 +904,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
             }
         }
 
-        // 用于配置当前模块信息，可选
+        // <dubbo:module/>	模块配置	用于配置当前模块信息，可选
         if (module != null) {
             if (registries == null) {
                 setRegistries(module.getRegistries());
@@ -914,7 +914,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
             }
         }
 
-        // 用于配置当前应用信息，不管该应用是提供者还是消费者
+        // <dubbo:application/>	应用配置，用于配置当前应用信息，不管该应用是提供者还是消费者
         if (application != null) {
             if (registries == null) {
                 setRegistries(application.getRegistries());
