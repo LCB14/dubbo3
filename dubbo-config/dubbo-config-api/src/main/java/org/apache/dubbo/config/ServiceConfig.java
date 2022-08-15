@@ -384,6 +384,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         // 检查本地存根实现类是否有可传入 Proxy 的构造函数。
         checkStubAndLocal(interfaceClass);
 
+        // 检查本地伪装（mock）配置内容是否合法
         checkMock(interfaceClass);
     }
 
