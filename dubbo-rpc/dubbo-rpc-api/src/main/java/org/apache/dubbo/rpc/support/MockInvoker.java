@@ -219,6 +219,7 @@ final public class MockInvoker<T> implements Invoker<T> {
             return mock;
         }
 
+        // <dubbo:reference interface="com.foo.BarService" mock="return null" />
         if (RETURN_KEY.equalsIgnoreCase(mock)) {
             return RETURN_PREFIX + "null";
         }
@@ -227,14 +228,17 @@ final public class MockInvoker<T> implements Invoker<T> {
             return "default";
         }
 
+        // <dubbo:reference interface="com.foo.BarService" mock="fail:return fake" />
         if (mock.startsWith(FAIL_PREFIX)) {
             mock = mock.substring(FAIL_PREFIX.length()).trim();
         }
 
+        // <dubbo:reference interface="com.foo.BarService" mock="force:return fake" />
         if (mock.startsWith(FORCE_PREFIX)) {
             mock = mock.substring(FORCE_PREFIX.length()).trim();
         }
 
+        // <dubbo:reference interface="com.foo.BarService" mock="throw com.foo.MockException" />
         if (mock.startsWith(RETURN_PREFIX) || mock.startsWith(THROW_PREFIX)) {
             mock = mock.replace('`', '"');
         }

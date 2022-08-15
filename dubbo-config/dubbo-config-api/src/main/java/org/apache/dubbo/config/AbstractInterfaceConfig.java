@@ -258,6 +258,10 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
 
     protected void checkMetadataReport() {
         // TODO get from ConfigManager first, only create if absent.
+        /**
+         * metadataReportConfig 数据参考
+         * <dubbo:metadata-report prefix="dubbo.metadata-report" valid="false" />
+         */
         if (metadataReportConfig == null) {
             setMetadataReportConfig(new MetadataReportConfig());
         }
@@ -497,6 +501,10 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
             return;
         }
 
+        /**
+         * <dubbo:reference interface="com.foo.BarService" mock="throw com.foo.MockException" />
+         * 解析mock参数内容
+         */
         String normalizedMock = MockInvoker.normalizeMock(mock);
         if (normalizedMock.startsWith(RETURN_PREFIX)) {
             normalizedMock = normalizedMock.substring(RETURN_PREFIX.length()).trim();
@@ -504,8 +512,7 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
                 //Check whether the mock value is legal, if it is illegal, throw exception
                 MockInvoker.parseMockValue(normalizedMock);
             } catch (Exception e) {
-                throw new IllegalStateException("Illegal mock return in <dubbo:service/reference ... " +
-                        "mock=\"" + mock + "\" />");
+                throw new IllegalStateException("Illegal mock return in <dubbo:service/reference ... " + "mock=\"" + mock + "\" />");
             }
         } else if (normalizedMock.startsWith(THROW_PREFIX)) {
             normalizedMock = normalizedMock.substring(THROW_PREFIX.length()).trim();
@@ -514,8 +521,7 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
                     //Check whether the mock value is legal
                     MockInvoker.getThrowable(normalizedMock);
                 } catch (Exception e) {
-                    throw new IllegalStateException("Illegal mock throw in <dubbo:service/reference ... " +
-                            "mock=\"" + mock + "\" />");
+                    throw new IllegalStateException("Illegal mock throw in <dubbo:service/reference ... " + "mock=\"" + mock + "\" />");
                 }
             }
         } else {

@@ -315,6 +315,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         // 刷新各个渠道配置
         this.refresh();
 
+        // 刷新元数据中心配置
         checkMetadataReport();
 
         if (StringUtils.isEmpty(interfaceName)) {
@@ -335,10 +336,10 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                 throw new IllegalStateException(e.getMessage(), e);
             }
 
-            // 对 interfaceClass，以及 <dubbo:method> 标签中的必要字段进行检查
+            // 检查methods中的方法是否都是interfaceClass所具备的
             checkInterfaceAndMethods(interfaceClass, methods);
 
-            // 对 ref 合法性进行检测
+            // 检查 ref 所指定的实现类是否是实现了 interfaceClass
             checkRef();
 
             generic = Boolean.FALSE.toString();
@@ -380,7 +381,9 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
             }
         }
 
+        // 检查本地存根实现类是否有可传入 Proxy 的构造函数。
         checkStubAndLocal(interfaceClass);
+
         checkMock(interfaceClass);
     }
 
