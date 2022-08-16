@@ -894,12 +894,14 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
             if (module == null) {
                 setModule(provider.getModule());
             }
+
             if (registries == null) {
                 setRegistries(provider.getRegistries());
             }
             if (monitor == null) {
                 setMonitor(provider.getMonitor());
             }
+
             if (protocols == null) {
                 setProtocols(provider.getProtocols());
             }
