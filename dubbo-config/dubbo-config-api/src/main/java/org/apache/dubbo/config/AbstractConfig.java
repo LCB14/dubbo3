@@ -154,6 +154,13 @@ public abstract class AbstractConfig implements Serializable {
         appendParameters(parameters, config, null);
     }
 
+    /**
+     * 1、取给定配置实例config的所有get方法，截取get方法的除get外的方法名作为key;
+     * 2、利用反射调用get方法的值作为value；
+     * 3、把步骤1、2产生的key、value放入parameters集合；
+     *
+     * 注：key值的生成，受get方法上指定的@Parameter注解影响。
+     */
     @SuppressWarnings("unchecked")
     protected static void appendParameters(Map<String, String> parameters, Object config, String prefix) {
         if (config == null) {
@@ -168,12 +175,18 @@ public abstract class AbstractConfig implements Serializable {
                     if (method.getReturnType() == Object.class || parameter != null && parameter.excluded()) {
                         continue;
                     }
+
                     String key;
+                    /**
+                     * 被@Parameter注解修饰方法参考
+                     * @see ConfigCenterConfig#getConfigFile()
+                     */
                     if (parameter != null && parameter.key().length() > 0) {
                         key = parameter.key();
                     } else {
                         key = calculatePropertyFromGetter(name);
                     }
+
                     Object value = method.invoke(config);
                     String str = String.valueOf(value).trim();
                     if (value != null && str.length() > 0) {

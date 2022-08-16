@@ -346,6 +346,10 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
         List<URL> registryList = new ArrayList<URL>();
         if (CollectionUtils.isNotEmpty(registries)) {
             for (RegistryConfig config : registries) {
+                /**
+                 * config 数据参考：
+                 * <dubbo:registry zookeeperProtocol="true" address="zookeeper://127.0.0.1:2181" protocol="zookeeper" port="2181" valid="true" prefix="dubbo.registries." id="org.apache.dubbo.config.RegistryConfig" />
+                 */
                 String address = config.getAddress();
                 if (StringUtils.isEmpty(address)) {
                     address = ANYHOST_VALUE;
@@ -360,6 +364,8 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
                     if (!map.containsKey(PROTOCOL_KEY)) {
                         map.put(PROTOCOL_KEY, DUBBO_PROTOCOL);
                     }
+
+                    // <dubbo:registry .../> 的 address 属性可以通过';'指定多个注册中心地址
                     List<URL> urls = UrlUtils.parseURLs(address, map);
 
                     for (URL url : urls) {
