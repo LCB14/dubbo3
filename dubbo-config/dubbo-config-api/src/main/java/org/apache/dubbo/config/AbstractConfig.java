@@ -597,11 +597,14 @@ public abstract class AbstractConfig implements Serializable {
              */
             CompositeConfiguration compositeConfiguration = Environment.getInstance().getConfiguration(getPrefix(), getId());
             Configuration config = new ConfigConfigurationAdapter(this);
+            // isConfigCenterFirst()默认是true，
             if (Environment.getInstance().isConfigCenterFirst()) {
-                // The sequence would be: SystemConfiguration -> EnvironmentConfiguration -> AppExternalConfiguration -> ExternalConfiguration -> AbstractConfig -> PropertiesConfiguration
+                // The sequence would be: SystemConfiguration -> EnvironmentConfiguration -> AppExternalConfiguration -> ExternalConfiguration -> ConfigConfigurationAdapter -> PropertiesConfiguration
+                // 把@Service或xml上的配置放入集合中第五位，优先级位于Dubbo控制台配置之后
                 compositeConfiguration.addConfiguration(4, config);
             } else {
-                // The sequence would be: SystemConfiguration -> EnvironmentConfiguration -> AbstractConfig -> AppExternalConfiguration -> ExternalConfiguration -> PropertiesConfiguration
+                // The sequence would be: SystemConfiguration -> EnvironmentConfiguration -> ConfigConfigurationAdapter -> AppExternalConfiguration -> ExternalConfiguration -> PropertiesConfiguration
+                // 把@Service或xml上的配置,放入集合中第三位，优先级位于Dubbo控制台配置之前
                 compositeConfiguration.addConfiguration(2, config);
             }
 
