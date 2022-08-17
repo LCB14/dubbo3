@@ -509,6 +509,10 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
     }
 
     private void doExportUrlsFor1Protocol(ProtocolConfig protocolConfig, List<URL> registryURLs) {
+        /**
+         * protocolConfig 数据参考
+         * <dubbo:protocol name="dubbo" valid="true" prefix="dubbo.protocols." id="dubbo" />
+         */
         String name = protocolConfig.getName();
         if (StringUtils.isEmpty(name)) {
             name = DUBBO;
@@ -529,6 +533,14 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         appendParameters(map, protocolConfig);
         appendParameters(map, this);
 
+        /**
+         * 配置参考：
+         *  <dubbo:service interface="org.apache.dubbo.demo.DemoService" ref="demoService">
+         *      <dubbo:method name="sayHello" timeout="3000" retries="2">
+         *          <dubbo:argument index="0" type="java.lang.String" callback="false" />
+         *      </dubbo:method>
+         *  </dubbo:service>
+         */
         if (CollectionUtils.isNotEmpty(methods)) {
             // 读取导出服务上的针对某个方法设置的配置参数
             for (MethodConfig method : methods) {
@@ -545,6 +557,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                     for (ArgumentConfig argument : arguments) {
                         // convert argument type
                         if (argument.getType() != null && argument.getType().length() > 0) {
+                            // interfaceClass 数据参考： org.apache.dubbo.demo.DemoService
                             Method[] methods = interfaceClass.getMethods();
                             // visit all methods
                             if (methods != null && methods.length > 0) {
