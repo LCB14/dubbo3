@@ -655,8 +655,9 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
          *  dubbo://192.168.20.233:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bean.name=org.apache.dubbo.demo.DemoService&bind.ip=192.168.20.233&bind.port=20880&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello&pid=46311&qos.port=22222&release=&sayHello.0.callback=false&sayHello.retries=2&sayHello.timeout=3000&side=provider&timestamp=1660724644778
          */
         URL url = new URL(name, host, port, getContextPath(protocolConfig).map(p -> p + "/" + path).orElse(path), map);
+
+        // 加载 ConfiguratorFactory，并生成 Configurator 实例，然后通过 Configurator 实例的 configure 重新组装 url。 ConfiguratorFactory 是 dubbo 框架对外提供拼接目标导出服务 url 的拓展点。
         if (ExtensionLoader.getExtensionLoader(ConfiguratorFactory.class).hasExtension(url.getProtocol())) {
-            // 加载 ConfiguratorFactory，并生成 Configurator 实例，然后通过实例配置 url, 可以认为是 dubbo 框架对外提供拼接 url 的拓展点
             url = ExtensionLoader.getExtensionLoader(ConfiguratorFactory.class).getExtension(url.getProtocol()).getConfigurator(url).configure(url);
         }
 
@@ -666,7 +667,6 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         if (!SCOPE_NONE.equalsIgnoreCase(scope)) {
             // export to local if the config is not remote (export to remote only when config is remote)
             // scope != remote，导出到本地
-            // dubbo://192.168.20.233:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bean.name=org.apache.dubbo.demo.DemoService&bind.ip=192.168.20.233&bind.port=20880&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello&pid=12471&qos.port=22222&release=&side=provider&timestamp=1659683060351
             if (!SCOPE_REMOTE.equalsIgnoreCase(scope)) {
                 exportLocal(url);
             }
