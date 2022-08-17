@@ -246,6 +246,7 @@ public abstract class Wrapper {
                         break;
                     }
                 }
+                // 如果存在重载方法，还需要判断方法各个参数的类型是否一致。
                 if (override) {
                     if (len > 0) {
                         for (int l = 0; l < len; l++) {

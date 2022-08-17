@@ -608,6 +608,27 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                 map.put(REVISION_KEY, revision);
             }
 
+            /**
+             * Wrapper.getWrapper(interfaceClass)方法将生成interfaceClass对应的代理,核心代理方法代码参考如下：
+             *
+             * public Object invokeMethod(Object o, String n, Class[] p, Object[] v) throws java.lang.reflect.InvocationTargetException {
+             *         org.apache.dubbo.demo.provider.DemoServiceImpl w;
+             *         try {
+             *             w = ((org.apache.dubbo.demo.provider.DemoServiceImpl) $1);
+             *         } catch (Throwable e) {
+             *             throw new IllegalArgumentException(e);
+             *         }
+             *         try {
+             *             // 如果方法存在重载，系统还会自动生成方法各参数位置的类型校验逻辑。
+             *             if ("sayHello".equals($2) && $3.length == 1) {
+             *                 return ($w) w.sayHello((java.lang.String) $4[0]);
+             *             }
+             *         } catch (Throwable e) {
+             *             throw new java.lang.reflect.InvocationTargetException(e);
+             *         }
+             *         throw new org.apache.dubbo.common.bytecode.NoSuchMethodException("Not found method \"" + $2 + "\" in class org.apache.dubbo.demo.provider.DemoServiceImpl.");
+             * }
+             */
             String[] methods = Wrapper.getWrapper(interfaceClass).getMethodNames();
             if (methods.length == 0) {
                 logger.warn("No method found in service interface " + interfaceClass.getName());
@@ -617,6 +638,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
             }
         }
 
+        // token 的目的是防止用户绕开注册中心，直接进行服务调用。
         if (!ConfigUtils.isEmpty(token)) {
             if (ConfigUtils.isDefault(token)) {
                 map.put(TOKEN_KEY, UUID.randomUUID().toString());
@@ -628,9 +650,11 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         // export service
         String host = this.findConfigedHosts(protocolConfig, registryURLs, map);
         Integer port = this.findConfigedPorts(protocolConfig, name, map);
+        /**
+         *  当前url数据参考:
+         *  dubbo://192.168.20.233:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bean.name=org.apache.dubbo.demo.DemoService&bind.ip=192.168.20.233&bind.port=20880&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello&pid=46311&qos.port=22222&release=&sayHello.0.callback=false&sayHello.retries=2&sayHello.timeout=3000&side=provider&timestamp=1660724644778
+         */
         URL url = new URL(name, host, port, getContextPath(protocolConfig).map(p -> p + "/" + path).orElse(path), map);
-
-        // dubbo://192.168.20.233:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bean.name=org.apache.dubbo.demo.DemoService&bind.ip=192.168.20.233&bind.port=20880&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello&pid=4791&qos.port=22222&release=&side=provider&timestamp=1659430702816
         if (ExtensionLoader.getExtensionLoader(ConfiguratorFactory.class).hasExtension(url.getProtocol())) {
             // 加载 ConfiguratorFactory，并生成 Configurator 实例，然后通过实例配置 url, 可以认为是 dubbo 框架对外提供拼接 url 的拓展点
             url = ExtensionLoader.getExtensionLoader(ConfiguratorFactory.class).getExtension(url.getProtocol()).getConfigurator(url).configure(url);
