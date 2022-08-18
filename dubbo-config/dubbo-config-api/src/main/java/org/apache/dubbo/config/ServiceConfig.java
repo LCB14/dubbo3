@@ -760,11 +760,11 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         /**
          * PROXY_FACTORY.getInvoker
          * @see JavassistProxyFactory#getInvoker(Object, Class, URL)
+         * 为什么是JavassistProxyFactory？ - （ProxyFactory接口的getInvoker方法上的@Adaptive注解指定的value值在url的parameters中没有对应映射，拓展名使用ProxyFactory接口上@SPI注解中指定的defaultName）
          *
          * protocol.export
          * @see InjvmProtocol#export(Invoker)
-         *
-         * 为什么是InjvmProtocol？-（export方法上的@Adaptive注解未指定任何value值，getMethodAdaptiveValue值的获取即为拓展接口Protocol名）
+         * 为什么是InjvmProtocol？-（接口Protocol的export方法上的@Adaptive注解未指定任何value值，getMethodAdaptiveValue值的获取即为拓展接口Protocol名）
          * @see org.apache.dubbo.common.extension.AdaptiveClassCodeGenerator#getMethodAdaptiveValue(org.apache.dubbo.common.extension.Adaptive)
          */
         Exporter<?> exporter = protocol.export(PROXY_FACTORY.getInvoker(ref, (Class) interfaceClass, local));
