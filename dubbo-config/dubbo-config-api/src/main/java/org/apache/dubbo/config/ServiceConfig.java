@@ -758,7 +758,14 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                 .setPort(0)
                 .build();
         /**
+         * PROXY_FACTORY.getInvoker
+         * @see JavassistProxyFactory#getInvoker(Object, Class, URL)
+         *
+         * protocol.export
          * @see InjvmProtocol#export(Invoker)
+         *
+         * 为什么是InjvmProtocol？-（export方法上的@Adaptive注解未指定任何value值，getMethodAdaptiveValue值的获取即为拓展接口Protocol名）
+         * @see org.apache.dubbo.common.extension.AdaptiveClassCodeGenerator#getMethodAdaptiveValue(org.apache.dubbo.common.extension.Adaptive)
          */
         Exporter<?> exporter = protocol.export(PROXY_FACTORY.getInvoker(ref, (Class) interfaceClass, local));
         exporters.add(exporter);

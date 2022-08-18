@@ -67,10 +67,8 @@ public class ProtocolListenerWrapper implements Protocol {
         if (REGISTRY_PROTOCOL.equals(url.getProtocol())) {
             return protocol.refer(type, url);
         }
-        return new ListenerInvokerWrapper<T>(protocol.refer(type, url),
-                Collections.unmodifiableList(
-                        ExtensionLoader.getExtensionLoader(InvokerListener.class)
-                                .getActivateExtension(url, INVOKER_LISTENER_KEY)));
+        return new ListenerInvokerWrapper<T>(protocol.refer(type, url)
+                , Collections.unmodifiableList(ExtensionLoader.getExtensionLoader(InvokerListener.class).getActivateExtension(url, INVOKER_LISTENER_KEY)));
     }
 
     @Override

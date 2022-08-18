@@ -212,12 +212,16 @@ public class ExtensionLoader<T> {
         List<String> names = values == null ? new ArrayList<>(0) : Arrays.asList(values);
         if (!names.contains(REMOVE_VALUE_PREFIX + DEFAULT_KEY)) {
             getExtensionClasses();
+            /**
+             * cachedActivates 初始化位置
+             * @see ExtensionLoader#loadClass(Map, java.net.URL, Class, String)
+             * @see ExtensionLoader#cacheActivateClass(Class, String)
+             */
             for (Map.Entry<String, Object> entry : cachedActivates.entrySet()) {
                 String name = entry.getKey();
                 Object activate = entry.getValue();
 
                 String[] activateGroup, activateValue;
-
                 if (activate instanceof Activate) {
                     activateGroup = ((Activate) activate).group();
                     activateValue = ((Activate) activate).value();
@@ -227,6 +231,7 @@ public class ExtensionLoader<T> {
                 } else {
                     continue;
                 }
+
                 if (isMatchGroup(group, activateGroup)
                         && !names.contains(name)
                         && !names.contains(REMOVE_VALUE_PREFIX + name)
@@ -236,6 +241,7 @@ public class ExtensionLoader<T> {
             }
             exts.sort(ActivateComparator.COMPARATOR);
         }
+
         List<T> usrs = new ArrayList<>();
         for (int i = 0; i < names.size(); i++) {
             String name = names.get(i);
@@ -251,6 +257,7 @@ public class ExtensionLoader<T> {
                 }
             }
         }
+
         if (!usrs.isEmpty()) {
             exts.addAll(usrs);
         }
