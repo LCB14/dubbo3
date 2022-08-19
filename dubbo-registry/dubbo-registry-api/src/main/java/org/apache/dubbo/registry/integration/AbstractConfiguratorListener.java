@@ -39,14 +39,22 @@ public abstract class AbstractConfiguratorListener implements ConfigurationListe
 
 
     protected final void initWith(String key) {
+        // 获取配置中心并设置监听器
         DynamicConfiguration dynamicConfiguration = DynamicConfiguration.getDynamicConfiguration();
         dynamicConfiguration.addListener(key, this);
+
+        // 根据key获取配置中心对应配置
         String rawConfig = dynamicConfiguration.getRule(key, DynamicConfiguration.DEFAULT_GROUP);
         if (!StringUtils.isEmpty(rawConfig)) {
+            // 解析配置并更新本地配置
             genConfiguratorsFromRawRule(rawConfig);
         }
     }
 
+    /**
+     * 调用位置参考
+     * @see org.apache.dubbo.configcenter.support.zookeeper.CacheListener#dataChanged(String, Object, org.apache.dubbo.remoting.zookeeper.EventType)
+     */
     @Override
     public void process(ConfigChangeEvent event) {
         if (logger.isInfoEnabled()) {
@@ -69,8 +77,7 @@ public abstract class AbstractConfiguratorListener implements ConfigurationListe
         boolean parseSuccess = true;
         try {
             // parseConfigurators will recognize app/service config automatically.
-            configurators = Configurator.toConfigurators(ConfigParser.parseConfigurators(rawConfig))
-                    .orElse(configurators);
+            configurators = Configurator.toConfigurators(ConfigParser.parseConfigurators(rawConfig)).orElse(configurators);
         } catch (Exception e) {
             logger.error("Failed to parse raw dynamic config and it will not take effect, the raw config is: " +
                     rawConfig, e);

@@ -704,11 +704,10 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                         /**
                          * ref - 表示提供服务接口的具体实现类信息；
                          * interfaceClass - 表示服务接口信息；
-                         * registryURL.addParameterAndEncoded(EXPORT_KEY, url.toFullString()) - 执行结果如下:
-                         * registry://127.0.0.1:2181/org.apache.dubbo.registry.RegistryService?application=demo-provider&dubbo=2.0.2&export=dubbo://192.168.20.233:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bean.name=org.apache.dubbo.demo.DemoService&bind.ip=192.168.20.233&bind.port=20880&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello&pid=5025&qos.port=22222&release=&side=provider&timestamp=1659432631915&pid=5025&qos.port=22222&registry=zookeeper&timestamp=165943263190
-                         * 即将url作为export属性值拼接到registryURL之后。
                          *
-                         * getInvoker方法表示根据url信息生成一个指定服务接口的代理对象，Invoker实例表示服务提供者的代理，可以通过Invoker的invoker方法执行相关服务调用。
+                         * registryURL.addParameterAndEncoded(EXPORT_KEY, url.toFullString()) 作用是将目标导出服务url作为export属性值拼接到registryURL之后。- 执行结果如下:
+                         * registry://127.0.0.1:2181/org.apache.dubbo.registry.RegistryService?application=demo-provider&dubbo=2.0.2&export=dubbo://192.168.20.233:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bean.name=org.apache.dubbo.demo.DemoService&bind.ip=192.168.20.233&bind.port=20880&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello&pid=5025&qos.port=22222&release=&side=provider&timestamp=1659432631915&pid=5025&qos.port=22222&registry=zookeeper&timestamp=165943263190
+                         *
                          * @see JavassistProxyFactory#getInvoker(Object, Class, URL)
                          */
                         Invoker<?> invoker = PROXY_FACTORY.getInvoker(ref, (Class) interfaceClass, registryURL.addParameterAndEncoded(EXPORT_KEY, url.toFullString()));
@@ -718,6 +717,8 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
 
                         /**
                          * @see org.apache.dubbo.registry.integration.RegistryProtocol#export(org.apache.dubbo.rpc.Invoker)
+                         *
+                         * RegistryProtocol？-（接口Protocol的export方法上的@Adaptive注解未指定任何value值，getMethodAdaptiveValue值的获取即为拓展接口Protocol名）
                          */
                         Exporter<?> exporter = protocol.export(wrapperInvoker);
                         exporters.add(exporter);

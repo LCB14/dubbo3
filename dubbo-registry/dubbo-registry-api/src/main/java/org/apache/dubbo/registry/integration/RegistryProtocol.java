@@ -221,17 +221,22 @@ public class RegistryProtocol implements Protocol {
         final OverrideListener overrideSubscribeListener = new OverrideListener(overrideSubscribeUrl, originInvoker);
         overrideListeners.put(overrideSubscribeUrl, overrideSubscribeListener);
 
-        // dubbo://192.168.20.233:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bean.name=org.apache.dubbo.demo.DemoService&bind.ip=192.168.20.233&bind.port=20880&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello&pid=13265&qos.port=22222&release=&side=provider&timestamp=1659689683718
+        /**
+         * overrideUrlWithConfig方法是 Dubbo 2.7 版本提供的，Dubbo 2.6 版本所有数据都存在注册中心上，Dubbo 2.7版本分成了注册中心，配置中心，和元数据中心。
+         * 获取配置中心存储的配置数据，继续完善目标导出服务URL信息的组装。
+         */
         providerUrl = overrideUrlWithConfig(providerUrl, overrideSubscribeListener);
-        //export invoker
-        final ExporterChangeableWrapper<T> exporter = doLocalExport(originInvoker, providerUrl);
 
+        //export invoker
+        // 服务暴露
+        final ExporterChangeableWrapper<T> exporter = doLocalExport(originInvoker, providerUrl);
 
         /**
          * 根据 URL 加载 Registry 实现类，比如 ZookeeperRegistry
          * @see org.apache.dubbo.registry.zookeeper.ZookeeperRegistry
          */
         final Registry registry = getRegistry(originInvoker);
+
         /**
          * 获取已注册的服务提供者 URL
          * providerUrl->dubbo://192.168.20.233:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bean.name=org.apache.dubbo.demo.DemoService&bind.ip=192.168.20.233&bind.port=20880&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello&pid=21489&qos.port=22222&release=&side=provider&timestamp=1660034231340
@@ -251,7 +256,6 @@ public class RegistryProtocol implements Protocol {
             register(registryUrl, registeredProviderUrl);
             providerInvokerWrapper.setReg(true);
         }
-
         // Deprecated! Subscribe to override rules in 2.6.x or before.
         // 向注册中心进行订阅 override 数据
         registry.subscribe(overrideSubscribeUrl, overrideSubscribeListener);
@@ -263,16 +267,21 @@ public class RegistryProtocol implements Protocol {
     }
 
     private URL overrideUrlWithConfig(URL providerUrl, OverrideListener listener) {
+        // 从配置中心，获取应用级别配置并覆盖本地配置
         providerUrl = providerConfigurationListener.overrideUrl(providerUrl);
+
+        // 创建服务级别配置监听器
         ServiceConfigurationListener serviceConfigurationListener = new ServiceConfigurationListener(providerUrl, listener);
         serviceConfigurationListeners.put(providerUrl.getServiceKey(), serviceConfigurationListener);
+
+        // 从配置中心，获取服务级别配置并覆盖本地配置
         return serviceConfigurationListener.overrideUrl(providerUrl);
     }
 
     @SuppressWarnings("unchecked")
     private <T> ExporterChangeableWrapper<T> doLocalExport(final Invoker<T> originInvoker, URL providerUrl) {
+        // key 为 providerUrl 但移除了 dynamic、enabled参数
         String key = getCacheKey(originInvoker);
-
         return (ExporterChangeableWrapper<T>) bounds.computeIfAbsent(key, s -> {
             Invoker<?> invokerDelegate = new InvokerDelegate<>(originInvoker, providerUrl);
             /**
@@ -635,6 +644,11 @@ public class RegistryProtocol implements Protocol {
         public ServiceConfigurationListener(URL providerUrl, OverrideListener notifyListener) {
             this.providerUrl = providerUrl;
             this.notifyListener = notifyListener;
+            /**
+             * 通过该方法订阅配置中心的配置。
+             * DynamicConfiguration.getRuleKey(providerUrl) 数据参考：（即使用冒号拼接导出服务的接口全限定名、服务version以及group）
+             * org.apache.dubbo.demo.DemoService::
+             */
             this.initWith(DynamicConfiguration.getRuleKey(providerUrl) + CONFIGURATORS_SUFFIX);
         }
 
@@ -651,6 +665,7 @@ public class RegistryProtocol implements Protocol {
     private class ProviderConfigurationListener extends AbstractConfiguratorListener {
 
         public ProviderConfigurationListener() {
+            // ApplicationModel.getApplication() 数据参考：demo-provider
             this.initWith(ApplicationModel.getApplication() + CONFIGURATORS_SUFFIX);
         }
 

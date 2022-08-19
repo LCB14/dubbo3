@@ -27,6 +27,7 @@ import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.timeout.IdleStateEvent;
+import org.apache.dubbo.remoting.transport.dispatcher.all.AllChannelHandler;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
@@ -56,6 +57,9 @@ public class NettyServerHandler extends ChannelDuplexHandler {
             throw new IllegalArgumentException("handler == null");
         }
         this.url = url;
+        /**
+         * @see AllChannelHandler
+         */
         this.handler = handler;
     }
 

@@ -122,10 +122,17 @@ public interface DynamicConfiguration extends Configuration {
      * @return DynamicConfiguration instance
      */
     static DynamicConfiguration getDynamicConfiguration() {
+        /**
+         * 配置中心初始化位置参考
+         * step1:
+         *  @see org.apache.dubbo.config.AbstractInterfaceConfig#startConfigCenter()
+         * step2:
+         *  @see org.apache.dubbo.config.AbstractInterfaceConfig#prepareEnvironment()
+         * step3:
+         *  @see org.apache.dubbo.config.AbstractInterfaceConfig#getDynamicConfiguration(URL)
+         */
         Optional<Configuration> optional = Environment.getInstance().getDynamicConfiguration();
-        return (DynamicConfiguration) optional.orElseGet(() -> getExtensionLoader(DynamicConfigurationFactory.class)
-                .getDefaultExtension()
-                .getDynamicConfiguration(null));
+        return (DynamicConfiguration) optional.orElseGet(() -> getExtensionLoader(DynamicConfigurationFactory.class).getDefaultExtension().getDynamicConfiguration(null));
     }
 
     /**
