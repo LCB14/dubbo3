@@ -216,27 +216,49 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
         if (StringUtils.isEmpty(interfaceName)) {
             throw new IllegalStateException("<dubbo:reference interface=\"\" /> interface not allow null!");
         }
+
         completeCompoundConfigs();
+
         startConfigCenter();
+
         // get consumer's global configuration
+        // <dubbo:consumer/> 检测 ConsumerConfig 配置是否为空，为空则创建。
         checkDefault();
+
+        // 获取各个渠道指定的ReferenceConfig配置，并本地化
         this.refresh();
+
+        /**
+         * 服务端xml配置：
+         * <bean id="someService" class="com.abc.provider.GenericServiceImpl"/>
+         * <dubbo:service interface="com.abc.service.SomeService" ref="someService" generic="true"/>
+         *
+         * 消费端xml配置：
+         * <dubbo:reference id="someService" interface="com.abc.service.SomeService" check="false" generic="true" />
+         */
         if (getGeneric() == null && getConsumer() != null) {
             setGeneric(getConsumer().getGeneric());
         }
+
         if (ProtocolUtils.isGeneric(getGeneric())) {
             interfaceClass = GenericService.class;
         } else {
             try {
-                interfaceClass = Class.forName(interfaceName, true, Thread.currentThread()
-                        .getContextClassLoader());
+                interfaceClass = Class.forName(interfaceName, true, Thread.currentThread().getContextClassLoader());
             } catch (ClassNotFoundException e) {
                 throw new IllegalStateException(e.getMessage(), e);
             }
+            // 校验服务提供接口实际提供的方法和用户通过<dubbo:method/>指定的是否真正存在和匹配
             checkInterfaceAndMethods(interfaceClass, methods);
         }
+
+        // 从系统属性或配置文件中加载与接口名相对应的配置，并将解析结果赋值给 url 字段。url 字段的作用一般是用于点对点调用。
         resolveFile();
+
+        // 检查并刷新ApplicationConfig
         checkApplication();
+
+        // 检查并刷新元数据中心配置
         checkMetadataReport();
     }
 
@@ -273,12 +295,15 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
         if (initialized) {
             return;
         }
+
+        // 检测本地存根配置合法性
         checkStubAndLocal(interfaceClass);
+
+        // 检测mock配置合法性
         checkMock(interfaceClass);
+
         Map<String, String> map = new HashMap<String, String>();
-
         map.put(SIDE_KEY, CONSUMER_SIDE);
-
         appendRuntimeParameters(map);
         if (!ProtocolUtils.isGeneric(getGeneric())) {
             String revision = Version.getVersion(interfaceClass, version);
@@ -317,7 +342,7 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
                 attributes.put(methodConfig.getName(), convertMethodConfig2AsyncInfo(methodConfig));
             }
         }
-
+        // 获取服务消费者 ip 地址
         String hostToRegistry = ConfigUtils.getSystemProperty(DUBBO_IP_TO_REGISTRY);
         if (StringUtils.isEmpty(hostToRegistry)) {
             hostToRegistry = NetUtils.getLocalHost();
@@ -329,6 +354,7 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
         // 根据服务引入所配置的参数去创建代理对象
         ref = createProxy(map);
 
+        // 根据服务名，ReferenceConfig，代理类构建 ConsumerModel，并将 ConsumerModel 存入到 ApplicationModel 中
         String serviceKey = URL.buildKey(interfaceName, group, version);
         ApplicationModel.initConsumerModel(serviceKey, buildConsumerModel(serviceKey, attributes));
         initialized = true;
@@ -421,6 +447,7 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
         if (logger.isInfoEnabled()) {
             logger.info("Refer dubbo service " + interfaceClass.getName() + " from url " + invoker.getUrl());
         }
+
         /**
          * @since 2.7.0
          * ServiceData Store
@@ -430,6 +457,7 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
             URL consumerURL = new URL(CONSUMER_PROTOCOL, map.remove(REGISTER_IP_KEY), 0, map.get(INTERFACE_KEY), map);
             metadataReportService.publishConsumer(consumerURL);
         }
+
         // create service proxy
         return (T) PROXY_FACTORY.getProxy(invoker);
     }
@@ -630,24 +658,30 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
     }
 
     private void resolveFile() {
+        // 从系统变量中获取与接口名对应的属性值
         String resolve = System.getProperty(interfaceName);
         String resolveFile = null;
         if (StringUtils.isEmpty(resolve)) {
+            // 从系统属性中获取解析文件路径
             resolveFile = System.getProperty("dubbo.resolve.file");
             if (StringUtils.isEmpty(resolveFile)) {
+                // 从指定位置加载配置文件
                 File userResolveFile = new File(new File(System.getProperty("user.home")), "dubbo-resolve.properties");
                 if (userResolveFile.exists()) {
+                    // 获取文件绝对路径
                     resolveFile = userResolveFile.getAbsolutePath();
                 }
             }
             if (resolveFile != null && resolveFile.length() > 0) {
                 Properties properties = new Properties();
                 try (FileInputStream fis = new FileInputStream(new File(resolveFile))) {
+                    // 从文件中加载配置
                     properties.load(fis);
                 } catch (IOException e) {
                     throw new IllegalStateException("Failed to load " + resolveFile + ", cause: " + e.getMessage(), e);
                 }
 
+                // 获取与接口名对应的配置
                 resolve = properties.getProperty(interfaceName);
             }
         }
