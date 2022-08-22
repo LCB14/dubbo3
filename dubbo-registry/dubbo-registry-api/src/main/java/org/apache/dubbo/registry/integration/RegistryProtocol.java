@@ -31,6 +31,7 @@ import org.apache.dubbo.registry.NotifyListener;
 import org.apache.dubbo.registry.Registry;
 import org.apache.dubbo.registry.RegistryFactory;
 import org.apache.dubbo.registry.RegistryService;
+import org.apache.dubbo.registry.support.AbstractRegistryFactory;
 import org.apache.dubbo.registry.support.FailbackRegistry;
 import org.apache.dubbo.registry.support.ProviderConsumerRegTable;
 import org.apache.dubbo.registry.support.ProviderInvokerWrapper;
@@ -184,13 +185,9 @@ public class RegistryProtocol implements Protocol {
 
     public void register(URL registryUrl, URL registeredProviderUrl) {
         /**
-         * @see org.apache.dubbo.registry.zookeeper.ZookeeperRegistry
+         * @see org.apache.dubbo.registry.zookeeper.ZookeeperRegistryFactory
          */
         Registry registry = registryFactory.getRegistry(registryUrl);
-
-        /**
-         * @see FailbackRegistry#register(URL)
-         */
         registry.register(registeredProviderUrl);
     }
 
@@ -232,8 +229,7 @@ public class RegistryProtocol implements Protocol {
         final ExporterChangeableWrapper<T> exporter = doLocalExport(originInvoker, providerUrl);
 
         /**
-         * 根据 URL 加载 Registry 实现类，比如 ZookeeperRegistry
-         * @see org.apache.dubbo.registry.zookeeper.ZookeeperRegistry
+         * 创建注册中心客户端
          */
         final Registry registry = getRegistry(originInvoker);
 
@@ -342,8 +338,14 @@ public class RegistryProtocol implements Protocol {
         // zookeeper://127.0.0.1:2181/org.apache.dubbo.registry.RegistryService?application=demo-provider&dubbo=2.0.2&export=dubbo://192.168.20.233:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bean.name=org.apache.dubbo.demo.DemoService&bind.ip=192.168.20.233&bind.port=20880&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello&pid=21163&qos.port=22222&release=&side=provider&timestamp=1660029600003&pid=21163&qos.port=22222&timestamp=1660029599994
         URL registryUrl = getRegistryUrl(originInvoker);
         /**
-         * registryFactory 初始化位置(拓展加载Protocol时，通过set注入的方式):
+         * registryFactory 初始化位置(SPI拓展加载Protocol时，通过set注入的方式进行的初始化):
          * @see RegistryProtocol#setRegistryFactory(RegistryFactory)
+         *
+         * registryFactory 实例
+         * step1:
+         *  @see AbstractRegistryFactory#getRegistry(URL)
+         * step2:
+         *  @see org.apache.dubbo.registry.zookeeper.ZookeeperRegistryFactory#createRegistry(URL)
          */
         return registryFactory.getRegistry(registryUrl);
     }
