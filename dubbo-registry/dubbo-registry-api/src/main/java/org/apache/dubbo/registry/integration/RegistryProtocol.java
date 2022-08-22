@@ -31,10 +31,7 @@ import org.apache.dubbo.registry.NotifyListener;
 import org.apache.dubbo.registry.Registry;
 import org.apache.dubbo.registry.RegistryFactory;
 import org.apache.dubbo.registry.RegistryService;
-import org.apache.dubbo.registry.support.AbstractRegistryFactory;
-import org.apache.dubbo.registry.support.FailbackRegistry;
-import org.apache.dubbo.registry.support.ProviderConsumerRegTable;
-import org.apache.dubbo.registry.support.ProviderInvokerWrapper;
+import org.apache.dubbo.registry.support.*;
 import org.apache.dubbo.rpc.Exporter;
 import org.apache.dubbo.rpc.Invoker;
 import org.apache.dubbo.rpc.Protocol;
@@ -185,9 +182,19 @@ public class RegistryProtocol implements Protocol {
 
     public void register(URL registryUrl, URL registeredProviderUrl) {
         /**
+         * step1
          * @see org.apache.dubbo.registry.zookeeper.ZookeeperRegistryFactory
+         * step2
+         * @see AbstractRegistryFactory#getRegistry(URL)
          */
         Registry registry = registryFactory.getRegistry(registryUrl);
+
+        /**
+         * step1
+         * @see org.apache.dubbo.registry.zookeeper.ZookeeperRegistry
+         * step2
+         * @see AbstractRegistry#register(URL)
+         */
         registry.register(registeredProviderUrl);
     }
 

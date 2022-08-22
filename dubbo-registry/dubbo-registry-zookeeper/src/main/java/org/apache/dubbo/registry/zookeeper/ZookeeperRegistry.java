@@ -30,6 +30,8 @@ import org.apache.dubbo.remoting.zookeeper.ChildListener;
 import org.apache.dubbo.remoting.zookeeper.StateListener;
 import org.apache.dubbo.remoting.zookeeper.ZookeeperClient;
 import org.apache.dubbo.remoting.zookeeper.ZookeeperTransporter;
+import org.apache.dubbo.remoting.zookeeper.curator.CuratorZookeeperTransporter;
+import org.apache.dubbo.remoting.zookeeper.support.AbstractZookeeperTransporter;
 import org.apache.dubbo.rpc.RpcException;
 
 import java.util.ArrayList;
@@ -86,7 +88,10 @@ public class ZookeeperRegistry extends FailbackRegistry {
 
         /**
          * 创建 Zookeeper 客户端，默认为 CuratorZookeeperTransporter
-         * @see org.apache.dubbo.remoting.zookeeper.curator.CuratorZookeeperTransporter
+         * step1
+         * @see AbstractZookeeperTransporter#connect(URL)
+         * step2
+         * @see CuratorZookeeperTransporter#createZookeeperClient(URL)
          */
         zkClient = zookeeperTransporter.connect(url);
         // 添加状态监听器
