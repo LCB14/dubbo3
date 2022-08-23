@@ -67,6 +67,7 @@ public class AsyncToSyncInvoker<T> implements Invoker<T> {
         } catch (Throwable e) {
             throw new RpcException(e.getMessage(), e);
         }
+
         return asyncResult;
     }
 

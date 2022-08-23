@@ -437,12 +437,23 @@ public class RegistryProtocol implements Protocol {
                 .setProtocol(url.getParameter(REGISTRY_KEY, DEFAULT_REGISTRY))
                 .removeParameter(REGISTRY_KEY)
                 .build();
+        /**
+         * 启动zk客户端
+         * step1
+         * @see AbstractRegistryFactory#getRegistry(URL)
+         * step2
+         * @see org.apache.dubbo.registry.zookeeper.ZookeeperRegistryFactory#createRegistry(URL)
+         */
         Registry registry = registryFactory.getRegistry(url);
         if (RegistryService.class.equals(type)) {
             return proxyFactory.getInvoker((T) registry, type, url);
         }
 
         // group="a,b" or group="*"
+        /**
+         * refer 参数值参考：
+         * application=democonsumer&check=false&dubbo=2.0.2&interface=org.apache.dubbo.demo.DemoService&lazy=false&methods=sayHello&pid=9483&qos.port=33333&register.ip=192.168.20.233&side=consumer&sticky=false&timestamp=1661246288438
+         */
         Map<String, String> qs = StringUtils.parseQueryString(url.getParameterAndDecoded(REFER_KEY));
         String group = qs.get(GROUP_KEY);
         if (group != null && group.length() > 0) {

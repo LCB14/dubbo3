@@ -456,12 +456,9 @@ public class UrlUtils {
     }
 
     public static boolean isServiceKeyMatch(URL pattern, URL value) {
-        return pattern.getParameter(INTERFACE_KEY).equals(
-                value.getParameter(INTERFACE_KEY))
-                && isItemMatch(pattern.getParameter(GROUP_KEY),
-                value.getParameter(GROUP_KEY))
-                && isItemMatch(pattern.getParameter(VERSION_KEY),
-                value.getParameter(VERSION_KEY));
+        return pattern.getParameter(INTERFACE_KEY).equals(value.getParameter(INTERFACE_KEY))
+                && isItemMatch(pattern.getParameter(GROUP_KEY), value.getParameter(GROUP_KEY))
+                && isItemMatch(pattern.getParameter(VERSION_KEY), value.getParameter(VERSION_KEY));
     }
 
     public static List<URL> classifyUrls(List<URL> urls, Predicate<URL> predicate) {

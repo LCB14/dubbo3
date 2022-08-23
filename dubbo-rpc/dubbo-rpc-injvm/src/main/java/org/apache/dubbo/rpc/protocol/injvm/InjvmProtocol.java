@@ -51,7 +51,8 @@ public class InjvmProtocol extends AbstractProtocol implements Protocol {
 
     public static InjvmProtocol getInjvmProtocol() {
         if (INSTANCE == null) {
-            ExtensionLoader.getExtensionLoader(Protocol.class).getExtension(InjvmProtocol.NAME); // load
+            // load
+            ExtensionLoader.getExtensionLoader(Protocol.class).getExtension(InjvmProtocol.NAME);
         }
         return INSTANCE;
     }
@@ -74,8 +75,7 @@ public class InjvmProtocol extends AbstractProtocol implements Protocol {
 
         if (result == null) {
             return null;
-        } else if (ProtocolUtils.isGeneric(
-                result.getInvoker().getUrl().getParameter(GENERIC_KEY))) {
+        } else if (ProtocolUtils.isGeneric(result.getInvoker().getUrl().getParameter(GENERIC_KEY))) {
             return null;
         } else {
             return result;

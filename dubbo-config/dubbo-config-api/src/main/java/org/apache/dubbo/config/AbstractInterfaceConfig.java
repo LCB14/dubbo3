@@ -373,8 +373,7 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
                                 .addParameter(REGISTRY_KEY, url.getProtocol())
                                 .setProtocol(REGISTRY_PROTOCOL)
                                 .build();
-                        if ((provider && url.getParameter(REGISTER_KEY, true))
-                                || (!provider && url.getParameter(SUBSCRIBE_KEY, true))) {
+                        if ((provider && url.getParameter(REGISTER_KEY, true)) || (!provider && url.getParameter(SUBSCRIBE_KEY, true))) {
                             registryList.add(url);
                         }
                     }
@@ -392,9 +391,11 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
      */
     protected URL loadMonitor(URL registryURL) {
         checkMonitor();
+
         Map<String, String> map = new HashMap<String, String>();
         map.put(INTERFACE_KEY, MonitorService.class.getName());
         appendRuntimeParameters(map);
+
         //set ip
         String hostToRegistry = ConfigUtils.getSystemProperty(DUBBO_IP_TO_REGISTRY);
         if (StringUtils.isEmpty(hostToRegistry)) {
@@ -404,6 +405,7 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
                     DUBBO_IP_TO_REGISTRY + ", value:" + hostToRegistry);
         }
         map.put(REGISTER_IP_KEY, hostToRegistry);
+
         appendParameters(map, monitor);
         appendParameters(map, application);
         String address = monitor.getAddress();
