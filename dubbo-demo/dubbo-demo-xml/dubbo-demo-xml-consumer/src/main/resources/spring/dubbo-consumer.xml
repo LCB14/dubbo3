@@ -25,6 +25,9 @@
 
     <dubbo:registry address="zookeeper://127.0.0.1:2181"/>
 
-    <dubbo:reference id="demoService" check="false" interface="org.apache.dubbo.demo.DemoService"/>
+    <!--模拟本地服务调用-->
+    <bean id="demoServiceLocal" class="org.apache.dubbo.demo.consumer.DemoServiceLocalImpl"/>
+    <dubbo:service interface="org.apache.dubbo.demo.DemoService" ref="demoServiceLocal"/>
 
+    <dubbo:reference id="demoService" check="false" interface="org.apache.dubbo.demo.DemoService"/>
 </beans>

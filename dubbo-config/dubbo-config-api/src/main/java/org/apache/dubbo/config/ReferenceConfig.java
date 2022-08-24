@@ -397,7 +397,7 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
             urls.clear();
 
             // user specified URL, could be peer-to-peer address, or register center's address.
-            // url 不为空，表明用户可能想进行点对点调用
+            // url 不为空，表明用户可能想进行点对点调用（服务直连）
             if (url != null && url.length() > 0) {
                 // 当需要配置多个 url 时，可用分号进行分割，这里会进行切分
                 String[] us = SEMICOLON_SPLIT_PATTERN.split(url);
@@ -412,7 +412,7 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
                         // 检测 url 协议是否为 registry，若是，表明用户想使用指定的注册中心
                         if (REGISTRY_PROTOCOL.equals(url.getProtocol())) {
                             /**
-                             * 将 map 转换为查询字符串，并作为 refer 参数的值添加到 url 中。
+                             * 添加 refer 参数到 url 中，并将 url 添加到 urls 中，将 map 转换为查询字符串，并作为 refer 参数的值。
                              * StringUtils.toQueryString(map) 数据参考：
                              * application=democonsumer&check=false&dubbo=2.0.2&interface=org.apache.dubbo.demo.DemoService&lazy=false&methods=sayHello&pid=9483&qos.port=33333&register.ip=192.168.20.233&side=consumer&sticky=false&timestamp=1661246288438
                              */
@@ -438,7 +438,11 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
                             if (monitorUrl != null) {
                                 map.put(MONITOR_KEY, URL.encode(monitorUrl.toFullString()));
                             }
-                            // 添加 refer 参数到 url 中，并将 url 添加到 urls 中
+                            /**
+                             * 添加 refer 参数到 url 中，并将 url 添加到 urls 中，将 map 转换为查询字符串，并作为 refer 参数的值。
+                             * StringUtils.toQueryString(map) 数据参考：
+                             * application=democonsumer&check=false&dubbo=2.0.2&interface=org.apache.dubbo.demo.DemoService&lazy=false&methods=sayHello&pid=9483&qos.port=33333&register.ip=192.168.20.233&side=consumer&sticky=false&timestamp=1661246288438
+                             */
                             urls.add(u.addParameterAndEncoded(REFER_KEY, StringUtils.toQueryString(map)));
                         }
                     }
@@ -450,7 +454,6 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
                 }
             }
 
-            // 未配置注册中心，抛出异常
             if (urls.size() == 1) {
                 /**
                  * 调用 RegistryProtocol 的 refer 构建 Invoker 实例
@@ -519,7 +522,7 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
         boolean isJvmRefer;
         if (isInjvm() == null) {
             // if a url is specified, don't do local reference
-            // url 配置被指定，则不做本地引用
+            // url 属性被指定，则不做本地引用
             if (url != null && url.length() > 0) {
                 isJvmRefer = false;
             } else {
