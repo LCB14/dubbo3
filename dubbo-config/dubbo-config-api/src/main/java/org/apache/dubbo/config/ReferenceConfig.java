@@ -42,6 +42,7 @@ import org.apache.dubbo.rpc.model.ApplicationModel;
 import org.apache.dubbo.rpc.model.ConsumerModel;
 import org.apache.dubbo.rpc.protocol.AbstractProtocol;
 import org.apache.dubbo.rpc.protocol.injvm.InjvmProtocol;
+import org.apache.dubbo.rpc.proxy.javassist.JavassistProxyFactory;
 import org.apache.dubbo.rpc.service.GenericService;
 import org.apache.dubbo.rpc.support.ProtocolUtils;
 
@@ -456,7 +457,13 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
 
             if (urls.size() == 1) {
                 /**
-                 * 调用 RegistryProtocol 的 refer 构建 Invoker 实例
+                 * 服务直连，通过 DubboProtocol 父类 AbstractProtocol 的 refer 构建 Invoker 实例
+                 * step1
+                 * @see AbstractProtocol#refer(Class, URL)
+                 * step2
+                 * @see org.apache.dubbo.rpc.protocol.dubbo.DubboProtocol#protocolBindingRefer(Class, URL)
+                 *
+                 * 远程调用，通过 RegistryProtocol 的 refer 构建 Invoker 实例
                  * @see RegistryProtocol#refer(Class, URL)
                  */
                 invoker = REF_PROTOCOL.refer(interfaceClass, urls.get(0));
@@ -473,6 +480,7 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
                         registryURL = url;
                     }
                 }
+
                 // registry url is available
                 if (registryURL != null) {
                     // use RegistryAwareCluster only when register's CLUSTER is available
@@ -505,7 +513,10 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
             metadataReportService.publishConsumer(consumerURL);
         }
 
-        // create service proxy
+        /**
+         * create service proxy
+         * @see JavassistProxyFactory#getProxy(Invoker, Class[])
+         */
         return (T) PROXY_FACTORY.getProxy(invoker);
     }
 

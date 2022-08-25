@@ -53,6 +53,7 @@ public abstract class AbstractProxyFactory implements ProxyFactory {
                 }
             }
         }
+
         if (interfaces == null) {
             interfaces = new Class<?>[]{invoker.getInterface(), EchoService.class};
         }
