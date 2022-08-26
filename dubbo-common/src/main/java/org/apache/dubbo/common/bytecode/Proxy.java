@@ -186,6 +186,7 @@ public abstract class Proxy {
             }
 
             // create ProxyInstance class.
+            // ccp 用于为服务接口生成代理类，比如我们有一个 DemoService 接口，这个接口代理类就是由 ccp 生成的。
             String pcn = pkg + ".proxy" + id;
             ccp.setClassName(pcn);
             ccp.addField("public static java.lang.reflect.Method[] methods;");
@@ -196,6 +197,7 @@ public abstract class Proxy {
             clazz.getField("methods").set(null, methods.toArray(new Method[0]));
 
             // create Proxy class.
+            // ccm 则是用于为 org.apache.dubbo.common.bytecode.Proxy 抽象类生成子类，主要是实现 Proxy 类的抽象方法。
             String fcn = Proxy.class.getName() + id;
             ccm = ClassGenerator.newInstance(cl);
             ccm.setClassName(fcn);

@@ -467,7 +467,7 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
                  * @see RegistryProtocol#refer(Class, URL)
                  */
                 invoker = REF_PROTOCOL.refer(interfaceClass, urls.get(0));
-            } else {// 调用 RegistryProtocol 的 refer 构建 Invoker 实例
+            } else {
                 List<Invoker<?>> invokers = new ArrayList<Invoker<?>>();
                 URL registryURL = null;
                 // 获取所有的 Invoker

@@ -468,6 +468,7 @@ public class DubboProtocol extends AbstractProtocol {
      */
     private List<ReferenceCountExchangeClient> getSharedClient(URL url, int connectNum) {
         String key = url.getAddress();
+
         // 获取带有“引用计数”功能的 ExchangeClient
         List<ReferenceCountExchangeClient> clients = referenceClientMap.get(key);
         if (checkClientCanUse(clients)) {

@@ -30,7 +30,7 @@
 <!--    <dubbo:service interface="org.apache.dubbo.demo.DemoService" ref="demoServiceLocal"/>-->
 
     <!--模拟服务直连-->
-    <dubbo:reference id="demoService" check="false" interface="org.apache.dubbo.demo.DemoService" url="dubbo://localhost:20880" registry="N/A"/>
+<!--    <dubbo:reference id="demoService" check="false" interface="org.apache.dubbo.demo.DemoService" url="dubbo://localhost:20880" registry="N/A"/>-->
 
-<!--    <dubbo:reference id="demoService" check="false" interface="org.apache.dubbo.demo.DemoService"/>-->
+    <dubbo:reference id="demoService" check="false" interface="org.apache.dubbo.demo.DemoService"/>
 </beans>
