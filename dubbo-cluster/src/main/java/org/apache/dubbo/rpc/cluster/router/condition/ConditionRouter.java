@@ -83,10 +83,16 @@ public class ConditionRouter extends AbstractRouter {
             }
             rule = rule.replace("consumer.", "").replace("provider.", "");
             int i = rule.indexOf("=>");
+
+            // 分别获取服务消费者和提供者匹配规则(之所以"i+2"，因为'=>'是由两个字符组成)
             String whenRule = i < 0 ? null : rule.substring(0, i).trim();
             String thenRule = i < 0 ? rule.trim() : rule.substring(i + 2).trim();
+
+            // 解析服务消费者匹配规则
             Map<String, MatchPair> when = StringUtils.isBlank(whenRule) || "true".equals(whenRule) ? new HashMap<String, MatchPair>() : parseRule(whenRule);
+            // 解析服务提供者匹配规则
             Map<String, MatchPair> then = StringUtils.isBlank(thenRule) || "false".equals(thenRule) ? null : parseRule(thenRule);
+
             // NOTE: It should be determined on the business level whether the `When condition` can be empty or not.
             this.whenCondition = when;
             this.thenCondition = then;
@@ -95,28 +101,50 @@ public class ConditionRouter extends AbstractRouter {
         }
     }
 
-    private static Map<String, MatchPair> parseRule(String rule)
-            throws ParseException {
+    private static Map<String, MatchPair> parseRule(String rule) throws ParseException {
         Map<String, MatchPair> condition = new HashMap<String, MatchPair>();
         if (StringUtils.isBlank(rule)) {
             return condition;
         }
+
         // Key-Value pair, stores both match and mismatch conditions
         MatchPair pair = null;
         // Multiple values
         Set<String> values = null;
+
+        // 通过正则表达式匹配路由规则，ROUTE_PATTERN = ([&!=,]*)\s*([^&!=,\s]+)
+        // 这个表达式看起来不是很好理解，第一个括号内的表达式用于匹配"&", "!", "=" 和 "," 等符号。
+        // 第二括号内的用于匹配英文字母，数字等字符。举个例子说明一下：
+        //    host = 2.2.2.2 & host != 1.1.1.1 & method = hello
+        // 匹配结果如下：
+        //     括号一      括号二
+        // 1.  null       host
+        // 2.   =         2.2.2.2
+        // 3.   &         host
+        // 4.   !=        1.1.1.1
+        // 5.   &         method
+        // 6.   =         hello
         final Matcher matcher = ROUTE_PATTERN.matcher(rule);
-        while (matcher.find()) { // Try to match one by one
+        // Try to match one by one
+        while (matcher.find()) {
+            // 获取括号一内的匹配结果
             String separator = matcher.group(1);
+            // 获取括号二内的匹配结果
             String content = matcher.group(2);
             // Start part of the condition expression.
+            // 分隔符为空，表示匹配的是表达式的开始部分
             if (StringUtils.isEmpty(separator)) {
+                // 创建 MatchPair 对象
                 pair = new MatchPair();
+                // 存储 <匹配项, MatchPair> 键值对，比如 <host, MatchPair>
                 condition.put(content, pair);
             }
             // The KV part of the condition expression
+            // 如果分隔符为 &，表明接下来也是一个条件
             else if ("&".equals(separator)) {
+                // 尝试从 condition 获取 MatchPair
                 if (condition.get(content) == null) {
+                    // 未获取到 MatchPair，重新创建一个，并放入 condition 中
                     pair = new MatchPair();
                     condition.put(content, pair);
                 } else {
@@ -124,6 +152,7 @@ public class ConditionRouter extends AbstractRouter {
                 }
             }
             // The Value in the KV part.
+            // 分隔符为 =
             else if ("=".equals(separator)) {
                 if (pair == null) {
                     throw new ParseException("Illegal route rule \""
@@ -133,9 +162,11 @@ public class ConditionRouter extends AbstractRouter {
                 }
 
                 values = pair.matches;
+                // 将 content 存入到 MatchPair 的 matches 集合中
                 values.add(content);
             }
             // The Value in the KV part.
+            //  分隔符为 !=
             else if ("!=".equals(separator)) {
                 if (pair == null) {
                     throw new ParseException("Illegal route rule \""
@@ -145,6 +176,7 @@ public class ConditionRouter extends AbstractRouter {
                 }
 
                 values = pair.mismatches;
+                // 将 content 存入到 MatchPair 的 mismatches 集合中
                 values.add(content);
             }
             // The Value in the KV part, if Value have more than one items.
@@ -155,6 +187,7 @@ public class ConditionRouter extends AbstractRouter {
                             + "' at index " + matcher.start() + " before \""
                             + content + "\".", matcher.start());
                 }
+                // 将 content 存入到上一步获取到的 values 中，可能是 matches，也可能是 mismatches
                 values.add(content);
             } else {
                 throw new ParseException("Illegal route rule \"" + rule
