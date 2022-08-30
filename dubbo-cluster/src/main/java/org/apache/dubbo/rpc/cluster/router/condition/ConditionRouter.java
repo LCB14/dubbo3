@@ -124,8 +124,22 @@ public class ConditionRouter extends AbstractRouter {
         // 4.   !=        1.1.1.1
         // 5.   &         method
         // 6.   =         hello
+        // 循环结束，此时 condition 的内容如下：
+        /**
+         * {
+         *     "host": {
+         *         "matches": ["2.2.2.2"],
+         *         "mismatches": ["1.1.1.1"]
+         *     },
+         *     "method": {
+         *         "matches": ["hello"],
+         *         "mismatches": []
+         *     }
+         * }
+         */
         final Matcher matcher = ROUTE_PATTERN.matcher(rule);
         // Try to match one by one
+        // matcher.find() 尝试查找与该模式匹配的输入序列的下一个子序列。
         while (matcher.find()) {
             // 获取括号一内的匹配结果
             String separator = matcher.group(1);
@@ -199,8 +213,8 @@ public class ConditionRouter extends AbstractRouter {
     }
 
     @Override
-    public <T> List<Invoker<T>> route(List<Invoker<T>> invokers, URL url, Invocation invocation)
-            throws RpcException {
+    public <T> List<Invoker<T>> route(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
+        // 当前路由规则是否生效，默认生效。
         if (!enabled) {
             return invokers;
         }
@@ -208,29 +222,45 @@ public class ConditionRouter extends AbstractRouter {
         if (CollectionUtils.isEmpty(invokers)) {
             return invokers;
         }
+
         try {
+            // 先对服务消费者条件进行匹配，如果匹配失败，表明服务消费者 url 不符合匹配规则，
+            // 无需进行后续匹配，直接返回 Invoker 列表即可。比如下面的规则：
+            //     host = 10.20.153.10 => host = 10.0.0.10
+            // 这条路由规则希望 IP 为 10.20.153.10 的服务消费者调用 IP 为 10.0.0.10 机器上的服务。
+            // 当消费者 ip 为 10.20.153.11 时，matchWhen 返回 false，表明当前这条路由规则不适用于
+            // 当前的服务消费者，此时无需再进行后续匹配，直接返回即可。
             if (!matchWhen(url, invocation)) {
                 return invokers;
             }
+
             List<Invoker<T>> result = new ArrayList<Invoker<T>>();
+            // 服务提供者匹配条件未配置，表明对指定的服务消费者禁用服务，也就是服务消费者在黑名单中
             if (thenCondition == null) {
                 logger.warn("The current consumer in the service blacklist. consumer: " + NetUtils.getLocalHost() + ", service: " + url.getServiceKey());
                 return result;
             }
+
+            // 这里可以简单的把 Invoker 理解为服务提供者，现在使用服务提供者匹配规则对 Invoker 列表进行匹配
             for (Invoker<T> invoker : invokers) {
                 if (matchThen(invoker.getUrl(), url)) {
                     result.add(invoker);
                 }
             }
+
+            // 返回匹配结果，如果 result 为空列表，且 force = true，表示强制返回空列表，否则路由结果为空的路由规则将自动失效
             if (!result.isEmpty()) {
                 return result;
-            } else if (force) {
+            }
+            // 当路由结果为空时，是否强制执行，如果不强制执行，路由结果为空的路由规则将自动失效，可不填，缺省为 false。
+            else if (force) {
                 logger.warn("The route result is empty and force execute. consumer: " + NetUtils.getLocalHost() + ", service: " + url.getServiceKey() + ", router: " + url.getParameterAndDecoded(RULE_KEY));
                 return result;
             }
         } catch (Throwable t) {
             logger.error("Failed to execute condition router rule: " + getUrl() + ", invokers: " + invokers + ", cause: " + t.getMessage(), t);
         }
+        // 原样返回，此时 force = false，表示该条路由规则失效
         return invokers;
     }
 
@@ -247,10 +277,12 @@ public class ConditionRouter extends AbstractRouter {
     }
 
     boolean matchWhen(URL url, Invocation invocation) {
+        // 服务消费者条件为 null 或空，表示对所有消费方应用。
         return CollectionUtils.isEmptyMap(whenCondition) || matchCondition(whenCondition, url, null, invocation);
     }
 
     private boolean matchThen(URL url, URL param) {
+        // 服务提供者条件为 null 或空，表示禁用服务。
         return CollectionUtils.isNotEmptyMap(thenCondition) && matchCondition(thenCondition, url, param, null);
     }
 
@@ -260,6 +292,7 @@ public class ConditionRouter extends AbstractRouter {
         for (Map.Entry<String, MatchPair> matchPair : condition.entrySet()) {
             String key = matchPair.getKey();
             String sampleValue;
+
             //get real invoked method name from invocation
             if (invocation != null && (METHOD_KEY.equals(key) || METHODS_KEY.equals(key))) {
                 sampleValue = invocation.getMethodName();
@@ -273,6 +306,7 @@ public class ConditionRouter extends AbstractRouter {
                     sampleValue = sample.get(DEFAULT_KEY_PREFIX + key);
                 }
             }
+
             if (sampleValue != null) {
                 if (!matchPair.getValue().isMatch(sampleValue, param)) {
                     return false;
