@@ -886,7 +886,7 @@ public class ExtensionLoader<T> {
      */
     private boolean isWrapperClass(Class<?> clazz) {
         try {
-            // 检查拓展类是否是wrapper类型
+            // 检查拓展实现类是否是wrapper类型
             clazz.getConstructor(type);
             return true;
         } catch (NoSuchMethodException e) {
