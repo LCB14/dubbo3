@@ -573,6 +573,11 @@ public class ExtensionLoader<T> {
     }
 
     private T injectExtension(T instance) {
+        /**
+         * objectFactory 初始化位置
+         * @see ExtensionLoader#getExtensionLoader(Class)
+         * @see ExtensionLoader#ExtensionLoader(Class)
+         */
         if (objectFactory == null) {
             return instance;
         }
