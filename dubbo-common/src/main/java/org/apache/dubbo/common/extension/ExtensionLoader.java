@@ -930,8 +930,11 @@ public class ExtensionLoader<T> {
 
     private Class<?> createAdaptiveExtensionClass() {
         /**
-         * cachedDefaultName 的值来源于@SPI注解中指定
+         * cachedDefaultName 变量的初始化位置
          * @see ExtensionLoader#cacheDefaultExtensionName()
+         * 
+         * cachedDefaultName 的值来源于@SPI注解中指定, 在自适应拓展中用于
+         * @see AdaptiveClassCodeGenerator#generateExtNameAssignment(String[], boolean)
          */
         String code = new AdaptiveClassCodeGenerator(type, cachedDefaultName).generate();
         ClassLoader classLoader = findClassLoader();

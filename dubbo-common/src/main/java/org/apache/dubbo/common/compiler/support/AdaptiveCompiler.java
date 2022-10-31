@@ -29,6 +29,10 @@ public class AdaptiveCompiler implements Compiler {
     private static volatile String DEFAULT_COMPILER;
 
     public static void setDefaultCompiler(String compiler) {
+        /**
+         * 初始化位置
+         * @see org.apache.dubbo.config.ApplicationConfig#setCompiler(String)
+         */
         DEFAULT_COMPILER = compiler;
     }
 

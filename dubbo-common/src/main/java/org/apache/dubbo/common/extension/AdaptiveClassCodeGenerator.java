@@ -236,26 +236,45 @@ public class AdaptiveClassCodeGenerator {
             // found parameter in URL type
             if (urlTypeIndex != -1) {
                 // Null Point check
+                /**
+                 * 生成代码参考：
+                 * if (arg1 == null)
+                 *     throw new IllegalArgumentException("url == null");
+                 * com.alibaba.dubbo.common.URL url = arg1;
+                 */
                 code.append(generateUrlNullCheck(urlTypeIndex));
             } else {
                 // did not find parameter in URL type
+                /**
+                 * 生成代码参考：
+                 * if (arg0 == null)
+                 *     throw new IllegalArgumentException("com.alibaba.dubbo.rpc.Invoker argument == null");
+                 * if (arg0.getUrl() == null)
+                 *     throw new IllegalArgumentException("com.alibaba.dubbo.rpc.Invoker argument getUrl() == null");
+                 * com.alibaba.dubbo.common.URL url = arg0.getUrl();
+                 */
                 code.append(generateUrlAssignmentIndirectly(method));
             }
 
             // 如果@Adaptice注解未指定value值，就使用被代理接口的名称（例如接口名称为：xY，处理后：x.y）作为value值
             String[] value = getMethodAdaptiveValue(adaptiveAnnotation);
 
+            // 判断被代理的方法是否含有Invocation类型的参数
             boolean hasInvocation = hasInvocationArgument(method);
 
+            // 生成Invocation类型参数的非空判断
             code.append(generateInvocationArgumentNullCheck(method));
 
+            // 重点：生成拓展名即获取真正拓展接口实现类的key
             code.append(generateExtNameAssignment(value, hasInvocation));
+
             // check extName == null?
             code.append(generateExtNameNullCheck(value));
 
+            // 生成通过拓展名获取目标拓展实现类的代码
             code.append(generateExtensionAssignment());
 
-            // return statement
+            // return statement （生成目标代理方法的调用逻辑代码）
             code.append(generateReturnAndInvocation(method));
         }
 
@@ -278,12 +297,19 @@ public class AdaptiveClassCodeGenerator {
         for (int i = value.length - 1; i >= 0; --i) {
             // value.length 大于 1 时，才会走到 else 分支。
             if (i == value.length - 1) {
+                /**
+                 * defaultExtName 变量的初始化位置(defaultExtName 变量的值来源于@SPI注解中指定)
+                 * @see ExtensionLoader#createAdaptiveExtensionClass()
+                 */
                 if (null != defaultExtName) {
                     // 通过下面源码阅读可知，可以在 @Adaptive 注解中通过 @Adaptive("protocol") 来明确指定拓展实现类名称在URL中的取值属性。
                     if (!"protocol".equals(value[i])) {
                         /**
                          * Dubbo 生成拓展名逻辑, 为什么受 Invocation 类型参数影响?
-                         * 如果包含Invocation类型参数，代理方法中生成的拓展名需要包含getMethodName()返回的方法名。
+                         * 因为目标拓展的代理方法中关于拓展名的获取，需要借助Invocation#getMethodName()返回的值作为参数，从URL信息中提取。
+                         *
+                         * @see URL#getMethodParameter(String, String) 获取拓展名方法中的第一个参数值就是来源于：
+                         * @see org.apache.dubbo.rpc.Invocation#getMethodName()
                          */
                         if (hasInvocation) {
                             /**
@@ -306,7 +332,10 @@ public class AdaptiveClassCodeGenerator {
                 } else {
                     if (!"protocol".equals(value[i])) {
                         if (hasInvocation) {
-                            // 此处可能导致 getNameCode 值为 null
+                            /**
+                             * 此处可能导致 getNameCode 值为 null，不过还好，在 generateExtNameNullCheck 方法中有生成针对拓展名非空的校验
+                             * @see org.apache.dubbo.common.extension.AdaptiveClassCodeGenerator.generateExtNameNullCheck
+                             */
                             getNameCode = String.format("url.getMethodParameter(methodName, \"%s\", \"%s\")", value[i], defaultExtName);
                         } else {
                             getNameCode = String.format("url.getParameter(\"%s\")", value[i]);
