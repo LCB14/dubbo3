@@ -353,7 +353,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         }
 
         /**
-         * local 和 stub 在功能应该是一致的，用于配置本地存根
+         * local 和 stub 在功能应该是一致的，用于配置本地存根(相当于在消费端实现对目标调用服务的代理或统一异常处理)
          * 实现本地存根：@link https://dubbo.apache.org/zh/docsv2.7/user/examples/local-stub/
          */
         if (local != null) {
@@ -393,7 +393,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         checkStubAndLocal(interfaceClass);
 
         /**
-         * 检查本地伪装（mock）配置内容是否合法
+         * 检查本地伪装（mock）配置内容是否合法（本地 mock 相当于在消费端实现'服务降级'或'容错'，Mock 是 Stub 的一个子集，因为 mock 专用于处理 RpcException 异常。）
          * 实现本地 mock: @link https://dubbo.apache.org/zh/docsv2.7/user/examples/local-mock/
          */
         checkMock(interfaceClass);
