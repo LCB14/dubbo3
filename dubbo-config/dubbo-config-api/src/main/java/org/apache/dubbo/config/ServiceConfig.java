@@ -326,7 +326,10 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
             throw new IllegalStateException("<dubbo:service interface=\"\" /> interface not allow null!");
         }
 
-        // 检测 ref 是否为泛化服务类型
+        /**
+         * 检测 ref 是否为泛化服务类型（ref 值参考：org.apache.dubbo.demo.provider.DemoServiceImpl）
+         * 实现泛化调用：@link https://dubbo.apache.org/zh/docsv2.7/user/examples/generic-service/
+         */
         if (ref instanceof GenericService) {
             // 设置 interfaceClass 为 GenericService.class
             interfaceClass = GenericService.class;
@@ -340,7 +343,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                 throw new IllegalStateException(e.getMessage(), e);
             }
 
-            // 检查methods中的方法是否都是interfaceClass所具备的
+            // 检查methods中的方法（来源于用户配置）是否都是interfaceClass所具备的
             checkInterfaceAndMethods(interfaceClass, methods);
 
             // 检查 ref 所指定的实现类是否是实现了 interfaceClass
@@ -349,7 +352,10 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
             generic = Boolean.FALSE.toString();
         }
 
-        // local 和 stub 在功能应该是一致的，用于配置本地存根
+        /**
+         * local 和 stub 在功能应该是一致的，用于配置本地存根
+         * 实现本地存根：@link https://dubbo.apache.org/zh/docsv2.7/user/examples/local-stub/
+         */
         if (local != null) {
             if (Boolean.TRUE.toString().equals(local)) {
                 local = interfaceName + "Local";
@@ -367,7 +373,6 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                 throw new IllegalStateException("The local implementation class " + localClass.getName() + " not implement interface " + interfaceName);
             }
         }
-
         if (stub != null) {
             if (Boolean.TRUE.toString().equals(stub)) {
                 stub = interfaceName + "Stub";
@@ -384,11 +389,13 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                 throw new IllegalStateException("The stub implementation class " + stubClass.getName() + " not implement interface " + interfaceName);
             }
         }
-
         // 检查本地存根实现类是否有可传入 Proxy 的构造函数。
         checkStubAndLocal(interfaceClass);
 
-        // 检查本地伪装（mock）配置内容是否合法
+        /**
+         * 检查本地伪装（mock）配置内容是否合法
+         * 实现本地 mock: @link https://dubbo.apache.org/zh/docsv2.7/user/examples/local-mock/
+         */
         checkMock(interfaceClass);
     }
 
