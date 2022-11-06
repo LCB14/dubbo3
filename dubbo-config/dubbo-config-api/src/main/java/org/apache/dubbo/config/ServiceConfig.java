@@ -399,7 +399,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
     }
 
     public synchronized void export() {
-        // 在导出服务之前，Dubbo 需要检查用户的配置是否合理，或者为用户补充缺省配置。
+        // 在导出服务之前，Dubbo 需要检查用户的配置是否合理同时为用户补充缺省配置。
         checkAndUpdateSubConfigs();
 
         // 如果 export 为 false，则不导出服务
@@ -932,7 +932,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
     }
 
     private void completeCompoundConfigs() {
-        // <dubbo:provider/> 服务提供方配置，当 ProtocolConfig 和 ServiceConfig 某属性没有配置时，采用此缺省值，可选
+        // <dubbo:provider/> 作为服务提供方配置，当 ProtocolConfig 和 ServiceConfig 某属性没有配置时，采用此缺省值，可选
         if (provider != null) {
             if (application == null) {
                 setApplication(provider.getApplication());
