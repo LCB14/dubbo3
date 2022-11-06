@@ -451,6 +451,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         if (unexported) {
             throw new IllegalStateException("The service " + interfaceClass.getName() + " has already unexported!");
         }
+
         if (exported) {
             return;
         }
