@@ -605,7 +605,7 @@ public abstract class AbstractConfig implements Serializable {
         try {
             /**
              * 数据参考：<dubbo:application name="demo-provider" valid="true" prefix="dubbo.application" id="demo-provider" />
-             * getPrefix() -> dubbo.application
+             * getPrefix() -> dubbo.application （随着获取不同配置信息（例如：provider、module、registry等），该值是动态变化的）
              * getId()     -> demo-provider
              */
             CompositeConfiguration compositeConfiguration = Environment.getInstance().getConfiguration(getPrefix(), getId());

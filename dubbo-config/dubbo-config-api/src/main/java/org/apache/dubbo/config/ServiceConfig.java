@@ -931,6 +931,10 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         return port;
     }
 
+    /**
+     * 配置信息优先级
+     * provider > module > application
+     */
     private void completeCompoundConfigs() {
         // <dubbo:provider/> 作为服务提供方配置，当 ProtocolConfig 和 ServiceConfig 某属性没有配置时，采用此缺省值，可选
         if (provider != null) {
