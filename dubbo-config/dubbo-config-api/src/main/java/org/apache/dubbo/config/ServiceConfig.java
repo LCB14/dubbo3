@@ -298,7 +298,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         completeCompoundConfigs();
 
         // Config Center should always being started first.
-        // 获取dubbo各个可配置渠道对应的配置，按优先级实例化到本地或根据URL连接相关的配置中心
+        // 获取 dubbo 各个可配置渠道对应的配置，按优先级实例化到本地或根据URL连接相关的配置中心
         startConfigCenter();
 
         // 对 ProviderConfig、ProtocolConfig、ApplicationConfig等配置类进行检测，为空则尝试创建，若无法创建则抛出异常
@@ -312,11 +312,14 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
             checkRegistry();
         }
 
-        // 刷新各个渠道配置
+        // 刷新ServiceConfig配置
         this.refresh();
 
-        // 刷新元数据中心配置（元数据中心主要是为了减轻注册中心的压力，将部分存储在注册中心的内容放到元数据中心。）
-        // 元数据中心的数据只是给自己使用的，改动不需要告知对端，比如服务端修改了元数据，不需要通知消费端。这样注册中心存储的数据减少，同时大大降低了因为配置修改导致注册中心频繁通知监听者，从而大大减轻注册中心的压力。
+        /**
+         * 刷新元数据中心配置 -- 元数据中心主要是为了减轻注册中心的压力，将部分存储在注册中心的内容放到元数据中心。
+         * 元数据中心的数据只是给 dubbo 框架自身使用，改动无需告知对端，比如服务端修改了元数据，不需要通知消费端。
+         * 这样注册中心存储的数据减少，同时大大降低了因为配置修改导致注册中心频繁通知监听者，从而大大减轻注册中心的压力。
+         */
         checkMetadataReport();
 
         if (StringUtils.isEmpty(interfaceName)) {

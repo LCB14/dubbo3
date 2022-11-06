@@ -648,6 +648,7 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
             // we use the loading status of DynamicConfiguration to decide whether ConfigCenter has been initiated.
             Environment.getInstance().getDynamicConfiguration().orElseGet(() -> {
                 ConfigManager configManager = ConfigManager.getInstance();
+
                 ConfigCenterConfig cc = configManager.getConfigCenter().orElse(new ConfigCenterConfig());
                 if (cc.getParameters() == null) {
                     cc.setParameters(new HashMap<>());
@@ -661,7 +662,9 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
                 cc.setUsername(rc.getUsername());
                 cc.setPassword(rc.getPassword());
                 cc.setHighestPriority(false);
+
                 setConfigCenter(cc);
+
                 startConfigCenter();
                 return null;
             });
