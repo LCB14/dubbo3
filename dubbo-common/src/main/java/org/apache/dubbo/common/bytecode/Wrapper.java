@@ -144,6 +144,7 @@ public abstract class Wrapper {
          *         }
          */
         c1.append(name).append(" w; try{ w = ((").append(name).append(")$1); }catch(Throwable e){ throw new IllegalArgumentException(e); }");
+
         /**
          * public Object getPropertyValue(Object o, String n) {
          *         org.apache.dubbo.demo.provider.DemoServiceImpl w;
@@ -154,6 +155,7 @@ public abstract class Wrapper {
          *         }
          */
         c2.append(name).append(" w; try{ w = ((").append(name).append(")$1); }catch(Throwable e){ throw new IllegalArgumentException(e); }");
+
         /**
          * public Object invokeMethod(Object o, String n, Class[] p, Object[] v) throws java.lang.reflect.InvocationTargetException {
          *         org.apache.dubbo.demo.provider.DemoServiceImpl w;
@@ -186,7 +188,7 @@ public abstract class Wrapper {
             }
 
             /**
-             * public void setPropertyValue(Object o, String n, Object v) {
+             *   public void setPropertyValue(Object o, String n, Object v) {
              *         org.apache.dubbo.demo.provider.DemoServiceImpl w;
              *         try {
              *             w = ((org.apache.dubbo.demo.provider.DemoServiceImpl) $1);
@@ -201,22 +203,37 @@ public abstract class Wrapper {
              *             w.age = (java.lang.Integer) $3;
              *             return;
              *         }
+             *         if ($2.equals("age")) {
+             *             w.setAge((java.lang.Integer) $3);
+             *             return;
+             *         }
+             *         if ($2.equals("name")) {
+             *             w.setName((java.lang.String) $3);
+             *             return;
+             *         }
              */
             c1.append(" if( $2.equals(\"").append(fn).append("\") ){ w.").append(fn).append("=").append(arg(ft, "$3")).append("; return; }");
+
             /**
-             * public Object getPropertyValue (Object o, String n){
-             *             org.apache.dubbo.demo.provider.DemoServiceImpl w;
-             *             try {
-             *                 w = ((org.apache.dubbo.demo.provider.DemoServiceImpl) $1);
-             *             } catch (Throwable e) {
-             *                 throw new IllegalArgumentException(e);
-             *             }
-             *             if ($2.equals("name")) {
-             *                 return ($w) w.name;
-             *             }
-             *             if ($2.equals("age")) {
-             *                 return ($w) w.age;
-             *             }
+             *  public Object getPropertyValue(Object o, String n) {
+             *         org.apache.dubbo.demo.provider.DemoServiceImpl w;
+             *         try {
+             *             w = ((org.apache.dubbo.demo.provider.DemoServiceImpl) $1);
+             *         } catch (Throwable e) {
+             *             throw new IllegalArgumentException(e);
+             *         }
+             *         if ($2.equals("name")) {
+             *             return ($w) w.name;
+             *         }
+             *         if ($2.equals("age")) {
+             *             return ($w) w.age;
+             *         }
+             *         if ($2.equals("age")) {
+             *             return ($w) w.getAge();
+             *         }
+             *         if ($2.equals("name")) {
+             *             return ($w) w.getName();
+             *         }
              */
             c2.append(" if( $2.equals(\"").append(fn).append("\") ){ return ($w)w.").append(fn).append("; }");
             pts.put(fn, ft);
@@ -278,7 +295,7 @@ public abstract class Wrapper {
         }
 
         /**
-         * public Object invokeMethod(Object o, String n, Class[] p, Object[] v) throws java.lang.reflect.InvocationTargetException {
+         *  public Object invokeMethod(Object o, String n, Class[] p, Object[] v) throws java.lang.reflect.InvocationTargetException {
          *         org.apache.dubbo.demo.provider.DemoServiceImpl w;
          *         try {
          *             w = ((org.apache.dubbo.demo.provider.DemoServiceImpl) $1);
@@ -286,14 +303,28 @@ public abstract class Wrapper {
          *             throw new IllegalArgumentException(e);
          *         }
          *         try {
+         *             if ("getAge".equals($2) && $3.length == 0) {
+         *                 return ($w) w.getAge();
+         *             }
          *             if ("sayHello".equals($2) && $3.length == 1) {
          *                 return ($w) w.sayHello((java.lang.String) $4[0]);
+         *             }
+         *             if ("setAge".equals($2) && $3.length == 1) {
+         *                 w.setAge((java.lang.Integer) $4[0]);
+         *                 return null;
+         *             }
+         *             if ("getName".equals($2) && $3.length == 0) {
+         *                 return ($w) w.getName();
+         *             }
+         *             if ("setName".equals($2) && $3.length == 1) {
+         *                 w.setName((java.lang.String) $4[0]);
+         *                 return null;
          *             }
          *         } catch (Throwable e) {
          *             throw new java.lang.reflect.InvocationTargetException(e);
          *         }
          *         throw new org.apache.dubbo.common.bytecode.NoSuchMethodException("Not found method \"" + $2 + "\" in class org.apache.dubbo.demo.provider.DemoServiceImpl.");
-         * }
+         *     }
          */
         c3.append(" throw new " + NoSuchMethodException.class.getName() + "(\"Not found method \\\"\"+$2+\"\\\" in class " + c.getName() + ".\"); }");
 
@@ -320,8 +351,9 @@ public abstract class Wrapper {
                 pts.put(pn, pt);
             }
         }
+
         /**
-         *  public void setPropertyValue(Object o, String n, Object v) {
+         * public void setPropertyValue(Object o, String n, Object v) {
          *         org.apache.dubbo.demo.provider.DemoServiceImpl w;
          *         try {
          *             w = ((org.apache.dubbo.demo.provider.DemoServiceImpl) $1);
@@ -345,9 +377,10 @@ public abstract class Wrapper {
          *             return;
          *         }
          *         throw new org.apache.dubbo.common.bytecode.NoSuchPropertyException("Not found property \"" + $2 + "\" field or setter method in class org.apache.dubbo.demo.provider.DemoServiceImpl.");
-         * }
+         *     }
          */
         c1.append(" throw new " + NoSuchPropertyException.class.getName() + "(\"Not found property \\\"\"+$2+\"\\\" field or setter method in class " + c.getName() + ".\"); }");
+
         /**
          * public Object getPropertyValue(Object o, String n) {
          *         org.apache.dubbo.demo.provider.DemoServiceImpl w;
@@ -369,7 +402,7 @@ public abstract class Wrapper {
          *             return ($w) w.getName();
          *         }
          *         throw new org.apache.dubbo.common.bytecode.NoSuchPropertyException("Not found property \"" + $2 + "\" field or setter method in class org.apache.dubbo.demo.provider.DemoServiceImpl.");
-         * }
+         *     }
          */
         c2.append(" throw new " + NoSuchPropertyException.class.getName() + "(\"Not found property \\\"\"+$2+\"\\\" field or setter method in class " + c.getName() + ".\"); }");
 
