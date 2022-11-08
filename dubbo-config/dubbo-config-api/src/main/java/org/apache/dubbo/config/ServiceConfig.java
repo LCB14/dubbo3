@@ -618,11 +618,10 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
             if (revision != null && revision.length() > 0) {
                 map.put(REVISION_KEY, revision);
             }
-
             /**
-             * Wrapper.getWrapper(interfaceClass)方法将生成interfaceClass对应的代理,核心代理方法代码参考如下：
+             *  Wrapper.getWrapper(interfaceClass)方法将生成interfaceClass对应的代理,核心代理方法代码参考如下：
              *
-             * public Object invokeMethod(Object o, String n, Class[] p, Object[] v) throws java.lang.reflect.InvocationTargetException {
+             *  public Object invokeMethod(Object o, String n, Class[] p, Object[] v) throws java.lang.reflect.InvocationTargetException {
              *         org.apache.dubbo.demo.provider.DemoServiceImpl w;
              *         try {
              *             w = ((org.apache.dubbo.demo.provider.DemoServiceImpl) $1);
@@ -630,15 +629,28 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
              *             throw new IllegalArgumentException(e);
              *         }
              *         try {
-             *             // 如果方法存在重载，系统还会自动生成方法各参数位置的类型校验逻辑。
+             *             if ("getAge".equals($2) && $3.length == 0) {
+             *                 return ($w) w.getAge();
+             *             }
              *             if ("sayHello".equals($2) && $3.length == 1) {
              *                 return ($w) w.sayHello((java.lang.String) $4[0]);
+             *             }
+             *             if ("setAge".equals($2) && $3.length == 1) {
+             *                 w.setAge((java.lang.Integer) $4[0]);
+             *                 return null;
+             *             }
+             *             if ("getName".equals($2) && $3.length == 0) {
+             *                 return ($w) w.getName();
+             *             }
+             *             if ("setName".equals($2) && $3.length == 1) {
+             *                 w.setName((java.lang.String) $4[0]);
+             *                 return null;
              *             }
              *         } catch (Throwable e) {
              *             throw new java.lang.reflect.InvocationTargetException(e);
              *         }
              *         throw new org.apache.dubbo.common.bytecode.NoSuchMethodException("Not found method \"" + $2 + "\" in class org.apache.dubbo.demo.provider.DemoServiceImpl.");
-             * }
+             *     }
              */
             String[] methods = Wrapper.getWrapper(interfaceClass).getMethodNames();
             if (methods.length == 0) {
@@ -727,9 +739,8 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                         DelegateProviderMetaDataInvoker wrapperInvoker = new DelegateProviderMetaDataInvoker(invoker, this);
 
                         /**
+                         * 为什么是 RegistryProtocol？-（接口Protocol的export方法上的@Adaptive注解未指定任何value值，getMethodAdaptiveValue值的获取即为拓展接口Protocol名）
                          * @see org.apache.dubbo.registry.integration.RegistryProtocol#export(org.apache.dubbo.rpc.Invoker)
-                         *
-                         * RegistryProtocol？-（接口Protocol的export方法上的@Adaptive注解未指定任何value值，getMethodAdaptiveValue值的获取即为拓展接口Protocol名）
                          */
                         Exporter<?> exporter = protocol.export(wrapperInvoker);
                         exporters.add(exporter);
