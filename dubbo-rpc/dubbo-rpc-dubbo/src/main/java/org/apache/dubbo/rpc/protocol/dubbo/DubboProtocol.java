@@ -280,11 +280,14 @@ public class DubboProtocol extends AbstractProtocol {
 
     @Override
     public <T> Exporter<T> export(Invoker<T> invoker) throws RpcException {
-        // 目标导出服务url信息
+        /**
+         * 目标导出服务url信息
+         * dubbo://192.168.17.153:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bean.name=org.apache.dubbo.demo.DemoService&bind.ip=192.168.17.153&bind.port=20880&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello&pid=7589&qos.port=22222&release=&sayHello.0.callback=false&sayHello.retries=2&sayHello.timeout=3000&side=provider&timestamp=1667898079509
+         */
         URL url = invoker.getUrl();
 
         // export service.
-        // org.apache.dubbo.demo.DemoService:20880
+        // key值参考：org.apache.dubbo.demo.DemoService:20880
         String key = serviceKey(url);
         DubboExporter<T> exporter = new DubboExporter<T>(invoker, key, exporterMap);
         exporterMap.put(key, exporter);
@@ -299,7 +302,6 @@ public class DubboProtocol extends AbstractProtocol {
                     logger.warn(new IllegalStateException("consumer [" + url.getParameter(INTERFACE_KEY) +
                             "], has set stubproxy support event ,but no stub methods founded."));
                 }
-
             } else {
                 stubServiceMethodsMap.put(url.getServiceKey(), stubServiceMethods);
             }
