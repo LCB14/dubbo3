@@ -230,6 +230,7 @@ public class RegistryProtocol implements Protocol {
         /**
          * overrideUrlWithConfig方法是 Dubbo 2.7 版本提供的，Dubbo 2.6 版本所有数据都存在注册中心上，Dubbo 2.7版本分成了注册中心，配置中心，和元数据中心。
          * 获取配置中心存储的配置数据，继续完善目标导出服务URL信息的组装。
+         * dubbo://192.168.17.153:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bean.name=org.apache.dubbo.demo.DemoService&bind.ip=192.168.17.153&bind.port=20880&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello&pid=7125&qos.port=22222&release=&sayHello.0.callback=false&sayHello.retries=2&sayHello.timeout=3000&side=provider&timestamp=1667896225780
          */
         providerUrl = overrideUrlWithConfig(providerUrl, overrideSubscribeListener);
 
