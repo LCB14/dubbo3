@@ -119,6 +119,7 @@ public class ProtocolFilterWrapper implements Protocol {
         if (REGISTRY_PROTOCOL.equals(invoker.getUrl().getProtocol())) {
             return protocol.export(invoker);
         }
+        // 如果仅导出到jvm, 则需要经过下面代码
         return protocol.export(buildInvokerChain(invoker, SERVICE_FILTER_KEY, CommonConstants.PROVIDER));
     }
 
