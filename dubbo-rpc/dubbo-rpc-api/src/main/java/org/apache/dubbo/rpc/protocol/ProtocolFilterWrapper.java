@@ -57,9 +57,7 @@ public class ProtocolFilterWrapper implements Protocol {
             for (int i = filters.size() - 1; i >= 0; i--) {
                 final Filter filter = filters.get(i);
                 final Invoker<T> next = last;
-                // 新创建的new Invoker会有上一个创建的Invoker的引用，依次类推，构成一个引用链。
                 last = new Invoker<T>() {
-
                     @Override
                     public Class<T> getInterface() {
                         return invoker.getInterface();
