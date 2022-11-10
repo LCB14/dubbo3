@@ -34,33 +34,22 @@ import static org.apache.dubbo.rpc.cluster.Constants.WEIGHT_KEY;
  * AbstractLoadBalance
  */
 public abstract class AbstractLoadBalance implements LoadBalance {
-    /**
-     * Calculate the weight according to the uptime proportion of warmup time
-     * the new weight will be within 1(inclusive) to weight(inclusive)
-     *
-     * @param uptime the uptime in milliseconds
-     * @param warmup the warmup time in milliseconds
-     * @param weight the weight of an invoker
-     * @return weight which takes warmup into account
-     */
-    static int calculateWarmupWeight(int uptime, int warmup, int weight) {
-        int ww = (int) (uptime / ((float) warmup / weight));
-        return ww < 1 ? 1 : (Math.min(ww, weight));
-    }
-
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) {
         if (CollectionUtils.isEmpty(invokers)) {
             return null;
         }
+
+        // 如果 invokers 列表中仅有一个 Invoker，直接返回即可，无需进行负载均衡
         if (invokers.size() == 1) {
             return invokers.get(0);
         }
+
+        // 调用 doSelect 方法进行负载均衡，该方法为抽象方法，由子类实现
         return doSelect(invokers, url, invocation);
     }
 
     protected abstract <T> Invoker<T> doSelect(List<Invoker<T>> invokers, URL url, Invocation invocation);
-
 
     /**
      * Get the weight of the invoker's invocation which takes warmup time into account
@@ -71,20 +60,40 @@ public abstract class AbstractLoadBalance implements LoadBalance {
      * @return weight
      */
     int getWeight(Invoker<?> invoker, Invocation invocation) {
+        // 从 url 中获取权重 weight 配置值
         int weight = invoker.getUrl().getMethodParameter(invocation.getMethodName(), WEIGHT_KEY, DEFAULT_WEIGHT);
         if (weight > 0) {
+            // 获取服务提供者启动时间戳
             long timestamp = invoker.getUrl().getParameter(TIMESTAMP_KEY, 0L);
             if (timestamp > 0L) {
+                // 计算服务提供者运行时长
                 long uptime = System.currentTimeMillis() - timestamp;
                 if (uptime < 0) {
                     return 1;
                 }
+                // 获取服务预热时间，默认为10分钟
                 int warmup = invoker.getUrl().getParameter(WARMUP_KEY, DEFAULT_WARMUP);
                 if (uptime > 0 && uptime < warmup) {
+                    // 重新计算服务权重（该过程主要用于保证当服务运行时长小于服务预热时间时，对服务进行降权，避免让服务在启动之初就处于高负载状态。）
                     weight = calculateWarmupWeight((int) uptime, warmup, weight);
                 }
             }
         }
         return Math.max(weight, 0);
+    }
+
+    /**
+     * Calculate the weight according to the uptime proportion of warmup time
+     * the new weight will be within 1(inclusive) to weight(inclusive)
+     *
+     * @param uptime the uptime in milliseconds
+     * @param warmup the warmup time in milliseconds
+     * @param weight the weight of an invoker
+     * @return weight which takes warmup into account
+     */
+    static int calculateWarmupWeight(int uptime, int warmup, int weight) {
+        // 计算权重，下面代码逻辑上形似于 (uptime / warmup) * weight。 随着服务运行时间 uptime 增大，权重计算值 ww 会慢慢接近配置值 weight
+        int ww = (int) (uptime / ((float) warmup / weight));
+        return ww < 1 ? 1 : (Math.min(ww, weight));
     }
 }
