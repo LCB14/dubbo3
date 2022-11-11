@@ -81,7 +81,9 @@ public class ConsistentHashLoadBalance extends AbstractLoadBalance {
         private final int[] argumentIndex;
 
         ConsistentHashSelector(List<Invoker<T>> invokers, String methodName, int identityHashCode) {
+            // 使用 TreeMap 存储 Invoker 虚拟节点
             this.virtualInvokers = new TreeMap<Long, Invoker<T>>();
+
             this.identityHashCode = identityHashCode;
 
             URL url = invokers.get(0).getUrl();
@@ -106,8 +108,7 @@ public class ConsistentHashLoadBalance extends AbstractLoadBalance {
                         // h = 1 时，取 digest 中下标为 4 ~ 7 的4个字节进行位运算
                         // h = 2, h = 3 时过程同上
                         long m = hash(digest, h);
-                        // 将 hash 到 invoker 的映射关系存储到 virtualInvokers 中，
-                        // virtualInvokers 需要提供高效的查询操作，因此选用 TreeMap 作为存储结构
+                        // 将 hash 到 invoker 的映射关系存储到 virtualInvokers 中，virtualInvokers 需要提供高效的查询操作，因此选用 TreeMap 作为存储结构
                         virtualInvokers.put(m, invoker);
                     }
                 }
@@ -145,11 +146,12 @@ public class ConsistentHashLoadBalance extends AbstractLoadBalance {
         }
 
         private long hash(byte[] digest, int number) {
-            return (((long) (digest[3 + number * 4] & 0xFF) << 24)
+            return (
+                    ((long) (digest[3 + number * 4] & 0xFF) << 24)
                     | ((long) (digest[2 + number * 4] & 0xFF) << 16)
                     | ((long) (digest[1 + number * 4] & 0xFF) << 8)
-                    | (digest[number * 4] & 0xFF))
-                    & 0xFFFFFFFFL;
+                    | (digest[number * 4] & 0xFF)
+            ) & 0xFFFFFFFFL;
         }
 
         private byte[] md5(String value) {
@@ -160,6 +162,7 @@ public class ConsistentHashLoadBalance extends AbstractLoadBalance {
                 throw new IllegalStateException(e.getMessage(), e);
             }
             md5.reset();
+
             byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
             md5.update(bytes);
             return md5.digest();
