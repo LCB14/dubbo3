@@ -51,6 +51,7 @@ public class RandomLoadBalance extends AbstractLoadBalance {
         // Every invoker has the same weight?
         boolean sameWeight = true;
         // the weight of every invokers
+        // 每台服务器的权重值可以看成是数轴上的一个点，weights数组用来存储这样的每个点的。
         int[] weights = new int[length];
 
         // the first invoker's weight
