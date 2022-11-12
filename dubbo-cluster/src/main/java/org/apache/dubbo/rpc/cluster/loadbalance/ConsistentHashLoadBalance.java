@@ -91,7 +91,8 @@ public class ConsistentHashLoadBalance extends AbstractLoadBalance {
             // 获取虚拟节点数，默认为160
             this.replicaNumber = url.getMethodParameter(methodName, HASH_NODES, 160);
 
-            // 获取参与 hash 计算的参数下标值，默认对第一个参数进行 hash 运算
+            // 获取参与 hash 计算的参数下标值，默认对第一个参数进行 hash 运算(默认情况下只使用第一个参数进行 hash。)
+            // ConsistentHashLoadBalance 的负载均衡逻辑只受参数值影响，具有相同参数值的请求将会被分配给同一个服务提供者。
             String[] index = COMMA_SPLIT_PATTERN.split(url.getMethodParameter(methodName, HASH_ARGUMENTS, "0"));
             argumentIndex = new int[index.length];
             for (int i = 0; i < index.length; i++) {
