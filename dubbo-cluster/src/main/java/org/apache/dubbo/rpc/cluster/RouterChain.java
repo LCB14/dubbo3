@@ -33,9 +33,11 @@ import java.util.stream.Collectors;
 public class RouterChain<T> {
 
     // full list of addresses from registry, classified by method name.
+    // 服务提供者列表
     private List<Invoker<T>> invokers = Collections.emptyList();
 
     // containing all routers, reconstruct every time 'route://' urls change.
+    // 路由规则列表
     private volatile List<Router> routers = Collections.emptyList();
 
     // Fixed router instances: ConfigConditionRouter, TagRouter, e.g., the rule for each instance may change but the
@@ -93,6 +95,7 @@ public class RouterChain<T> {
      */
     public List<Invoker<T>> route(URL url, Invocation invocation) {
         List<Invoker<T>> finalInvokers = invokers;
+        // 遍历每个route，针对每个路由规则，分别对Invoker列表进行过滤
         for (Router router : routers) {
             finalInvokers = router.route(finalInvokers, url, invocation);
         }
