@@ -232,17 +232,19 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
         this.refresh();
 
         /**
-         * 服务端xml配置：
+         * 使用泛化调用时服务提供端和服务消费端配置如下：
+         * 1、服务端xml配置
          * <bean id="someService" class="com.abc.provider.GenericServiceImpl"/>
          * <dubbo:service interface="com.abc.service.SomeService" ref="someService" generic="true"/>
          *
-         * 消费端xml配置：
+         * 2、消费端xml配置
          * <dubbo:reference id="someService" interface="com.abc.service.SomeService" check="false" generic="true" />
          */
         if (getGeneric() == null && getConsumer() != null) {
             setGeneric(getConsumer().getGeneric());
         }
 
+        // 检测是否为泛化接口
         if (ProtocolUtils.isGeneric(getGeneric())) {
             interfaceClass = GenericService.class;
         } else {
@@ -255,7 +257,7 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
             checkInterfaceAndMethods(interfaceClass, methods);
         }
 
-        // 从系统属性或配置文件中加载与接口名相对应的配置，并将解析结果赋值给 url 字段。url 字段的作用一般是用于点对点调用。
+        // 从系统属性或配置文件中加载与接口名相对应的配置，并将解析结果赋值给 url 字段。url 字段的作用一般是用于点对点调用（服务直连）。
         resolveFile();
 
         // 检查并刷新ApplicationConfig
@@ -345,6 +347,7 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
                 attributes.put(methodConfig.getName(), convertMethodConfig2AsyncInfo(methodConfig));
             }
         }
+
         // 获取服务消费者 ip 地址
         String hostToRegistry = ConfigUtils.getSystemProperty(DUBBO_IP_TO_REGISTRY);
         if (StringUtils.isEmpty(hostToRegistry)) {
@@ -592,6 +595,7 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
             if (module == null) {
                 setModule(consumer.getModule());
             }
+
             if (registries == null) {
                 setRegistries(consumer.getRegistries());
             }
@@ -599,6 +603,8 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
                 setMonitor(consumer.getMonitor());
             }
         }
+
+        // 模块级别
         if (module != null) {
             if (registries == null) {
                 setRegistries(module.getRegistries());
@@ -607,6 +613,8 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
                 setMonitor(module.getMonitor());
             }
         }
+
+        // 应用级别
         if (application != null) {
             if (registries == null) {
                 setRegistries(application.getRegistries());
@@ -734,6 +742,7 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
                     resolveFile = userResolveFile.getAbsolutePath();
                 }
             }
+
             if (resolveFile != null && resolveFile.length() > 0) {
                 Properties properties = new Properties();
                 try (FileInputStream fis = new FileInputStream(new File(resolveFile))) {
@@ -747,6 +756,7 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
                 resolve = properties.getProperty(interfaceName);
             }
         }
+
         if (resolve != null && resolve.length() > 0) {
             url = resolve;
             if (logger.isWarnEnabled()) {
