@@ -95,7 +95,7 @@ public class InjvmProtocol extends AbstractProtocol implements Protocol {
     @Override
     public <T> Invoker<T> protocolBindingRefer(Class<T> serviceType, URL url) throws RpcException {
         /**
-         * exporterMap 初始化时机？
+         * exporterMap 初始化时机？-- 服务导出的时候进行的初始化
          * @see org.apache.dubbo.rpc.protocol.injvm.InjvmProtocol#export(Invoker)
          *
          * consumer 启动后在加载并解析dubbo-provider.xml文件时，解析发现用户想要进行本地引用，会加载serviceBean，触发
