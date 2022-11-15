@@ -460,13 +460,21 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
 
             if (urls.size() == 1) {
                 /**
-                 * 服务直连，通过 DubboProtocol 父类 AbstractProtocol 的 refer 构建 Invoker 实例
+                 * 服务直连，通过 DubboProtocol 父类 AbstractProtocol 的 refer 构建 Invoker 实例，url 数据参考如下：
+                 * dubbo://localhost:20880/org.apache.dubbo.demo.DemoService?application=demo-consumer&check=false&interface=org.apache.dubbo.demo.DemoService
+                 * &lazy=false&pid=46055&qos.port=33333&register.ip=192.168.199.139&remote.application=&side=consumer&sticky=false
+                 *
                  * step1
                  * @see AbstractProtocol#refer(Class, URL)
                  * step2
                  * @see org.apache.dubbo.rpc.protocol.dubbo.DubboProtocol#protocolBindingRefer(Class, URL)
                  *
-                 * 远程调用，通过 RegistryProtocol 的 refer 构建 Invoker 实例
+                 * 远程调用，通过 RegistryProtocol 的 refer 构建 Invoker 实例，url 数据参考如下：
+                 * registry://127.0.0.1:2181/org.apache.dubbo.registry.RegistryService?application=demo-consumer&dubbo=2.0.2&pid=45850
+                 * &qos.port=33333&refer=application=demo-consumer&check=false&dubbo=2.0.2&interface=org.apache.dubbo.demo.DemoService
+                 * &lazy=false&methods=sayHello&pid=45850&qos.port=33333&register.ip=192.168.199.139&side=consumer&sticky=false
+                 * &timestamp=1668523739215&registry=zookeeper&timestamp=1668523739548
+                 *
                  * @see RegistryProtocol#refer(Class, URL)
                  */
                 invoker = REF_PROTOCOL.refer(interfaceClass, urls.get(0));
