@@ -216,6 +216,8 @@ public abstract class Proxy {
             ccp.addDefaultConstructor();
 
             /**
+             * ccp 对应代理代码参考：
+             *
              * package org.apache.dubbo.common.bytecode;
              *
              * public class proxy0 implements org.apache.dubbo.demo.DemoService {
