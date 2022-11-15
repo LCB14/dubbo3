@@ -78,6 +78,7 @@ public abstract class Proxy {
             throw new IllegalArgumentException("interface limit exceeded");
         }
 
+        // sb 值参考：org.apache.dubbo.demo.DemoService;com.alibaba.dubbo.rpc.service.EchoService;
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < ics.length; i++) {
             String itf = ics[i].getName();
@@ -151,9 +152,11 @@ public abstract class Proxy {
                         }
                     }
                 }
+                // 添加接口
                 ccp.addInterface(ics[i]);
 
                 for (Method method : ics[i].getMethods()) {
+                    // desc 值参考：sayHello(Ljava/lang/String;)Ljava/lang/String;
                     String desc = ReflectUtils.getDesc(method);
                     if (worked.contains(desc)) {
                         continue;
@@ -167,6 +170,13 @@ public abstract class Proxy {
                     Class<?> rt = method.getReturnType();
                     Class<?>[] pts = method.getParameterTypes();
 
+                    /**
+                     * code 值参考：
+                     * Object[] args = new Object[1];
+                     * args[0] = ($w)$1;
+                     * Object ret = handler.invoke(this, methods[0], args);
+                     * return (java.lang.String)ret;
+                     */
                     StringBuilder code = new StringBuilder("Object[] args = new Object[").append(pts.length).append("];");
                     for (int j = 0; j < pts.length; j++) {
                         code.append(" args[").append(j).append("] = ($w)$").append(j + 1).append(";");
@@ -177,6 +187,7 @@ public abstract class Proxy {
                     }
 
                     methods.add(method);
+                    // 添加方法
                     ccp.addMethod(method.getName(), method.getModifiers(), rt, pts, method.getExceptionTypes(), code.toString());
                 }
             }
@@ -186,13 +197,22 @@ public abstract class Proxy {
             }
 
             // create ProxyInstance class.
-            // ccp 用于为服务接口生成代理类，比如我们有一个 DemoService 接口，这个接口代理类就是由 ccp 生成的。
+            // pcn 值参考：org.apache.dubbo.common.bytecode.proxy0
             String pcn = pkg + ".proxy" + id;
             ccp.setClassName(pcn);
+
             ccp.addField("public static java.lang.reflect.Method[] methods;");
+            // private java.lang.reflect.InvocationHandler handler;
             ccp.addField("private " + InvocationHandler.class.getName() + " handler;");
+
+            /**
+             * public <init>(java.lang.reflect.InvocationHandler arg0){
+             *     handler=$1;
+             * }
+             */
             ccp.addConstructor(Modifier.PUBLIC, new Class<?>[]{InvocationHandler.class}, new Class<?>[0], "handler=$1;");
             ccp.addDefaultConstructor();
+
             Class<?> clazz = ccp.toClass();
             clazz.getField("methods").set(null, methods.toArray(new Method[0]));
 

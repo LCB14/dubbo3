@@ -40,6 +40,12 @@ public abstract class AbstractProxyFactory implements ProxyFactory {
     @Override
     public <T> T getProxy(Invoker<T> invoker, boolean generic) throws RpcException {
         Class<?>[] interfaces = null;
+        /**
+         * invoker.getUrl() 数据参考：
+         * injvm://127.0.0.1/org.apache.dubbo.demo.DemoService?application=demo-consumer&check=false&dubbo=2.0.2
+         * &interface=org.apache.dubbo.demo.DemoService&lazy=false&methods=sayHello&pid=5850&qos.port=33333
+         * &register.ip=192.168.17.153&release=&scope=local&side=consumer&sticky=false&timestamp=1668481018002
+         */
         String config = invoker.getUrl().getParameter(INTERFACES);
         if (config != null && config.length() > 0) {
             String[] types = COMMA_SPLIT_PATTERN.split(config);
