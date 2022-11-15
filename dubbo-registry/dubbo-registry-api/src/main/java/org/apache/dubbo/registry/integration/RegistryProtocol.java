@@ -471,6 +471,7 @@ public class RegistryProtocol implements Protocol {
                 return doRefer(getMergeableCluster(), registry, type, url);
             }
         }
+
         return doRefer(cluster, registry, type, url);
     }
 
@@ -479,6 +480,12 @@ public class RegistryProtocol implements Protocol {
     }
 
     private <T> Invoker<T> doRefer(Cluster cluster, Registry registry, Class<T> type, URL url) {
+        /**
+         * url 数据参考：
+         * zookeeper://127.0.0.1:2181/org.apache.dubbo.registry.RegistryService?application=demo-consumer&dubbo=2.0.2&pid=10589&qos.port=33333&refer=application=demo-consumer&check=false
+         * &dubbo=2.0.2&interface=org.apache.dubbo.demo.DemoService&lazy=false&methods=sayHello&pid=10589&qos.port=33333&register.ip=192.168.17.153
+         * &side=consumer&sticky=false&timestamp=1668510676719&timestamp=1668510677079
+         */
         RegistryDirectory<T> directory = new RegistryDirectory<T>(type, url);
         directory.setRegistry(registry);
         directory.setProtocol(protocol);
@@ -486,7 +493,11 @@ public class RegistryProtocol implements Protocol {
         // all attributes of REFER_KEY
         Map<String, String> parameters = new HashMap<String, String>(directory.getUrl().getParameters());
 
-        // 生成服务消费者链接
+        /**
+         * 生成服务消费者链接, 数据参考：
+         * consumer://192.168.17.153/org.apache.dubbo.demo.DemoService?application=demo-consumer&check=false&dubbo=2.0.2&interface=org.apache.dubbo.demo.DemoService
+         * &lazy=false&methods=sayHello&pid=9851&qos.port=33333&side=consumer&sticky=false&timestamp=1668506070653
+         */
         URL subscribeUrl = new URL(CONSUMER_PROTOCOL, parameters.remove(REGISTER_IP_KEY), 0, type.getName(), parameters);
 
         if (!ANY_VALUE.equals(url.getServiceInterface()) && url.getParameter(REGISTER_KEY, true)) {
@@ -494,6 +505,8 @@ public class RegistryProtocol implements Protocol {
             // 注册服务消费者，在 consumers 目录下新节点
             registry.register(directory.getRegisteredConsumerUrl());
         }
+
+        // 构造路由链（过滤用）
         directory.buildRouterChain(subscribeUrl);
 
         // 订阅 providers、configurators、routers 等节点数据
