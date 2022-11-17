@@ -515,7 +515,10 @@ public class RegistryProtocol implements Protocol {
         // 2、构造路由链（过滤用） -- 服务路由
         directory.buildRouterChain(subscribeUrl);
 
-        // 订阅 providers、configurators、routers 等节点数据
+        /**
+         * 订阅 providers、configurators、routers 等节点数据。
+         * @see org.apache.dubbo.registry.integration.RegistryDirectory#invokers 属性的初始化从此处开始
+         */
         directory.subscribe(subscribeUrl.addParameter(CATEGORY_KEY, PROVIDERS_CATEGORY + "," + CONFIGURATORS_CATEGORY + "," + ROUTERS_CATEGORY));
 
         /**
