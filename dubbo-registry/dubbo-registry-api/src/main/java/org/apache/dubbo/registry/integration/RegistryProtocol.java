@@ -522,7 +522,7 @@ public class RegistryProtocol implements Protocol {
         directory.subscribe(subscribeUrl.addParameter(CATEGORY_KEY, PROVIDERS_CATEGORY + "," + CONFIGURATORS_CATEGORY + "," + ROUTERS_CATEGORY));
 
         /**
-         * 3、一个注册中心可能有多个服务提供者，因此这里需要将多个服务提供者合并为一个 -- 集群
+         * 3、一个注册中心可能有多个服务提供者，因此这里需要将多个服务提供者合并为一个 -- 集群(内嵌有负载均衡逻辑)
          * @see FailoverCluster#join(Directory)
          */
         Invoker invoker = cluster.join(directory);

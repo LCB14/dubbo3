@@ -55,12 +55,16 @@ public class FailoverClusterInvoker<T> extends AbstractClusterInvoker<T> {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Result doInvoke(Invocation invocation, final List<Invoker<T>> invokers, LoadBalance loadbalance) throws RpcException {
         List<Invoker<T>> copyInvokers = invokers;
+
         checkInvokers(copyInvokers, invocation);
+
         String methodName = RpcUtils.getMethodName(invocation);
+
         int len = getUrl().getMethodParameter(methodName, RETRIES_KEY, DEFAULT_RETRIES) + 1;
         if (len <= 0) {
             len = 1;
         }
+
         // retry loop.
         RpcException le = null; // last exception.
         List<Invoker<T>> invoked = new ArrayList<Invoker<T>>(copyInvokers.size()); // invoked invokers.
@@ -74,9 +78,11 @@ public class FailoverClusterInvoker<T> extends AbstractClusterInvoker<T> {
                 // check again
                 checkInvokers(copyInvokers, invocation);
             }
+
             Invoker<T> invoker = select(loadbalance, invocation, copyInvokers, invoked);
             invoked.add(invoker);
             RpcContext.getContext().setInvokers((List) invoked);
+
             try {
                 Result result = invoker.invoke(invocation);
                 if (le != null && logger.isWarnEnabled()) {
@@ -102,6 +108,7 @@ public class FailoverClusterInvoker<T> extends AbstractClusterInvoker<T> {
                 providers.add(invoker.getUrl().getAddress());
             }
         }
+
         throw new RpcException(le.getCode(), "Failed to invoke the method "
                 + methodName + " in the service " + getInterface().getName()
                 + ". Tried " + len + " times of the providers " + providers
