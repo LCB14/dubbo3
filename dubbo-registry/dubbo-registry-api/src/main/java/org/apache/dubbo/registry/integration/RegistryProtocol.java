@@ -465,9 +465,12 @@ public class RegistryProtocol implements Protocol {
          * application=democonsumer&check=false&dubbo=2.0.2&interface=org.apache.dubbo.demo.DemoService&lazy=false&methods=sayHello&pid=9483&qos.port=33333&register.ip=192.168.20.233&side=consumer&sticky=false&timestamp=1661246288438
          */
         Map<String, String> qs = StringUtils.parseQueryString(url.getParameterAndDecoded(REFER_KEY));
+
+        // 获取 group 配置（group 配置决定 doRefer 第一个参数的类型。）
         String group = qs.get(GROUP_KEY);
         if (group != null && group.length() > 0) {
             if ((COMMA_SPLIT_PATTERN.split(group)).length > 1 || "*".equals(group)) {
+                // 通过 SPI 加载 MergeableCluster 实例，并调用 doRefer 继续执行服务引用逻辑
                 return doRefer(getMergeableCluster(), registry, type, url);
             }
         }
@@ -485,6 +488,8 @@ public class RegistryProtocol implements Protocol {
          * zookeeper://127.0.0.1:2181/org.apache.dubbo.registry.RegistryService?application=demo-consumer&dubbo=2.0.2&pid=10589&qos.port=33333&refer=application=demo-consumer&check=false
          * &dubbo=2.0.2&interface=org.apache.dubbo.demo.DemoService&lazy=false&methods=sayHello&pid=10589&qos.port=33333&register.ip=192.168.17.153
          * &side=consumer&sticky=false&timestamp=1668510676719&timestamp=1668510677079
+         *
+         * 1、创建'服务目录'实例 -- 服务目录
          */
         RegistryDirectory<T> directory = new RegistryDirectory<T>(type, url);
         directory.setRegistry(registry);
@@ -500,20 +505,21 @@ public class RegistryProtocol implements Protocol {
          */
         URL subscribeUrl = new URL(CONSUMER_PROTOCOL, parameters.remove(REGISTER_IP_KEY), 0, type.getName(), parameters);
 
+        // 注册服务消费者，在 consumers 目录下新节点
         if (!ANY_VALUE.equals(url.getServiceInterface()) && url.getParameter(REGISTER_KEY, true)) {
             directory.setRegisteredConsumerUrl(getRegisteredConsumerUrl(subscribeUrl, url));
             // 注册服务消费者，在 consumers 目录下新节点
             registry.register(directory.getRegisteredConsumerUrl());
         }
 
-        // 构造路由链（过滤用）
+        // 2、构造路由链（过滤用） -- 服务路由
         directory.buildRouterChain(subscribeUrl);
 
         // 订阅 providers、configurators、routers 等节点数据
         directory.subscribe(subscribeUrl.addParameter(CATEGORY_KEY, PROVIDERS_CATEGORY + "," + CONFIGURATORS_CATEGORY + "," + ROUTERS_CATEGORY));
 
         /**
-         * 一个注册中心可能有多个服务提供者，因此这里需要将多个服务提供者合并为一个
+         * 3、一个注册中心可能有多个服务提供者，因此这里需要将多个服务提供者合并为一个 -- 集群
          * @see FailoverCluster#join(Directory)
          */
         Invoker invoker = cluster.join(directory);
