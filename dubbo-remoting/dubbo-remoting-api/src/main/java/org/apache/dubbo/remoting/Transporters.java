@@ -69,6 +69,7 @@ public class Transporters {
         if (url == null) {
             throw new IllegalArgumentException("url == null");
         }
+
         ChannelHandler handler;
         if (handlers == null || handlers.length == 0) {
             handler = new ChannelHandlerAdapter();
@@ -77,6 +78,7 @@ public class Transporters {
         } else {
             handler = new ChannelHandlerDispatcher(handlers);
         }
+
         /**
          * @see org.apache.dubbo.remoting.transport.netty4.NettyTransporter#connect(URL, ChannelHandler)
          */

@@ -108,10 +108,13 @@ public class Exchangers {
         if (url == null) {
             throw new IllegalArgumentException("url == null");
         }
+
         if (handler == null) {
             throw new IllegalArgumentException("handler == null");
         }
+
         url = url.addParameterIfAbsent(Constants.CODEC_KEY, "exchange");
+
         /**
          * @see HeaderExchanger#connect(URL, ExchangeHandler)
          */
