@@ -85,6 +85,7 @@ public class DubboInvoker<T> extends AbstractInvoker<T> {
         } else {
             currentClient = clients[index.getAndIncrement() % clients.length];
         }
+
         try {
             boolean isOneway = RpcUtils.isOneway(getUrl(), invocation);
             int timeout = getUrl().getMethodPositiveParameter(methodName, TIMEOUT_KEY, DEFAULT_TIMEOUT);
