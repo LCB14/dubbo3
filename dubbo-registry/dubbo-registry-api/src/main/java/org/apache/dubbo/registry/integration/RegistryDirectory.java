@@ -226,15 +226,34 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
                     return "";
                 }));
 
-        // configurators
+        /**
+         * configurators
+         *
+         * url 数据参考:
+         * empty://192.168.17.153/org.apache.dubbo.demo.DemoService?application=demo-consumer&category=configurators
+         * &check=false&dubbo=2.0.2&interface=org.apache.dubbo.demo.DemoService&lazy=false&methods=sayHello&pid=64414&qos.port=33333&side=consumer&sticky=false&timestamp=1668763820814
+         */
         List<URL> configuratorURLs = categoryUrls.getOrDefault(CONFIGURATORS_CATEGORY, Collections.emptyList());
         this.configurators = Configurator.toConfigurators(configuratorURLs).orElse(this.configurators);
 
-        // routers
+        /**
+         * routers
+         *
+         * url 数据参考：
+         * empty://192.168.17.153/org.apache.dubbo.demo.DemoService?application=demo-consumer&category=routers
+         * &check=false&dubbo=2.0.2&interface=org.apache.dubbo.demo.DemoService&lazy=false&methods=sayHello&pid=64414&qos.port=33333&side=consumer&sticky=false&timestamp=1668763820814
+         */
         List<URL> routerURLs = categoryUrls.getOrDefault(ROUTERS_CATEGORY, Collections.emptyList());
         toRouters(routerURLs).ifPresent(this::addRouters);
 
-        // providers
+        /**
+         * providers
+         *
+         * url 数据参考：
+         * dubbo://192.168.17.153:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bean.name=org.apache.dubbo.demo.DemoService&deprecated=false
+         * &dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello
+         * &pid=64374&release=&sayHello.0.callback=false&sayHello.retries=2&sayHello.timeout=3000&side=provider&timestamp=1668763694947
+         */
         List<URL> providerURLs = categoryUrls.getOrDefault(PROVIDERS_CATEGORY, Collections.emptyList());
         refreshOverrideAndInvoker(providerURLs);
     }
