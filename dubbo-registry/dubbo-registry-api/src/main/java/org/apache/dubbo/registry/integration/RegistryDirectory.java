@@ -290,19 +290,24 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
             destroyAllInvokers(); // Close all invokers
         } else {
             this.forbidden = false; // Allow to access
+
             Map<String, Invoker<T>> oldUrlInvokerMap = this.urlInvokerMap; // local reference
+
             if (invokerUrls == Collections.<URL>emptyList()) {
                 invokerUrls = new ArrayList<>();
             }
+
             if (invokerUrls.isEmpty() && this.cachedInvokerUrls != null) {
                 invokerUrls.addAll(this.cachedInvokerUrls);
             } else {
                 this.cachedInvokerUrls = new HashSet<>();
                 this.cachedInvokerUrls.addAll(invokerUrls);//Cached invoker urls, convenient for comparison
             }
+
             if (invokerUrls.isEmpty()) {
                 return;
             }
+
             // 将 url 转成 Invoker
             Map<String, Invoker<T>> newUrlInvokerMap = toInvokers(invokerUrls);// Translate url list to Invoker map
 
@@ -434,6 +439,26 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
                 continue;
             }
 
+            /**
+             * mergeUrl前：
+             * dubbo://192.168.17.153:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bean.name=org.apache.dubbo.demo.DemoService
+             * &deprecated=false
+             * &dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService
+             * &methods=sayHello&pid=64703
+             * &release=&sayHello.0.callback=false&sayHello.retries=2&sayHello.timeout=3000&side=provider
+             * &timestamp=1668764613376
+             *
+             * mergeUrl后：
+             * dubbo://192.168.17.153:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-consumer&bean.name=org.apache.dubbo.demo.DemoService
+             * &check=false&deprecated=false
+             * &dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService
+             * &lazy=false
+             * &methods=sayHello&pid=64708
+             * &qos.port=33333&register.ip=192.168.17.153
+             * &release=&remote.application=demo-provider&sayHello.0.callback=false&sayHello.retries=2&sayHello.timeout=3000&side=consumer
+             * &sticky=false
+             * &timestamp=1668764613376
+             */
             URL url = mergeUrl(providerUrl);
             String key = url.toFullString(); // The parameter urls are sorted
             if (keys.contains(key)) { // Repeated url
