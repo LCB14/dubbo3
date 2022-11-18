@@ -483,8 +483,13 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
                 URL registryURL = null;
                 // 获取所有的 Invoker
                 for (URL url : urls) {
-                    // 通过 ref_protocol 调用 refer 构建 Invoker，ref_protocol 会在运行时
-                    // 根据 url 协议头加载指定的 Protocol 实例，并调用实例的 refer 方法
+                    /**
+                     * ref_protocol 调用 refer 构建 Invoker，ref_protocol 会在运行时，根据 url 协议头加载指定的 Protocol 实例，并调用实例的 refer 方法
+                     *
+                     * @see org.apache.dubbo.rpc.protocol.dubbo.DubboProtocol#protocolBindingRefer(Class, URL)
+                     * or
+                     * @see RegistryProtocol#refer(Class, URL)
+                     */
                     invokers.add(REF_PROTOCOL.refer(interfaceClass, url));
                     if (REGISTRY_PROTOCOL.equals(url.getProtocol())) {
                         // use last registry url

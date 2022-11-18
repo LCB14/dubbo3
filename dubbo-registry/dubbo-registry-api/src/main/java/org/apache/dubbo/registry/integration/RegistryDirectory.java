@@ -384,6 +384,7 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
         if (urls == null || urls.isEmpty()) {
             return newUrlInvokerMap;
         }
+
         Set<String> keys = new HashSet<>();
         String queryProtocols = this.queryMap.get(PROTOCOL_KEY);
         for (URL providerUrl : urls) {
@@ -401,9 +402,11 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
                     continue;
                 }
             }
+
             if (EMPTY_PROTOCOL.equals(providerUrl.getProtocol())) {
                 continue;
             }
+
             if (!ExtensionLoader.getExtensionLoader(Protocol.class).hasExtension(providerUrl.getProtocol())) {
                 logger.error(new IllegalStateException("Unsupported protocol " + providerUrl.getProtocol() +
                         " in notified url: " + providerUrl + " from registry " + getUrl().getAddress() +
@@ -411,13 +414,14 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
                         ExtensionLoader.getExtensionLoader(Protocol.class).getSupportedExtensions()));
                 continue;
             }
-            URL url = mergeUrl(providerUrl);
 
+            URL url = mergeUrl(providerUrl);
             String key = url.toFullString(); // The parameter urls are sorted
             if (keys.contains(key)) { // Repeated url
                 continue;
             }
             keys.add(key);
+
             // Cache key is url that does not merge with consumer side parameters, regardless of how the consumer combines parameters, if the server url changes, then refer again
             Map<String, Invoker<T>> localUrlInvokerMap = this.urlInvokerMap; // local reference
             Invoker<T> invoker = localUrlInvokerMap == null ? null : localUrlInvokerMap.get(key);
@@ -429,12 +433,14 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
                     } else {
                         enabled = url.getParameter(ENABLED_KEY, true);
                     }
+
                     if (enabled) {
                         invoker = new InvokerDelegate<>(protocol.refer(serviceType, url), url, providerUrl);
                     }
                 } catch (Throwable t) {
                     logger.error("Failed to refer invoker for interface:" + serviceType + ",url:(" + url + ")" + t.getMessage(), t);
                 }
+
                 if (invoker != null) { // Put new invoker in cache
                     newUrlInvokerMap.put(key, invoker);
                 }
