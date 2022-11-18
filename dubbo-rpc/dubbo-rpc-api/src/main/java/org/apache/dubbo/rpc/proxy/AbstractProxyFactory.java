@@ -45,6 +45,11 @@ public abstract class AbstractProxyFactory implements ProxyFactory {
          * injvm://127.0.0.1/org.apache.dubbo.demo.DemoService?application=demo-consumer&check=false&dubbo=2.0.2
          * &interface=org.apache.dubbo.demo.DemoService&lazy=false&methods=sayHello&pid=5850&qos.port=33333
          * &register.ip=192.168.17.153&release=&scope=local&side=consumer&sticky=false&timestamp=1668481018002
+         * 或
+         * zookeeper://127.0.0.1:2181/org.apache.dubbo.registry.RegistryService?anyhost=true&application=demo-consumer
+         * &bean.name=org.apache.dubbo.demo.DemoService&check=false&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false
+         * &interface=org.apache.dubbo.demo.DemoService&lazy=false&methods=sayHello&pid=61336&qos.port=33333&register.ip=192.168.17.153
+         * &release=&remote.application=demo-provider&sayHello.0.callback=false&sayHello.retries=2&sayHello.timeout=3000&side=consumer&sticky=false&timestamp=1668754903932
          */
         String config = invoker.getUrl().getParameter(INTERFACES);
         if (config != null && config.length() > 0) {

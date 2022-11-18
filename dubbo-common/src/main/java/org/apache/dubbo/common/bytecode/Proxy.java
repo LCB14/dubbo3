@@ -278,13 +278,21 @@ public abstract class Proxy {
             ccm.setClassName(fcn);
             ccm.addDefaultConstructor();
             ccm.setSuperClass(Proxy.class);
+            ccm.addMethod("public Object newInstance(" + InvocationHandler.class.getName() + " h){ return new " + pcn + "($1); }");
             /**
-             * 为 Proxy 的抽象方法 newInstance 生成实现代码，形如：
-             * public Object newInstance(java.lang.reflect.InvocationHandler h) {
-             *    return new org.apache.dubbo.proxy0($1);
+             * ccm 对应代理代码参考：
+             * package org.apache.dubbo.common.bytecode;
+             * import java.lang.reflect.InvocationHandler;
+             * import org.apache.dubbo.common.bytecode.ClassGenerator;
+             * import org.apache.dubbo.common.bytecode.Proxy;
+             * import org.apache.dubbo.common.bytecode.proxy0;
+             *
+             * public class Proxy0 extends Proxy implements ClassGenerator.DC {
+             *     public Object newInstance(InvocationHandler invocationHandler) {
+             *         return new proxy0(invocationHandler);
+             *     }
              * }
              */
-            ccm.addMethod("public Object newInstance(" + InvocationHandler.class.getName() + " h){ return new " + pcn + "($1); }");
             Class<?> pc = ccm.toClass();
             proxy = (Proxy) pc.newInstance();
         } catch (RuntimeException e) {
