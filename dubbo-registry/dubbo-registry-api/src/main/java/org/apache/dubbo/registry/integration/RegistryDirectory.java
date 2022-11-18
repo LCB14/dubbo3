@@ -479,6 +479,7 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
                     }
 
                     if (enabled) {
+                        // protocol 存在包装实现类，调试时需注意！！
                         invoker = new InvokerDelegate<>(protocol.refer(serviceType, url), url, providerUrl);
                     }
                 } catch (Throwable t) {
