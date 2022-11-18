@@ -505,7 +505,7 @@ public class RegistryProtocol implements Protocol {
          */
         URL subscribeUrl = new URL(CONSUMER_PROTOCOL, parameters.remove(REGISTER_IP_KEY), 0, type.getName(), parameters);
 
-        // 注册服务消费者，在 consumers 目录下新节点
+        // 注册服务消费者，在zk的 consumers 节点下
         if (!ANY_VALUE.equals(url.getServiceInterface()) && url.getParameter(REGISTER_KEY, true)) {
             directory.setRegisteredConsumerUrl(getRegisteredConsumerUrl(subscribeUrl, url));
             // 注册服务消费者，在 consumers 目录下新节点
