@@ -517,7 +517,7 @@ public class RegistryProtocol implements Protocol {
 
         /**
          * 订阅 providers、configurators、routers 等节点数据。
-         * @see org.apache.dubbo.registry.integration.RegistryDirectory#invokers 属性的初始化从此处开始
+         * 服务目录中管理的invokes、routers、configurators属性的初始化便是从此段代码执行后初始化的。
          */
         directory.subscribe(subscribeUrl.addParameter(CATEGORY_KEY, PROVIDERS_CATEGORY + "," + CONFIGURATORS_CATEGORY + "," + ROUTERS_CATEGORY));
 
