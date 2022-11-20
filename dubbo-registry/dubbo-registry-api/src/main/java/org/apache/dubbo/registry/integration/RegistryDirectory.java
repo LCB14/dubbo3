@@ -44,6 +44,7 @@ import org.apache.dubbo.rpc.cluster.directory.AbstractDirectory;
 import org.apache.dubbo.rpc.cluster.directory.StaticDirectory;
 import org.apache.dubbo.rpc.cluster.support.ClusterUtils;
 import org.apache.dubbo.rpc.model.ApplicationModel;
+import org.apache.dubbo.rpc.protocol.AbstractProtocol;
 import org.apache.dubbo.rpc.protocol.InvokerWrapper;
 
 import java.util.ArrayList;
@@ -480,6 +481,12 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
 
                     if (enabled) {
                         // protocol 存在包装实现类，调试时需注意！！
+                        /**
+                         * step 1
+                         * @see AbstractProtocol#refer(Class, URL)
+                         * step 2
+                         * @see org.apache.dubbo.rpc.protocol.dubbo.DubboProtocol#protocolBindingRefer(Class, URL)
+                         */
                         invoker = new InvokerDelegate<>(protocol.refer(serviceType, url), url, providerUrl);
                     }
                 } catch (Throwable t) {

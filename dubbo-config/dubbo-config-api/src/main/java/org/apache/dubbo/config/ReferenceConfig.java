@@ -401,7 +401,7 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
             urls.clear();
 
             // user specified URL, could be peer-to-peer address, or register center's address.
-            // url 不为空，表明用户可能想进行点对点调用（服务直连）
+            // url 不为空，表明用户可能想进行点对点调用（通过服务直连方式请求远程服务 url 处理）
             if (url != null && url.length() > 0) {
                 // 当需要配置多个 url 时，可用分号进行分割，这里会进行切分
                 String[] us = SEMICOLON_SPLIT_PATTERN.split(url);
@@ -431,6 +431,7 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
                 }
             } else { // assemble URL from register center's configuration
                 // if protocols not injvm checkRegistry
+                // 通过注册中心方式访问远程服务 url 处理
                 if (!LOCAL_PROTOCOL.equalsIgnoreCase(getProtocol())) {
                     checkRegistry();
 

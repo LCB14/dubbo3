@@ -135,6 +135,7 @@ public abstract class AbstractInvoker<T> implements Invoker<T> {
 
         RpcInvocation invocation = (RpcInvocation) inv;
         invocation.setInvoker(this);
+
         if (CollectionUtils.isNotEmptyMap(attachment)) {
             invocation.addAttachmentsIfAbsent(attachment);
         }
@@ -151,6 +152,7 @@ public abstract class AbstractInvoker<T> implements Invoker<T> {
         }
 
         invocation.setInvokeMode(RpcUtils.getInvokeMode(url, invocation));
+
         RpcUtils.attachInvocationIdIfAsync(getUrl(), invocation);
 
         try {

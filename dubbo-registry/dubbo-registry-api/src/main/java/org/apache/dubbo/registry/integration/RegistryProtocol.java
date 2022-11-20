@@ -32,15 +32,12 @@ import org.apache.dubbo.registry.Registry;
 import org.apache.dubbo.registry.RegistryFactory;
 import org.apache.dubbo.registry.RegistryService;
 import org.apache.dubbo.registry.support.*;
-import org.apache.dubbo.rpc.Exporter;
-import org.apache.dubbo.rpc.Invoker;
-import org.apache.dubbo.rpc.Protocol;
-import org.apache.dubbo.rpc.ProxyFactory;
-import org.apache.dubbo.rpc.RpcException;
+import org.apache.dubbo.rpc.*;
 import org.apache.dubbo.rpc.cluster.Cluster;
 import org.apache.dubbo.rpc.cluster.Configurator;
 import org.apache.dubbo.rpc.cluster.Directory;
 import org.apache.dubbo.rpc.cluster.support.FailoverCluster;
+import org.apache.dubbo.rpc.cluster.support.wrapper.MockClusterInvoker;
 import org.apache.dubbo.rpc.model.ApplicationModel;
 import org.apache.dubbo.rpc.protocol.InvokerWrapper;
 
@@ -524,7 +521,11 @@ public class RegistryProtocol implements Protocol {
         /**
          * 3、一个注册中心可能有多个服务提供者，因此这里需要将多个服务提供者合并为一个 -- 集群(内嵌有负载均衡逻辑)
          * @see FailoverCluster#join(Directory)
+         *
          * cluster 存在包装实现类，调试时需注意！！
+         *
+         * 经过cluster.join处理，invoker 成员变量类型为 MockClusterInvoker
+         * @see MockClusterInvoker#invoke(Invocation)
          */
         Invoker invoker = cluster.join(directory);
         ProviderConsumerRegTable.registerConsumer(invoker, url, subscribeUrl, directory);
