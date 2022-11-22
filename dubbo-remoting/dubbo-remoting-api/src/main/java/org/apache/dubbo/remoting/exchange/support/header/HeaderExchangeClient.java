@@ -41,6 +41,7 @@ import static org.apache.dubbo.remoting.Constants.TICKS_PER_WHEEL;
 
 /**
  * DefaultMessageClient
+ * HeaderExchangeClient 封装了一些关于断线重连、心跳检测的逻辑。
  */
 public class HeaderExchangeClient implements ExchangeClient {
 
@@ -55,6 +56,7 @@ public class HeaderExchangeClient implements ExchangeClient {
     public HeaderExchangeClient(Client client, boolean startTimer) {
         Assert.notNull(client, "Client can't be null");
         this.client = client;
+        // 创建 HeaderExchangeChannel 对象
         this.channel = new HeaderExchangeChannel(client);
 
         if (startTimer) {
