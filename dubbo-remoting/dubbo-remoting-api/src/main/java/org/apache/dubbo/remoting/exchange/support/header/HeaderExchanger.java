@@ -34,6 +34,10 @@ public class HeaderExchanger implements Exchanger {
 
     @Override
     public ExchangeClient connect(URL url, ExchangeHandler handler) throws RemotingException {
+        /**
+         * Transporters.connect(url, new DecodeHandler(new HeaderExchangeHandler(handler))) 返回值参考
+         * @see org.apache.dubbo.remoting.transport.netty4.NettyClient
+         */
         return new HeaderExchangeClient(Transporters.connect(url, new DecodeHandler(new HeaderExchangeHandler(handler))), true);
     }
 

@@ -432,7 +432,16 @@ public class DubboProtocol extends AbstractProtocol {
         // 是否共享连接
         boolean useShareConnect = false;
 
-        // 获取连接数，默认为0，表示未配置
+        /**
+         * 获取连接数，默认为0，表示未配置
+         *
+         * url 数据参考：
+         * dubbo://192.168.199.139:20880/org.apache.dubbo.demo.DemoService?anyhost=true
+         * &application=demo-consumer&bean.name=org.apache.dubbo.demo.DemoService&check=false&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false
+         * &interface=org.apache.dubbo.demo.DemoService&lazy=false&methods=sayHello&pid=90530&qos.port=33333&register.ip=192.168.199.139
+         * &release=&remote.application=demo-provider&sayHello.0.callback=false
+         * &sayHello.retries=2&sayHello.timeout=3000&side=consumer&sticky=false&timestamp=1669119378200
+         */
         int connections = url.getParameter(CONNECTIONS_KEY, 0);
 
         List<ReferenceCountExchangeClient> shareClients = null;

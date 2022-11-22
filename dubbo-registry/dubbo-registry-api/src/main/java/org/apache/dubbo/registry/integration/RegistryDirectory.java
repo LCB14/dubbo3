@@ -441,7 +441,7 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
             }
 
             /**
-             * mergeUrl前：
+             * mergeUrl前：(providerUrl)
              * dubbo://192.168.17.153:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bean.name=org.apache.dubbo.demo.DemoService
              * &deprecated=false
              * &dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService
@@ -449,7 +449,7 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
              * &release=&sayHello.0.callback=false&sayHello.retries=2&sayHello.timeout=3000&side=provider
              * &timestamp=1668764613376
              *
-             * mergeUrl后：
+             * mergeUrl后：(url)
              * dubbo://192.168.17.153:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-consumer&bean.name=org.apache.dubbo.demo.DemoService
              * &check=false&deprecated=false
              * &dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService

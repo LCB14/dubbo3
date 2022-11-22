@@ -28,6 +28,7 @@ import org.apache.dubbo.remoting.exchange.ExchangeHandler;
 import org.apache.dubbo.remoting.exchange.Request;
 import org.apache.dubbo.remoting.exchange.Response;
 import org.apache.dubbo.remoting.exchange.support.DefaultFuture;
+import org.apache.dubbo.remoting.transport.AbstractPeer;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.CompletableFuture;
@@ -115,6 +116,9 @@ final class HeaderExchangeChannel implements ExchangeChannel {
         req.setData(request);
         DefaultFuture future = DefaultFuture.newFuture(channel, req, timeout);
         try {
+            /**
+             * @see AbstractPeer#send(Object)
+             */
             channel.send(req);
         } catch (RemotingException e) {
             future.cancel();
