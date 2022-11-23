@@ -63,11 +63,15 @@ public class DubboCodec extends ExchangeCodec {
 
     @Override
     protected Object decodeBody(Channel channel, InputStream is, byte[] header) throws IOException {
+        // 获取消息头中的第三个字节，并通过逻辑与运算得到序列化器编号
         byte flag = header[2], proto = (byte) (flag & SERIALIZATION_MASK);
         // get request id.
+        // 获取调用编号
         long id = Bytes.bytes2long(header, 4);
+        // 通过逻辑与运算得到调用类型，0 - Response，1 - Request
         if ((flag & FLAG_REQUEST) == 0) {
             // decode response.
+            // 对响应结果进行解码，得到 Response 对象。这个非本节内容，后面再分析
             Response res = new Response(id);
             if ((flag & FLAG_EVENT) != 0) {
                 res.setEvent(true);
@@ -112,37 +116,48 @@ public class DubboCodec extends ExchangeCodec {
             return res;
         } else {
             // decode request.
+            // 创建 Request 对象
             Request req = new Request(id);
             req.setVersion(Version.getProtocolVersion());
+            // 通过逻辑与运算得到通信方式，并设置到 Request 对象中
             req.setTwoWay((flag & FLAG_TWOWAY) != 0);
+            // 通过位运算检测数据包是否为事件类型
             if ((flag & FLAG_EVENT) != 0) {
                 req.setEvent(true);
             }
+
             try {
                 Object data;
                 if (req.isHeartbeat()) {
                     ObjectInput in = CodecSupport.deserialize(channel.getUrl(), is, proto);
+                    // 对心跳包进行解码
                     data = decodeHeartbeatData(channel, in);
                 } else if (req.isEvent()) {
                     ObjectInput in = CodecSupport.deserialize(channel.getUrl(), is, proto);
+                    // 对事件数据进行解码
                     data = decodeEventData(channel, in);
                 } else {
                     DecodeableRpcInvocation inv;
+                    // 根据 url 参数判断是否在 IO 线程上对消息体进行解码
                     if (channel.getUrl().getParameter(DECODE_IN_IO_THREAD_KEY, DEFAULT_DECODE_IN_IO_THREAD)) {
                         inv = new DecodeableRpcInvocation(channel, req, is, proto);
+                        // 在当前线程，也就是 IO 线程上进行后续的解码工作。此工作完成后，可将调用方法名、attachment、以及调用参数解析出来
                         inv.decode();
                     } else {
+                        // 仅创建 DecodeableRpcInvocation 对象，但不在当前线程上执行解码逻辑
                         inv = new DecodeableRpcInvocation(channel, req,
                                 new UnsafeByteArrayInputStream(readMessageData(is)), proto);
                     }
                     data = inv;
                 }
+                // 设置 data 到 Request 对象中
                 req.setData(data);
             } catch (Throwable t) {
                 if (log.isWarnEnabled()) {
                     log.warn("Decode request failed: " + t.getMessage(), t);
                 }
                 // bad request
+                // 若解码过程中出现异常，则将 broken 字段设为 true，并将异常对象设置到 Reqeust 对象中
                 req.setBroken(true);
                 req.setData(t);
             }
