@@ -47,16 +47,28 @@ import java.io.InputStream;
 public class ExchangeCodec extends TelnetCodec {
 
     // header length.
+    // 消息头长度（16字节）（注：消息头中包含的 '请求编号'（占8字节）和 '消息体长度'（占4字节）都是运行时计算）
     protected static final int HEADER_LENGTH = 16;
+
     // magic header.
+    // 魔数（位于消息头中，占2字节高低位分别占8位）
     protected static final short MAGIC = (short) 0xdabb;
     protected static final byte MAGIC_HIGH = Bytes.short2bytes(MAGIC)[0];
     protected static final byte MAGIC_LOW = Bytes.short2bytes(MAGIC)[1];
+
     // message flag.
+    // 数据包类型(位于消息头中，占1位):0 - Response, 1 - Request
     protected static final byte FLAG_REQUEST = (byte) 0x80;
+
+    // 调用方式(位于消息头中，占1位):仅在第16位被设为1的情况下有效，0 - 单向调用，1 - 双向调用
     protected static final byte FLAG_TWOWAY = (byte) 0x40;
+
+    // 事件标识(位于消息头中，占1位):0 - 当前数据包是请求或响应包，1 - 当前数据包是心跳包
     protected static final byte FLAG_EVENT = (byte) 0x20;
+
+    // 序列化器编号(位于消息头中，占5位)
     protected static final int SERIALIZATION_MASK = 0x1f;
+
     private static final Logger logger = LoggerFactory.getLogger(ExchangeCodec.class);
 
     public Short getMagicCode() {
@@ -66,8 +78,10 @@ public class ExchangeCodec extends TelnetCodec {
     @Override
     public void encode(Channel channel, ChannelBuffer buffer, Object msg) throws IOException {
         if (msg instanceof Request) {
+            // 对 Request 对象进行编码
             encodeRequest(channel, buffer, (Request) msg);
         } else if (msg instanceof Response) {
+            // 对 Response 对象进行编码
             encodeResponse(channel, buffer, (Response) msg);
         } else {
             super.encode(channel, buffer, msg);
@@ -207,34 +221,54 @@ public class ExchangeCodec extends TelnetCodec {
         return req.getData();
     }
 
+    /**
+     * 以下就是请求对象的编码过程，该过程首先会通过位运算将消息头写入到 header 数组中。
+     * 然后对 Request 对象的 data 字段执行序列化操作，序列化后的数据最终会存储到 ChannelBuffer 中。
+     * 序列化操作执行完后，可得到数据序列化后的长度 len，紧接着将 len 写入到 header 指定位置处。
+     * 最后再将消息头字节数组 header 写入到 ChannelBuffer 中，整个编码过程就结束了。
+     */
     protected void encodeRequest(Channel channel, ChannelBuffer buffer, Request req) throws IOException {
         Serialization serialization = getSerialization(channel);
+
         // header.
+        // 创建消息头字节数组，长度为 16 字节
         byte[] header = new byte[HEADER_LENGTH];
+
         // set magic number.
+        // 设置魔数
         Bytes.short2bytes(MAGIC, header);
 
         // set request and serialization flag.
+        // 设置数据包类型（Request/Response）和序列化器编号
         header[2] = (byte) (FLAG_REQUEST | serialization.getContentTypeId());
 
+        // 设置通信方式(单向/双向)
         if (req.isTwoWay()) {
             header[2] |= FLAG_TWOWAY;
         }
+
+        // 设置事件标识
         if (req.isEvent()) {
             header[2] |= FLAG_EVENT;
         }
 
         // set request id.
+        // 设置请求编号，8个字节，从第4个字节开始设置
         Bytes.long2bytes(req.getId(), header, 4);
 
         // encode request data.
+        // 获取 buffer 当前的写位置
         int savedWriteIndex = buffer.writerIndex();
+        // 更新 writerIndex，为消息头预留 16 个字节的空间
         buffer.writerIndex(savedWriteIndex + HEADER_LENGTH);
         ChannelBufferOutputStream bos = new ChannelBufferOutputStream(buffer);
+        // 创建序列化器，比如 Hessian2ObjectOutput
         ObjectOutput out = serialization.serialize(channel.getUrl(), bos);
         if (req.isEvent()) {
+            // 对事件数据进行序列化操作
             encodeEventData(channel, out, req.getData());
         } else {
+            // 对请求数据进行序列化操作
             encodeRequestData(channel, out, req.getData(), req.getVersion());
         }
         out.flushBuffer();
@@ -243,13 +277,20 @@ public class ExchangeCodec extends TelnetCodec {
         }
         bos.flush();
         bos.close();
+
+        // 获取写入的字节数，也就是消息体长度
         int len = bos.writtenBytes();
         checkPayload(channel, len);
+
+        // 将消息体长度写入到消息头中
         Bytes.int2bytes(len, header, 12);
 
         // write
+        // 将 buffer 指针移动到 savedWriteIndex，为写消息头做准备
         buffer.writerIndex(savedWriteIndex);
+        // 从 savedWriteIndex 下标处写入消息头
         buffer.writeBytes(header); // write header.
+        // 设置新的 writerIndex，writerIndex = 原写下标 + 消息头长度 + 消息体长度
         buffer.writerIndex(savedWriteIndex + HEADER_LENGTH + len);
     }
 
