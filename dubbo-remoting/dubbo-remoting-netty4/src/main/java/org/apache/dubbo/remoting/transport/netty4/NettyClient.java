@@ -77,6 +77,7 @@ public class NettyClient extends AbstractClient {
     public NettyClient(final URL url, final ChannelHandler handler) throws RemotingException {
         // you can customize name and type of client thread pool by THREAD_NAME_KEY and THREADPOOL_KEY in CommonConstants.
         // the handler will be warped: MultiMessageHandler->HeartbeatHandler->handler
+        // 父类构造函数会回调本类的 doConnect() 方法
         super(url, wrapChannelHandler(url, handler));
     }
 

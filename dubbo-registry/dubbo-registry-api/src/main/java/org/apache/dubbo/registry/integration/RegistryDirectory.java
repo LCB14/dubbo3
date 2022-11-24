@@ -480,8 +480,9 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
                     }
 
                     if (enabled) {
-                        // protocol 存在包装实现类，调试时需注意！！
                         /**
+                         * protocol 存在包装实现类，调试时需注意！！
+                         *
                          * step 1
                          * @see AbstractProtocol#refer(Class, URL)
                          * step 2

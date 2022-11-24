@@ -80,6 +80,7 @@ final class NettyChannel extends AbstractChannel {
         if (ch == null) {
             return null;
         }
+
         NettyChannel ret = CHANNEL_MAP.get(ch);
         if (ret == null) {
             NettyChannel nettyChannel = new NettyChannel(ch, url, handler);

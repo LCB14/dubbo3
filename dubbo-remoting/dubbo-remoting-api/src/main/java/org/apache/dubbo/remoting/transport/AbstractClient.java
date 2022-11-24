@@ -170,7 +170,7 @@ public abstract class AbstractClient extends AbstractEndpoint implements Client 
             connect();
         }
 
-        // 获取 Channel，getChannel 是一个抽象方法，具体由子类实现
+        // 获取 Channel，getChannel 是一个抽象方法，具体由子类 NettyClient 实现
         Channel channel = getChannel();
         //TODO Can the value returned by getChannel() be null? need improvement.
         if (channel == null || !channel.isConnected()) {
@@ -178,7 +178,9 @@ public abstract class AbstractClient extends AbstractEndpoint implements Client 
         }
 
         /**
-         * 默认情况下，Dubbo 使用 Netty 作为底层的通信框架
+         * 为什么会是 NettyChannel？
+         * @see org.apache.dubbo.remoting.transport.netty4.NettyClient#getChannel()
+         *
          * @see org.apache.dubbo.remoting.transport.netty4.NettyChannel#send(java.lang.Object, boolean)
          */
         channel.send(message, sent);

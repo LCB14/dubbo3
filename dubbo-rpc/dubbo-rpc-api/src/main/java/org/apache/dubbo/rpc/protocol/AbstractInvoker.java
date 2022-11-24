@@ -134,8 +134,11 @@ public abstract class AbstractInvoker<T> implements Invoker<T> {
         }
 
         RpcInvocation invocation = (RpcInvocation) inv;
+
+        // 设置 Invoker
         invocation.setInvoker(this);
 
+        // 设置 attachment
         if (CollectionUtils.isNotEmptyMap(attachment)) {
             invocation.addAttachmentsIfAbsent(attachment);
         }
@@ -147,6 +150,8 @@ public abstract class AbstractInvoker<T> implements Invoker<T> {
              * because the {@link RpcContext#setAttachment(String, String)} is passed in the Filter when the call is triggered
              * by the built-in retry mechanism of the Dubbo. The attachment to update RpcContext will no longer work, which is
              * a mistake in most cases (for example, through Filter to RpcContext output traceId and spanId and other information).
+             *
+             * 添加 contextAttachments 到 RpcInvocation#attachment 变量中
              */
             invocation.addAttachments(contextAttachments);
         }
