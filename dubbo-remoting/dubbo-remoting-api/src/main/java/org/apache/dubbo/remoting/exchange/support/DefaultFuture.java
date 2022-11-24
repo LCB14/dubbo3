@@ -65,11 +65,14 @@ public class DefaultFuture extends CompletableFuture<Object> {
     private Timeout timeoutCheckTask;
 
     private DefaultFuture(Channel channel, Request request, int timeout) {
+        // 这里的 channel 指向的是 NettyClient
         this.channel = channel;
         this.request = request;
+        // 获取请求 id，这个 id 很重要
         this.id = request.getId();
         this.timeout = timeout > 0 ? timeout : channel.getUrl().getPositiveParameter(TIMEOUT_KEY, DEFAULT_TIMEOUT);
         // put into waiting map.
+        // 存储 <requestId, DefaultFuture> 映射关系到 FUTURES 中
         FUTURES.put(id, this);
         CHANNELS.put(id, channel);
     }
@@ -252,6 +255,7 @@ public class DefaultFuture extends CompletableFuture<Object> {
             if (future == null || future.isDone()) {
                 return;
             }
+
             // create exception response.
             Response timeoutResponse = new Response(future.getId());
             // set timeout status.
