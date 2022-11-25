@@ -89,6 +89,10 @@ public class InjvmProtocol extends AbstractProtocol implements Protocol {
 
     @Override
     public <T> Exporter<T> export(Invoker<T> invoker) throws RpcException {
+        /**
+         * invoker.getUrl().getServiceKey() 值参考：
+         * org.apache.dubbo.demo.DemoService
+         */
         return new InjvmExporter<T>(invoker, invoker.getUrl().getServiceKey(), exporterMap);
     }
 

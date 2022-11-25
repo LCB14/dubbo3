@@ -50,35 +50,126 @@ public class JavassistProxyFactory extends AbstractProxyFactory {
                 /**
                  * Wrapper 是一个抽象类，其中 invokeMethod 是一个抽象方法。Dubbo 会在运行时通过 Javassist 框架为 Wrapper 生成实现类，
                  * 并实现 invokeMethod 方法，该方法最终会根据调用信息调用具体的服务。以 DemoServiceImpl 为例，Javassist 为其生成的代理类如下:
+                 * package org.apache.dubbo.common.bytecode;
                  *
-                 * public class Wrapper0 extends Wrapper implements ClassGenerator.DC {
+                 * import java.lang.reflect.InvocationTargetException;
+                 * import java.util.Map;
+                 * import org.apache.dubbo.common.bytecode.ClassGenerator;
+                 * import org.apache.dubbo.common.bytecode.NoSuchMethodException;
+                 * import org.apache.dubbo.common.bytecode.NoSuchPropertyException;
+                 * import org.apache.dubbo.common.bytecode.Wrapper;
+                 * import org.apache.dubbo.demo.provider.DemoServiceImpl;
+                 *
+                 * public class Wrapper1 extends Wrapper implements ClassGenerator.DC {
                  *     public static String[] pns;
                  *     public static Map pts;
                  *     public static String[] mns;
                  *     public static String[] dmns;
                  *     public static Class[] mts0;
+                 *     public static Class[] mts1;
+                 *     public static Class[] mts2;
+                 *     public static Class[] mts3;
+                 *     public static Class[] mts4;
                  *
-                 *     // 省略其他方法
+                 *     public String[] getPropertyNames() {
+                 *         return pns;
+                 *     }
                  *
-                 *     public Object invokeMethod(Object object, String string, Class[] arrclass, Object[] arrobject) throws InvocationTargetException {
-                 *         DemoService demoService;
+                 *     public boolean hasProperty(String string) {
+                 *         return pts.containsKey(string);
+                 *     }
+                 *
+                 *     public Class getPropertyType(String string) {
+                 *         return (Class) pts.get(string);
+                 *     }
+                 *
+                 *     public String[] getMethodNames() {
+                 *         return mns;
+                 *     }
+                 *
+                 *     public String[] getDeclaredMethodNames() {
+                 *         return dmns;
+                 *     }
+                 *
+                 *     public void setPropertyValue(Object object, String string, Object object2) {
+                 *         DemoServiceImpl demoServiceImpl;
                  *         try {
-                 *             // 类型转换
-                 *             demoService = (DemoService)object;
+                 *             demoServiceImpl = (DemoServiceImpl) object;
+                 *         } catch (Throwable throwable) {
+                 *             throw new IllegalArgumentException(throwable);
+                 *         }
+                 *         if (string.equals("name")) {
+                 *             demoServiceImpl.name = (String) object2;
+                 *             return;
+                 *         }
+                 *         if (string.equals("age")) {
+                 *             demoServiceImpl.age = (Integer) object2;
+                 *             return;
+                 *         }
+                 *         if (string.equals("age")) {
+                 *             demoServiceImpl.setAge((Integer) object2);
+                 *             return;
+                 *         }
+                 *         if (string.equals("name")) {
+                 *             demoServiceImpl.setName((String) object2);
+                 *             return;
+                 *         }
+                 *         throw new NoSuchPropertyException(new StringBuffer().append("Not found property \"").append(string).append("\" field or setter method in class org.apache.dubbo.demo.provider.DemoServiceImpl.").toString());
+                 *     }
+                 *
+                 *     public Object getPropertyValue(Object object, String string) {
+                 *         DemoServiceImpl demoServiceImpl;
+                 *         try {
+                 *             demoServiceImpl = (DemoServiceImpl) object;
+                 *         } catch (Throwable throwable) {
+                 *             throw new IllegalArgumentException(throwable);
+                 *         }
+                 *         if (string.equals("name")) {
+                 *             return demoServiceImpl.name;
+                 *         }
+                 *         if (string.equals("age")) {
+                 *             return demoServiceImpl.age;
+                 *         }
+                 *         if (string.equals("age")) {
+                 *             return demoServiceImpl.getAge();
+                 *         }
+                 *         if (string.equals("name")) {
+                 *             return demoServiceImpl.getName();
+                 *         }
+                 *         throw new NoSuchPropertyException(new StringBuffer().append("Not found property \"").append(string).append("\" field or setter method in class org.apache.dubbo.demo.provider.DemoServiceImpl.").toString());
+                 *     }
+                 *
+                 *     public Object invokeMethod(Object object, String string, Class[] classArray, Object[] objectArray) throws InvocationTargetException {
+                 *         DemoServiceImpl demoServiceImpl;
+                 *         try {
+                 *             demoServiceImpl = (DemoServiceImpl) object;
                  *         } catch (Throwable throwable) {
                  *             throw new IllegalArgumentException(throwable);
                  *         }
                  *
                  *         try {
-                 *             // 根据方法名调用指定的方法
-                 *             if ("sayHello".equals(string) && arrclass.length == 1) {
-                 *                 return demoService.sayHello((String)arrobject[0]);
+                 *             if ("getAge".equals(string) && classArray.length == 0) {
+                 *                 return demoServiceImpl.getAge();
+                 *             }
+                 *             if ("sayHello".equals(string) && classArray.length == 1) {
+                 *                 return demoServiceImpl.sayHello((String) objectArray[0]);
+                 *             }
+                 *             if ("setAge".equals(string) && classArray.length == 1) {
+                 *                 demoServiceImpl.setAge((Integer) objectArray[0]);
+                 *                 return null;
+                 *             }
+                 *             if ("getName".equals(string) && classArray.length == 0) {
+                 *                 return demoServiceImpl.getName();
+                 *             }
+                 *             if ("setName".equals(string) && classArray.length == 1) {
+                 *                 demoServiceImpl.setName((String) objectArray[0]);
+                 *                 return null;
                  *             }
                  *         } catch (Throwable throwable) {
                  *             throw new InvocationTargetException(throwable);
                  *         }
                  *
-                 *         throw new NoSuchMethodException(new StringBuffer().append("Not found method \"").append(string).append("\" in class com.alibaba.dubbo.demo.DemoService.").toString());
+                 *         throw new NoSuchMethodException(new StringBuffer().append("Not found method \"").append(string).append("\" in class org.apache.dubbo.demo.provider.DemoServiceImpl.").toString());
                  *     }
                  * }
                  */

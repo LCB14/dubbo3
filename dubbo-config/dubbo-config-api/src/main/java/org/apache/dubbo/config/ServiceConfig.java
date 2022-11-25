@@ -784,6 +784,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                 .setHost(LOCALHOST_VALUE)
                 .setPort(0)
                 .build();
+
         /**
          * protocol.export
          * @see InjvmProtocol#export(Invoker)
