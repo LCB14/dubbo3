@@ -99,7 +99,6 @@ public class NettyClient extends AbstractClient {
 
         bootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, Math.max(3000, getConnectTimeout()));
         bootstrap.handler(new ChannelInitializer() {
-
             @Override
             protected void initChannel(Channel ch) throws Exception {
                 int heartbeatInterval = UrlUtils.getHeartbeat(getUrl());
