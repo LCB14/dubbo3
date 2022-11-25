@@ -20,6 +20,7 @@ import org.apache.dubbo.remoting.Channel;
 import org.apache.dubbo.remoting.ChannelHandler;
 import org.apache.dubbo.remoting.RemotingException;
 import org.apache.dubbo.remoting.exchange.support.MultiMessage;
+import org.apache.dubbo.remoting.exchange.support.header.HeartbeatHandler;
 
 /**
  * @see MultiMessage
@@ -39,6 +40,9 @@ public class MultiMessageHandler extends AbstractChannelHandlerDelegate {
                 handler.received(channel, obj);
             }
         } else {
+            /**
+             * @see HeartbeatHandler#received(Channel, Object)
+             */
             handler.received(channel, message);
         }
     }

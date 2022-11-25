@@ -292,8 +292,10 @@ public class DubboProtocol extends AbstractProtocol {
          */
         URL url = invoker.getUrl();
 
-        // export service.
-        // key值参考：org.apache.dubbo.demo.DemoService:20880
+        /**
+         * 计算 service key，格式为 groupName/serviceName:serviceVersion:port。比如：
+         * dubbo/com.alibaba.dubbo.demo.DemoService:1.0.0:20880
+         */
         String key = serviceKey(url);
         DubboExporter<T> exporter = new DubboExporter<T>(invoker, key, exporterMap);
         exporterMap.put(key, exporter);

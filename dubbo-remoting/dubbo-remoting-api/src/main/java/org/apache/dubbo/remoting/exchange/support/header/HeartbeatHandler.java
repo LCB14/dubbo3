@@ -26,6 +26,7 @@ import org.apache.dubbo.remoting.RemotingException;
 import org.apache.dubbo.remoting.exchange.Request;
 import org.apache.dubbo.remoting.exchange.Response;
 import org.apache.dubbo.remoting.transport.AbstractChannelHandlerDelegate;
+import org.apache.dubbo.remoting.transport.dispatcher.all.AllChannelHandler;
 
 public class HeartbeatHandler extends AbstractChannelHandlerDelegate {
 
@@ -85,6 +86,9 @@ public class HeartbeatHandler extends AbstractChannelHandlerDelegate {
             }
             return;
         }
+        /**
+         * @see AllChannelHandler#received(Channel, Object)
+         */
         handler.received(channel, message);
     }
 
