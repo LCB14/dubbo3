@@ -610,7 +610,11 @@ public abstract class AbstractConfig implements Serializable {
              */
             CompositeConfiguration compositeConfiguration = Environment.getInstance().getConfiguration(getPrefix(), getId());
             Configuration config = new ConfigConfigurationAdapter(this);
-            // isConfigCenterFirst()默认是true
+            /**
+             * isConfigCenterFirst()默认是true,初始化位置
+             * @see AbstractInterfaceConfig#checkRegistry()
+             * @see AbstractInterfaceConfig#useRegistryForConfigIfNecessary()
+             */
             if (Environment.getInstance().isConfigCenterFirst()) {
                 // The sequence would be: SystemConfiguration -> EnvironmentConfiguration -> AppExternalConfiguration -> ExternalConfiguration -> ConfigConfigurationAdapter -> PropertiesConfiguration
                 // 把@Service或xml上的配置放入集合中第五位，优先级位于Dubbo控制台配置之后
