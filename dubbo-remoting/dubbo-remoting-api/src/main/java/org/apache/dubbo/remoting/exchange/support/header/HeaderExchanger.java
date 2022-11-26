@@ -35,6 +35,9 @@ public class HeaderExchanger implements Exchanger {
     @Override
     public ExchangeClient connect(URL url, ExchangeHandler handler) throws RemotingException {
         /**
+         * 此处的handler指向的是
+         * @see org.apache.dubbo.rpc.protocol.dubbo.DubboProtocol#requestHandler
+         *
          * Transporters.connect(url, new DecodeHandler(new HeaderExchangeHandler(handler))) 返回值参考
          * @see org.apache.dubbo.remoting.transport.netty4.NettyClient
          */

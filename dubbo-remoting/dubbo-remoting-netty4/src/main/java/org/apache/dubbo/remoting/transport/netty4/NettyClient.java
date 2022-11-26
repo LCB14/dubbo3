@@ -25,7 +25,10 @@ import org.apache.dubbo.common.utils.NetUtils;
 import org.apache.dubbo.remoting.ChannelHandler;
 import org.apache.dubbo.remoting.Constants;
 import org.apache.dubbo.remoting.RemotingException;
+import org.apache.dubbo.remoting.exchange.ExchangeHandler;
+import org.apache.dubbo.remoting.exchange.support.header.HeaderExchanger;
 import org.apache.dubbo.remoting.transport.AbstractClient;
+import org.apache.dubbo.remoting.transport.DecodeHandler;
 import org.apache.dubbo.remoting.utils.UrlUtils;
 
 import io.netty.bootstrap.Bootstrap;
@@ -78,6 +81,11 @@ public class NettyClient extends AbstractClient {
         // you can customize name and type of client thread pool by THREAD_NAME_KEY and THREADPOOL_KEY in CommonConstants.
         // the handler will be warped: MultiMessageHandler->HeartbeatHandler->handler
         // 父类构造函数会回调本类的 doConnect() 方法
+        /**
+         * 此处handler指向
+         * @see HeaderExchanger#connect(URL, ExchangeHandler)
+         * @see DecodeHandler
+         */
         super(url, wrapChannelHandler(url, handler));
     }
 
