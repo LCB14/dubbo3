@@ -1,10 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2014 The gRPC Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -19,6 +18,7 @@ package org.apache.dubbo.common.threadpool.serial;
 
 import org.apache.dubbo.common.logger.Logger;
 import org.apache.dubbo.common.logger.LoggerFactory;
+import org.apache.dubbo.common.threadlocal.InternalThreadLocal;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -96,9 +96,12 @@ public final class SerializingExecutor implements Executor, Runnable {
         try {
             while ((r = runQueue.poll()) != null) {
                 try {
+                    InternalThreadLocal.removeAll();
                     r.run();
                 } catch (RuntimeException e) {
                     LOGGER.error("Exception while executing runnable " + r, e);
+                } finally {
+                    InternalThreadLocal.removeAll();
                 }
             }
         } finally {
