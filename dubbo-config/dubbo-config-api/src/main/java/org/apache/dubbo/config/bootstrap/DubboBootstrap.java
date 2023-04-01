@@ -1076,8 +1076,10 @@ public class DubboBootstrap extends GenericEventListener {
 
                     // 注销注册中心
                     destroyRegistries();
+
                     // 关闭服务
                     DubboShutdownHook.destroyProtocols();
+
                     // 销毁注册中心客户端实例
                     destroyServiceDiscoveries();
                     // 清除应用配置类以及相关应用模型

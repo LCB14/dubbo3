@@ -23,6 +23,7 @@ import org.apache.dubbo.common.logger.LoggerFactory;
 import org.apache.dubbo.common.utils.ConcurrentHashSet;
 
 import com.alibaba.spring.util.BeanFactoryUtils;
+import org.apache.dubbo.config.DubboShutdownHook;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
@@ -41,6 +42,8 @@ public class SpringExtensionFactory implements ExtensionFactory {
         if (context instanceof ConfigurableApplicationContext) {
             // 在spring启动成功之后设置shutdownHook（兼容非SpringBoot环境）
             ((ConfigurableApplicationContext) context).registerShutdownHook();
+            // 在 Spring 环境下将 Dubbo 的 ShutdownHook 取消掉
+            DubboShutdownHook.getDubboShutdownHook().unregister();
         }
     }
 
