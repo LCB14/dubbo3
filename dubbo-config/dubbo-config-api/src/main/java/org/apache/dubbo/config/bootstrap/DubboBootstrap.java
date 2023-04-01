@@ -1064,20 +1064,27 @@ public class DubboBootstrap extends GenericEventListener {
             try {
                 DubboShutdownHook.destroyAll();
 
-                if (started.compareAndSet(true, false)
-                        && destroyed.compareAndSet(false, true)) {
-
+                if (started.compareAndSet(true, false) && destroyed.compareAndSet(false, true)) {
+                    // 取消注册
                     unregisterServiceInstance();
+                    // 取消元数据服务
                     unexportMetadataService();
+                    // 停止暴露服务
                     unexportServices();
+                    // 取消订阅服务
                     unreferServices();
 
+                    // 注销注册中心
                     destroyRegistries();
+                    // 关闭服务
                     DubboShutdownHook.destroyProtocols();
+                    // 销毁注册中心客户端实例
                     destroyServiceDiscoveries();
-
+                    // 清除应用配置类以及相关应用模型
                     clear();
+                    // 关闭线程池
                     shutdown();
+                    // 释放资源
                     release();
                 }
             } finally {

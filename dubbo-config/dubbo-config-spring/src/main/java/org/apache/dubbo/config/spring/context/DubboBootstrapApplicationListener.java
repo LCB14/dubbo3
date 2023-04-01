@@ -48,6 +48,7 @@ public class DubboBootstrapApplicationListener extends OneTimeExecutionApplicati
 
     @Override
     public void onApplicationContextEvent(ApplicationContextEvent event) {
+        // 这里是 Spring 的同步事件，publishEvent 和处理 Event 是在同一个线程中
         if (event instanceof ContextRefreshedEvent) {
             onContextRefreshedEvent((ContextRefreshedEvent) event);
         } else if (event instanceof ContextClosedEvent) {
@@ -60,6 +61,10 @@ public class DubboBootstrapApplicationListener extends OneTimeExecutionApplicati
     }
 
     private void onContextClosedEvent(ContextClosedEvent event) {
+        /**
+         * spring 在 shutdownhook 中会先触发 ContextClosedEvent ，然后再销毁 spring beans
+         * 所以这里 dubbo 开始优雅关闭时，依赖的 spring beans 并未销毁。
+         */
         dubboBootstrap.stop();
     }
 
