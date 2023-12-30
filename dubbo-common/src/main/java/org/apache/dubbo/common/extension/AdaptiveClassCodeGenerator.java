@@ -86,6 +86,7 @@ public class AdaptiveClassCodeGenerator {
      */
     public String generate() {
         // no need to generate adaptive class since there's no adaptive method found.
+        // 获取目标拓展接口对应的自适应实现（在不存在被@Adaptive注解修饰的类的前提喜爱），如果也不存在被@Adaptive注解修饰的方法，则认为该拓展接口不支持自适应拓展。
         if (!hasAdaptiveMethod()) {
             throw new IllegalStateException("No adaptive method exist on extension " + type.getName() + ", refuse to create the adaptive class!");
         }
@@ -295,7 +296,7 @@ public class AdaptiveClassCodeGenerator {
         // TODO: refactor it
         String getNameCode = null;
         for (int i = value.length - 1; i >= 0; --i) {
-            // value.length 大于 1 时，才会走到 else 分支。
+            // value.length 等于1或第一次遍历时该条件才会成立
             if (i == value.length - 1) {
                 /**
                  * defaultExtName 变量的初始化位置(defaultExtName 变量的值来源于@SPI注解中指定)
@@ -321,6 +322,9 @@ public class AdaptiveClassCodeGenerator {
                              *
                              * defaultExtName 值来源于cachedDefaultName，cachedDefaultName来源于@SPI注解中指定
                              * @see org.apache.dubbo.common.extension.ExtensionLoader#createAdaptiveExtensionClass()
+                             *
+                             * url.getMethodParameter 调用方法参考
+                             * @see URL#getMethodParameter(String, String, String)
                              */
                             getNameCode = String.format("url.getMethodParameter(methodName, \"%s\", \"%s\")", value[i], defaultExtName);
                         } else {
@@ -338,6 +342,10 @@ public class AdaptiveClassCodeGenerator {
                              */
                             getNameCode = String.format("url.getMethodParameter(methodName, \"%s\", \"%s\")", value[i], defaultExtName);
                         } else {
+                            /**
+                             * url.getParameter 调用方法参考
+                             * @see URL#getParameter(String)
+                             */
                             getNameCode = String.format("url.getParameter(\"%s\")", value[i]);
                         }
                     } else {
