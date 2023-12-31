@@ -44,9 +44,11 @@ public class DubboConfigConfigurationRegistrar implements ImportBeanDefinitionRe
         AnnotationAttributes attributes = AnnotationAttributes.fromMap(
                 importingClassMetadata.getAnnotationAttributes(EnableDubboConfig.class.getName()));
 
+        // 默认值 true
         boolean multiple = attributes.getBoolean("multiple");
 
         // Single Config Bindings
+        // 这块用了静态导入
         registerBeans(registry, DubboConfigConfiguration.Single.class);
 
         if (multiple) { // Since 2.6.6 https://github.com/apache/dubbo/issues/3193

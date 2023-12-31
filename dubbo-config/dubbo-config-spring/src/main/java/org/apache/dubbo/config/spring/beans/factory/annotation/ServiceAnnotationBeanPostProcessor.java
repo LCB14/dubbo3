@@ -128,7 +128,7 @@ public class ServiceAnnotationBeanPostProcessor implements BeanDefinitionRegistr
      * @param registry       {@link BeanDefinitionRegistry}
      */
     private void registerServiceBeans(Set<String> packagesToScan, BeanDefinitionRegistry registry) {
-
+        // 自定义一个扫描器，专门用来把加了Dubbo提供的@Service注解的bean，扫描到Spring容器。
         DubboClassPathBeanDefinitionScanner scanner =
                 new DubboClassPathBeanDefinitionScanner(registry, environment, resourceLoader);
 
@@ -158,6 +158,7 @@ public class ServiceAnnotationBeanPostProcessor implements BeanDefinitionRegistr
             if (!CollectionUtils.isEmpty(beanDefinitionHolders)) {
 
                 for (BeanDefinitionHolder beanDefinitionHolder : beanDefinitionHolders) {
+                    // 为每个向外提供的服务，都单独注册一个ServiceBean,用来存放服务配置信息
                     registerServiceBean(beanDefinitionHolder, registry, scanner);
                 }
 
@@ -275,6 +276,7 @@ public class ServiceAnnotationBeanPostProcessor implements BeanDefinitionRegistr
 
         String annotatedServiceBeanName = beanDefinitionHolder.getBeanName();
 
+        // 构造 ServiceBean 的 BeanDefinition
         AbstractBeanDefinition serviceBeanDefinition =
                 buildServiceBeanDefinition(service, serviceAnnotationAttributes, interfaceClass, annotatedServiceBeanName);
 
@@ -380,6 +382,11 @@ public class ServiceAnnotationBeanPostProcessor implements BeanDefinitionRegistr
 
         MutablePropertyValues propertyValues = beanDefinition.getPropertyValues();
 
+        /**
+         * 这里设置忽略值的目的是针对
+         * @Service(protocol="p1") 用户的这种配置，dubbo不能把解析出来的"p1"直接
+         * 赋值给ServiceBean对应的ProtocolConfig属性，而是要经过特殊处理找到"p1"对应的映射值。
+         */
         String[] ignoreAttributeNames = of("provider", "monitor", "application", "module", "registry", "protocol",
                 "interface", "interfaceName", "parameters");
 

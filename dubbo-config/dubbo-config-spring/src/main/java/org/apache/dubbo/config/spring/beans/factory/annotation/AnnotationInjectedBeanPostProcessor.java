@@ -138,9 +138,8 @@ public abstract class AnnotationInjectedBeanPostProcessor extends
     }
 
     @Override
-    public PropertyValues postProcessPropertyValues(
-            PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName) throws BeanCreationException {
-
+    public PropertyValues postProcessPropertyValues(PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName) throws BeanCreationException {
+        // 寻找 Bean 中被 @Reference 注解修饰的属性
         InjectionMetadata metadata = findInjectionMetadata(beanName, bean.getClass(), pvs);
         try {
             metadata.inject(bean, beanName, pvs);
@@ -166,6 +165,10 @@ public abstract class AnnotationInjectedBeanPostProcessor extends
 
         ReflectionUtils.doWithFields(beanClass, field -> {
 
+            /**
+             * getAnnotationTypes() 返回值的初始化位置
+             * @see ReferenceAnnotationBeanPostProcessor#ReferenceAnnotationBeanPostProcessor()
+             */
             for (Class<? extends Annotation> annotationType : getAnnotationTypes()) {
 
                 AnnotationAttributes attributes = getMergedAttributes(field, annotationType, getEnvironment(), true);
@@ -236,8 +239,12 @@ public abstract class AnnotationInjectedBeanPostProcessor extends
 
 
     private AnnotationInjectedBeanPostProcessor.AnnotatedInjectionMetadata buildAnnotatedMetadata(final Class<?> beanClass) {
+        // 寻找被添加@Reference注解的属性
         Collection<AnnotationInjectedBeanPostProcessor.AnnotatedFieldElement> fieldElements = findFieldAnnotationMetadata(beanClass);
+
+        // 寻找被添加@Reference注解的方法
         Collection<AnnotationInjectedBeanPostProcessor.AnnotatedMethodElement> methodElements = findAnnotatedMethodMetadata(beanClass);
+
         return new AnnotationInjectedBeanPostProcessor.AnnotatedInjectionMetadata(beanClass, fieldElements, methodElements);
 
     }

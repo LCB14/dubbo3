@@ -126,16 +126,19 @@ public class ReferenceAnnotationBeanPostProcessor extends AnnotationInjectedBean
 
         /**
          * The name of bean that annotated Dubbo's {@link Service @Service} in local Spring {@link ApplicationContext}
+         * referencedBeanName 对应 ServiceBean 的名称
          */
         String referencedBeanName = buildReferencedBeanName(attributes, injectedType);
 
         /**
          * The name of bean that is declared by {@link Reference @Reference} annotation injection
+         * 基于 @Reference 注解里面用户配置的属性生成 referenceBeanName 值
          */
         String referenceBeanName = getReferenceBeanName(attributes, injectedType);
 
         ReferenceBean referenceBean = buildReferenceBeanIfAbsent(referenceBeanName, attributes, injectedType);
 
+        // 将 ReferenceBean 添加到容器
         registerReferenceBean(referencedBeanName, referenceBean, attributes, injectedType);
 
         cacheInjectedReferenceBean(referenceBean, injectedElement);

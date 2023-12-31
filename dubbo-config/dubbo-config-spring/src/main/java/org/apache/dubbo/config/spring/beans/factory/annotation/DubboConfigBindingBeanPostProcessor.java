@@ -102,7 +102,10 @@ public class DubboConfigBindingBeanPostProcessor implements BeanPostProcessor, A
     }
 
     private void bind(String prefix, AbstractConfig dubboConfig) {
-
+        /**
+         * dubboConfigBinder实例初始化位置参考：
+         * @see org.apache.dubbo.config.spring.beans.factory.annotation.DubboConfigBindingBeanPostProcessor#afterPropertiesSet
+         */
         dubboConfigBinder.bind(prefix, dubboConfig);
 
         if (log.isInfoEnabled()) {

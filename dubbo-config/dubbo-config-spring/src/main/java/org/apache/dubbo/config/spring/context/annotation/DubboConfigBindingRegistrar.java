@@ -106,6 +106,7 @@ public class DubboConfigBindingRegistrar implements ImportBeanDefinitionRegistra
 
             registerDubboConfigBean(beanName, configClass, registry);
 
+            // 每个配置bean都会生成一个与之对应的 BeanPostProcessor 用来给其进行初始化。
             registerDubboConfigBindingBeanPostProcessor(prefix, beanName, multiple, registry);
 
         }
