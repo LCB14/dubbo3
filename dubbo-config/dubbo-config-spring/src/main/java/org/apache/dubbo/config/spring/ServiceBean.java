@@ -339,6 +339,7 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
 
     /**
      * @since 2.6.5
+     * Spring 容器启动后该方法会获得回调
      */
     @Override
     public void export() {
