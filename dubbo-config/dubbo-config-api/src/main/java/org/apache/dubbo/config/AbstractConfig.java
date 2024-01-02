@@ -609,7 +609,9 @@ public abstract class AbstractConfig implements Serializable {
              * getId()     -> demo-provider
              */
             CompositeConfiguration compositeConfiguration = Environment.getInstance().getConfiguration(getPrefix(), getId());
+
             Configuration config = new ConfigConfigurationAdapter(this);
+
             /**
              * isConfigCenterFirst()默认是true,初始化位置
              * @see AbstractInterfaceConfig#checkRegistry()

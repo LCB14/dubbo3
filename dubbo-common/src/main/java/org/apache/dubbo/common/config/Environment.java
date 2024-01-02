@@ -123,7 +123,7 @@ public class Environment {
         compositeConfiguration.addConfiguration(this.getSystemConfig(prefix, id));
         // 操作系统环境变量配置
         compositeConfiguration.addConfiguration(this.getEnvironmentConfig(prefix, id));
-        // 配置中心当前APP配置
+        // 配置中心当前应用配置
         compositeConfiguration.addConfiguration(this.getAppExternalConfig(prefix, id));
         // 配置中心全局配置（针对所有APP）
         compositeConfiguration.addConfiguration(this.getExternalConfig(prefix, id));

@@ -36,6 +36,7 @@ public class DefaultDubboConfigBinder extends AbstractDubboConfigBinder {
         // Set ignored*
         dataBinder.setIgnoreInvalidFields(isIgnoreInvalidFields());
         dataBinder.setIgnoreUnknownFields(isIgnoreUnknownFields());
+
         // Get properties under specified prefix from PropertySources
         Map<String, Object> properties = getPrefixedProperties(getPropertySources(), prefix);
         // Convert Map to MutablePropertyValues

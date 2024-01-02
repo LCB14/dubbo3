@@ -86,19 +86,14 @@ public class DubboConfigBindingBeanPostProcessor implements BeanPostProcessor, A
 
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-
         if (this.beanName.equals(beanName) && bean instanceof AbstractConfig) {
-
             AbstractConfig dubboConfig = (AbstractConfig) bean;
 
             bind(prefix, dubboConfig);
 
             customize(beanName, dubboConfig);
-
         }
-
         return bean;
-
     }
 
     private void bind(String prefix, AbstractConfig dubboConfig) {
@@ -115,11 +110,9 @@ public class DubboConfigBindingBeanPostProcessor implements BeanPostProcessor, A
     }
 
     private void customize(String beanName, AbstractConfig dubboConfig) {
-
         for (DubboConfigBeanCustomizer customizer : configBeanCustomizers) {
             customizer.customize(beanName, dubboConfig);
         }
-
     }
 
     public boolean isIgnoreUnknownFields() {
@@ -158,15 +151,12 @@ public class DubboConfigBindingBeanPostProcessor implements BeanPostProcessor, A
 
     @Override
     public void afterPropertiesSet() throws Exception {
-
         initDubboConfigBinder();
 
         initConfigBeanCustomizers();
-
     }
 
     private void initDubboConfigBinder() {
-
         if (dubboConfigBinder == null) {
             try {
                 dubboConfigBinder = applicationContext.getBean(DubboConfigBinder.class);
@@ -181,11 +171,9 @@ public class DubboConfigBindingBeanPostProcessor implements BeanPostProcessor, A
 
         dubboConfigBinder.setIgnoreUnknownFields(ignoreUnknownFields);
         dubboConfigBinder.setIgnoreInvalidFields(ignoreInvalidFields);
-
     }
 
     private void initConfigBeanCustomizers() {
-
         Collection<DubboConfigBeanCustomizer> configBeanCustomizers =
                 beansOfTypeIncludingAncestors(applicationContext, DubboConfigBeanCustomizer.class).values();
 

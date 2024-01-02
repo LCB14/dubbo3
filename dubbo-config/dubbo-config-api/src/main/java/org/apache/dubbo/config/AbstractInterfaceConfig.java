@@ -274,6 +274,10 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
 
 
     void startConfigCenter() {
+        /**
+         * configCenter 初始化位置参考，如果没有指定配置中心相关配置这里也是null
+         * @see org.apache.dubbo.config.spring.ServiceBean#afterPropertiesSet()
+         */
         if (configCenter == null) {
             ConfigManager.getInstance().getConfigCenter().ifPresent(cc -> this.configCenter = cc);
         }
@@ -286,10 +290,12 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
         if (this.configCenter != null) {
             // TODO there may have duplicate refresh
             this.configCenter.refresh();
+
             // 环境准备，与远程配置中心建立连接并获取相关配置信息
             prepareEnvironment();
         }
 
+        // 刷新 dubbo 的所有配置项
         ConfigManager.getInstance().refreshAll();
     }
 
