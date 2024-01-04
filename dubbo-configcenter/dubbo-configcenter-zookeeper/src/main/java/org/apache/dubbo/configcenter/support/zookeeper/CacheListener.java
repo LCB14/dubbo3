@@ -16,6 +16,8 @@
  */
 package org.apache.dubbo.configcenter.support.zookeeper;
 
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.apache.dubbo.common.utils.CollectionUtils;
 import org.apache.dubbo.common.utils.StringUtils;
 import org.apache.dubbo.configcenter.ConfigChangeEvent;
@@ -23,6 +25,7 @@ import org.apache.dubbo.configcenter.ConfigChangeType;
 import org.apache.dubbo.configcenter.ConfigurationListener;
 import org.apache.dubbo.remoting.zookeeper.DataListener;
 import org.apache.dubbo.remoting.zookeeper.EventType;
+import org.apache.dubbo.remoting.zookeeper.curator.CuratorZookeeperClient;
 
 import java.util.Map;
 import java.util.Set;
@@ -77,6 +80,10 @@ public class CacheListener implements DataListener {
     }
 
 
+    /**
+     * 回调位置参考：
+     * @see CuratorZookeeperClient.CuratorWatcherImpl#childEvent(CuratorFramework, TreeCacheEvent)
+     */
     @Override
     public void dataChanged(String path, Object value, EventType eventType) {
         if (eventType == null) {

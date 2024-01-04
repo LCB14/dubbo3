@@ -16,13 +16,11 @@
  */
 package org.apache.dubbo.registry.integration;
 
+import org.apache.dubbo.common.URL;
 import org.apache.dubbo.common.logger.Logger;
 import org.apache.dubbo.common.logger.LoggerFactory;
 import org.apache.dubbo.common.utils.StringUtils;
-import org.apache.dubbo.configcenter.ConfigChangeEvent;
-import org.apache.dubbo.configcenter.ConfigChangeType;
-import org.apache.dubbo.configcenter.ConfigurationListener;
-import org.apache.dubbo.configcenter.DynamicConfiguration;
+import org.apache.dubbo.configcenter.*;
 import org.apache.dubbo.rpc.cluster.Configurator;
 import org.apache.dubbo.rpc.cluster.configurator.parser.ConfigParser;
 
@@ -39,7 +37,13 @@ public abstract class AbstractConfiguratorListener implements ConfigurationListe
 
 
     protected final void initWith(String key) {
-        // 获取配置中心并设置监听器
+        /**
+         * 获取配置中心并设置监听器
+         * @see AbstractDynamicConfigurationFactory#getDynamicConfiguration(URL)
+         * @see org.apache.dubbo.configcenter.support.zookeeper.ZookeeperDynamicConfigurationFactory#createDynamicConfiguration(URL)
+         * @see org.apache.dubbo.configcenter.support.zookeeper.ZookeeperDynamicConfiguration#addListener(String, String, ConfigurationListener)
+         * @see org.apache.dubbo.configcenter.support.zookeeper.CacheListener#addListener(java.lang.String, org.apache.dubbo.configcenter.ConfigurationListener)
+         */
         DynamicConfiguration dynamicConfiguration = DynamicConfiguration.getDynamicConfiguration();
         dynamicConfiguration.addListener(key, this);
 
@@ -53,7 +57,7 @@ public abstract class AbstractConfiguratorListener implements ConfigurationListe
 
     /**
      * 调用位置参考
-     * @see org.apache.dubbo.configcenter.support.zookeeper.CacheListener#dataChanged(String, Object, org.apache.dubbo.remoting.zookeeper.EventType)
+     * @see org.apache.dubbo.configcenter.support.zookeeper.CacheListener#dataChanged
      */
     @Override
     public void process(ConfigChangeEvent event) {

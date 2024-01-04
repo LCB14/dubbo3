@@ -302,6 +302,7 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
     private void prepareEnvironment() {
         // 数据参考：<dubbo:config-center check="true" group="dubbo" timeout="3000" configFile="dubbo.properties" highestPriority="false" address="zookeeper://127.0.0.1:2181" protocol="zookeeper" namespace="dubbo" valid="true" prefix="dubbo.config-center" />
         if (configCenter.isValid()) {
+            // 防止被重复执行，同时也保证了用户单独指定配置中心相关的配置信息时，不再使用注册中心作为配置中心
             if (!configCenter.checkOrUpdateInited()) {
                 return;
             }

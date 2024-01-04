@@ -132,7 +132,8 @@ public interface DynamicConfiguration extends Configuration {
          *  @see org.apache.dubbo.config.AbstractInterfaceConfig#getDynamicConfiguration(URL)
          */
         Optional<Configuration> optional = Environment.getInstance().getDynamicConfiguration();
-        return (DynamicConfiguration) optional.orElseGet(() -> getExtensionLoader(DynamicConfigurationFactory.class).getDefaultExtension().getDynamicConfiguration(null));
+        return (DynamicConfiguration) optional.orElseGet(() ->
+                getExtensionLoader(DynamicConfigurationFactory.class).getDefaultExtension().getDynamicConfiguration(null));
     }
 
     /**

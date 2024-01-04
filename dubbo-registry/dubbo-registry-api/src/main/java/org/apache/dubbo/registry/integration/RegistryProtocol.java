@@ -26,6 +26,7 @@ import org.apache.dubbo.common.utils.CollectionUtils;
 import org.apache.dubbo.common.utils.NamedThreadFactory;
 import org.apache.dubbo.common.utils.StringUtils;
 import org.apache.dubbo.common.utils.UrlUtils;
+import org.apache.dubbo.configcenter.ConfigChangeEvent;
 import org.apache.dubbo.configcenter.DynamicConfiguration;
 import org.apache.dubbo.registry.NotifyListener;
 import org.apache.dubbo.registry.Registry;
@@ -209,9 +210,12 @@ public class RegistryProtocol implements Protocol {
      */
     @Override
     public <T> Exporter<T> export(final Invoker<T> originInvoker) throws RpcException {
+        // 注册中心信息
         // zookeeper://127.0.0.1:2181/org.apache.dubbo.registry.RegistryService?application=demo-provider&dubbo=2.0.2&export=dubbo://192.168.20.233:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bean.name=org.apache.dubbo.demo.DemoService&bind.ip=192.168.20.233&bind.port=20880&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello&pid=12687&qos.port=22222&release=&side=provider&timestamp=1659685744654&pid=12687&qos.port=22222&timestamp=1659685744639
         URL registryUrl = getRegistryUrl(originInvoker);
+
         // url to export locally
+        // 目标导出服务信息
         // dubbo://192.168.20.233:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bean.name=org.apache.dubbo.demo.DemoService&bind.ip=192.168.20.233&bind.port=20880&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello&pid=12687&qos.port=22222&release=&side=provider&timestamp=1659685744654
         URL providerUrl = getProviderUrl(originInvoker);
 
@@ -225,8 +229,8 @@ public class RegistryProtocol implements Protocol {
         overrideListeners.put(overrideSubscribeUrl, overrideSubscribeListener);
 
         /**
-         * overrideUrlWithConfig方法是 Dubbo 2.7 版本提供的，Dubbo 2.6 版本所有数据都存在注册中心上，Dubbo 2.7版本分成了注册中心，配置中心，和元数据中心。
-         * 获取配置中心存储的配置数据，继续完善目标导出服务URL信息的组装。
+         * 重点：这里初始化配置中心客户端，并为相关配置节点添加监听器
+         * 获取配置中心存储的配置数据，继续完善目标导出服务URL信息的组装。（注：overrideUrlWithConfig方法是 Dubbo 2.7 版本提供的，Dubbo 2.6 版本所有数据都存在注册中心上，Dubbo 2.7版本分成了注册中心，配置中心，和元数据中心。）
          * dubbo://192.168.17.153:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bean.name=org.apache.dubbo.demo.DemoService&bind.ip=192.168.17.153&bind.port=20880&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello&pid=7125&qos.port=22222&release=&sayHello.0.callback=false&sayHello.retries=2&sayHello.timeout=3000&side=provider&timestamp=1667896225780
          */
         providerUrl = overrideUrlWithConfig(providerUrl, overrideSubscribeListener);
@@ -241,7 +245,7 @@ public class RegistryProtocol implements Protocol {
         final Registry registry = getRegistry(originInvoker);
 
         /**
-         * 获取已注册的服务提供者 URL
+         * 将重写后的服务URL进行简化，把不用存到注册中心去的参数去除
          * providerUrl -> dubbo://192.168.20.233:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bean.name=org.apache.dubbo.demo.DemoService&bind.ip=192.168.20.233&bind.port=20880&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello&pid=21489&qos.port=22222&release=&side=provider&timestamp=1660034231340
          * registryUrl -> zookeeper://127.0.0.1:2181/org.apache.dubbo.registry.RegistryService?application=demo-provider&dubbo=2.0.2&export=dubbo://192.168.20.233:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bean.name=org.apache.dubbo.demo.DemoService&bind.ip=192.168.20.233&bind.port=20880&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello&pid=21489&qos.port=22222&release=&side=provider&timestamp=1660034231340&pid=21489&qos.port=22222&timestamp=1660034231329
          */
@@ -251,11 +255,7 @@ public class RegistryProtocol implements Protocol {
         //to judge if we need to delay publish
         boolean register = providerUrl.getParameter(REGISTER_KEY, true);
         if (register) {
-            /**
-             * 向注册中心注册服务,主要包含两步：
-             * 1、获取注册中心实例；
-             * 2、向注册中心注册服务。
-             */
+            // 把简化后的服务URL调用ZookeeperRegistry.registry()方法注册到注册中心去
             register(registryUrl, registeredProviderUrl);
             providerInvokerWrapper.setReg(true);
         }
@@ -289,8 +289,11 @@ public class RegistryProtocol implements Protocol {
         return (ExporterChangeableWrapper<T>) bounds.computeIfAbsent(key, s -> {
             Invoker<?> invokerDelegate = new InvokerDelegate<>(originInvoker, providerUrl);
             /**
-             * 为什么是 DubboProtocol ？-- （因为 InvokerDelegate 实例的 getUrl 方法的返回值是 providerUrl，providerUrl.getParameter("protocol")值为 dubbo）
+             * 为什么是 DubboProtocol ？
+             * 因为 InvokerDelegate 实例的 getUrl 方法的返回值是 providerUrl，providerUrl.getParameter("protocol")值为 dubbo
              * @see org.apache.dubbo.rpc.protocol.dubbo.DubboProtocol#export(Invoker)
+             *
+             * ExporterChangeableWrapper 这个类主要负责在unexport对应服务之前，把服务URL从注册中心中移除，把该服务对应的动态配置监听器移除
              */
             return new ExporterChangeableWrapper<>((Exporter<T>) protocol.export(invokerDelegate), originInvoker);
         });
@@ -347,7 +350,7 @@ public class RegistryProtocol implements Protocol {
         // zookeeper://127.0.0.1:2181/org.apache.dubbo.registry.RegistryService?application=demo-provider&dubbo=2.0.2&export=dubbo://192.168.20.233:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bean.name=org.apache.dubbo.demo.DemoService&bind.ip=192.168.20.233&bind.port=20880&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello&pid=21163&qos.port=22222&release=&side=provider&timestamp=1660029600003&pid=21163&qos.port=22222&timestamp=1660029599994
         URL registryUrl = getRegistryUrl(originInvoker);
         /**
-         * registryFactory 初始化位置(SPI拓展加载Protocol时，通过set注入的方式进行的初始化):
+         * registryFactory 初始化位置(SPI拓展加载Protocol时，通过set注入的方式注入的代理实例):
          * @see RegistryProtocol#setRegistryFactory(RegistryFactory)
          *
          * registryFactory 实例
@@ -661,6 +664,7 @@ public class RegistryProtocol implements Protocol {
             } else {
                 invoker = originInvoker;
             }
+
             //The origin invoker
             URL originUrl = RegistryProtocol.this.getProviderUrl(invoker);
             String key = getCacheKey(originInvoker);
@@ -669,6 +673,7 @@ public class RegistryProtocol implements Protocol {
                 logger.warn(new IllegalStateException("error state, exporter should not be null"));
                 return;
             }
+
             //The current, may have been merged many times
             URL currentUrl = exporter.getInvoker().getUrl();
             //Merged with this configuration
@@ -701,6 +706,11 @@ public class RegistryProtocol implements Protocol {
         }
     }
 
+    /**
+     * 监听的是服务的动态配置数据修改，和OverrideListener类似，也是对应一个服务的，所以在每个服务进行导出时都会生成一个，
+     * 实际上ServiceConfigurationListener的内部有一个属性就是OverrideListener，所以当ServiceConfigurationListener监听数据发生了变化时，
+     * 就会把配置中心的最新数据交给OverrideListener去重写服务URL。
+     */
     private class ServiceConfigurationListener extends AbstractConfiguratorListener {
         private URL providerUrl;
         private OverrideListener notifyListener;
@@ -726,6 +736,11 @@ public class RegistryProtocol implements Protocol {
         }
     }
 
+    /**
+     * 监听的是应用的动态配置数据修改，随着RegistryProtocol实例化而实例化好的，一个应用中只有一个
+     * 因为在RegistryProtocol类中保存了所有服务所对应的OverrideListener，所以实际上当ProviderConfigurationListener监听到数据发生了变化时，
+     * 也会把它所得到的最新数据依次调用每个OverrideListener去重写服务对应的服务URL。
+     */
     private class ProviderConfigurationListener extends AbstractConfiguratorListener {
 
         public ProviderConfigurationListener() {
@@ -744,6 +759,10 @@ public class RegistryProtocol implements Protocol {
             return RegistryProtocol.getConfigedInvokerUrl(configurators, providerUrl);
         }
 
+        /**
+         * 回调位置参考：
+         * @see AbstractConfiguratorListener#process(ConfigChangeEvent)
+         */
         @Override
         protected void notifyOverrides() {
             overrideListeners.values().forEach(listener -> ((OverrideListener) listener).doOverrideIfNecessary());

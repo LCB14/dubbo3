@@ -53,6 +53,7 @@ public class ZookeeperDynamicConfiguration implements DynamicConfiguration {
 
     ZookeeperDynamicConfiguration(URL url, ZookeeperTransporter zookeeperTransporter) {
         this.url = url;
+
         // rootPath 数据参考： /dubbo/config
         rootPath = PATH_SEPARATOR + url.getParameter(CONFIG_NAMESPACE_KEY, DEFAULT_GROUP) + "/config";
 
@@ -99,6 +100,14 @@ public class ZookeeperDynamicConfiguration implements DynamicConfiguration {
 
     @Override
     public String getRule(String key, String group, long timeout) throws IllegalStateException {
+        /**
+         * getPathKey(group, key) 值参考:
+         * 1、应用级别变动监听节点地址
+         *      /dubbo/config/dubbo/demo-provider.configurators
+         *
+         * 2、服务级别变动监听节点地址
+         *      /dubbo/config/dubbo/org.apache.dubbo.demo.DemoService::.configurators
+         */
         return (String) getInternalProperty(getPathKey(group, key));
     }
 

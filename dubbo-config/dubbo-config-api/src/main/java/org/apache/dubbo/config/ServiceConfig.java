@@ -159,6 +159,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
 
     /**
      * The reference of the interface implementation
+     * 代理服务具体的实现类实例
      */
     private T ref;
 
@@ -619,7 +620,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                 map.put(REVISION_KEY, revision);
             }
             /**
-             *  Wrapper.getWrapper(interfaceClass)方法将生成interfaceClass对应的代理,核心代理方法代码参考如下：
+             *  Wrapper.getWrapper(interfaceClass)方法将生成 interfaceClass 的包装类，生成的包装类核心方法代码参考如下：
              *
              *  public Object invokeMethod(Object o, String n, Class[] p, Object[] v) throws java.lang.reflect.InvocationTargetException {
              *         org.apache.dubbo.demo.provider.DemoServiceImpl w;
@@ -729,7 +730,11 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                          * interfaceClass - 表示服务接口信息；
                          *
                          * registryURL.addParameterAndEncoded(EXPORT_KEY, url.toFullString()) 作用是将目标导出服务url作为export属性值拼接到registryURL之后。- 执行结果如下:
-                         * registry://127.0.0.1:2181/org.apache.dubbo.registry.RegistryService?application=demo-provider&dubbo=2.0.2&export=dubbo://192.168.20.233:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bean.name=org.apache.dubbo.demo.DemoService&bind.ip=192.168.20.233&bind.port=20880&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService&methods=sayHello&pid=5025&qos.port=22222&release=&side=provider&timestamp=1659432631915&pid=5025&qos.port=22222&registry=zookeeper&timestamp=165943263190
+                         * registry://127.0.0.1:2181/org.apache.dubbo.registry.RegistryService?application=demo-provider
+                         * &dubbo=2.0.2&export=dubbo://192.168.20.233:20880/org.apache.dubbo.demo.DemoService
+                         * ?anyhost=true&application=demo-provider&bean.name=org.apache.dubbo.demo.DemoService&bind.ip=192.168.20.233
+                         * &bind.port=20880&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false&interface=org.apache.dubbo.demo.DemoService
+                         * &methods=sayHello&pid=5025&qos.port=22222&release=&side=provider&timestamp=1659432631915&pid=5025&qos.port=22222&registry=zookeeper&timestamp=165943263190
                          *
                          * @see JavassistProxyFactory#getInvoker(Object, Class, URL)
                          */
@@ -739,20 +744,30 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                         DelegateProviderMetaDataInvoker wrapperInvoker = new DelegateProviderMetaDataInvoker(invoker, this);
 
                         /**
-                         * 为什么是 RegistryProtocol？-（接口Protocol的export方法上的@Adaptive注解未指定任何value值，getMethodAdaptiveValue值的获取即为拓展接口Protocol名）
+                         * 为什么是 RegistryProtocol？
+                         *      接口Protocol的export方法上的@Adaptive注解未指定任何value值，getMethodAdaptiveValue值的获取即为拓展接口Protocol名。
+                         *
                          * @see org.apache.dubbo.registry.integration.RegistryProtocol#export(org.apache.dubbo.rpc.Invoker)
                          */
                         Exporter<?> exporter = protocol.export(wrapperInvoker);
                         exporters.add(exporter);
                     }
                 } else {
+                    // 当用户配置 <dubbo:registry address="N/A"/>，即address="N/A"时，会执行到该分支
                     if (logger.isInfoEnabled()) {
                         logger.info("Export dubbo service " + interfaceClass.getName() + " to url " + url);
                     }
 
+                    /**
+                     * @see JavassistProxyFactory#getInvoker(Object, Class, URL)
+                     */
                     Invoker<?> invoker = PROXY_FACTORY.getInvoker(ref, (Class) interfaceClass, url);
+
                     DelegateProviderMetaDataInvoker wrapperInvoker = new DelegateProviderMetaDataInvoker(invoker, this);
 
+                    /**
+                     * @see org.apache.dubbo.rpc.protocol.dubbo.DubboProtocol#export(Invoker)
+                     */
                     Exporter<?> exporter = protocol.export(wrapperInvoker);
                     exporters.add(exporter);
                 }
@@ -788,12 +803,24 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         /**
          * protocol.export
          * @see InjvmProtocol#export(Invoker)
-         * 为什么是InjvmProtocol？-（接口Protocol的export方法上的@Adaptive注解未指定任何value值，getMethodAdaptiveValue值的获取即为拓展接口Protocol名）
+         *
+         * 为什么是InjvmProtocol？（注：ProtocolListenerWrapper）
+         * 接口Protocol的export方法上的@Adaptive注解未指定任何value值，getMethodAdaptiveValue值的获取即为拓展接口Protocol名，因为拓展名为"protocol"
+         * 所以拓展实现类的key值通过url.getProtocol获取。
          * @see org.apache.dubbo.common.extension.AdaptiveClassCodeGenerator#getMethodAdaptiveValue(org.apache.dubbo.common.extension.Adaptive)
          *
          * PROXY_FACTORY.getInvoker
          * @see JavassistProxyFactory#getInvoker(Object, Class, URL)
-         * 为什么是JavassistProxyFactory？ - （ProxyFactory接口的getInvoker方法上的@Adaptive注解指定的value值在url的parameters中没有对应映射，拓展名使用ProxyFactory接口上@SPI注解中指定的defaultName）
+         *
+         * 为什么是JavassistProxyFactory？（注：StubProxyFactoryWrapper）
+         * ProxyFactory接口的getInvoker方法上的@Adaptive注解指定的value值以及拓展接口名作为key在url的parameters中都没有对应映射，
+         * 因此拓展名使用ProxyFactory接口上@SPI注解中指定的defaultName。
+         *
+         * PROXY_FACTORY.getInvoker(ref, (Class) interfaceClass, local) 功能？
+         *      Wrapper 实现对服务实现进行包装，Invoker 在上面的基础上采用组合的方式利用 Wrapper， 对导出服务的URL实际进行保装。
+         *
+         *  protocol.export 功能？
+         *      构建服务和服务实现的保装Invoker的映射关系。
          */
         Exporter<?> exporter = protocol.export(PROXY_FACTORY.getInvoker(ref, (Class) interfaceClass, local));
         exporters.add(exporter);
