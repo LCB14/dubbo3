@@ -56,6 +56,8 @@ public class Transporters {
         }
 
         /**
+         * 为啥是NettyTransporter？
+         * 因为 拓展接口 Transporter 上的 @SPI("netty")
          * @see org.apache.dubbo.remoting.transport.netty4.NettyTransporter#bind(org.apache.dubbo.common.URL, org.apache.dubbo.remoting.ChannelHandler)
          */
         return getTransporter().bind(url, handler);

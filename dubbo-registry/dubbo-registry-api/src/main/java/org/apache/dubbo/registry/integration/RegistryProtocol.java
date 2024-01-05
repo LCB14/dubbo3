@@ -182,17 +182,16 @@ public class RegistryProtocol implements Protocol {
 
     public void register(URL registryUrl, URL registeredProviderUrl) {
         /**
-         * step1
+         * registryFactory 属性的被初始化的时机？
+         * 系统获取 Protocol 拓展接口的 RegistryProtocol 拓展实现时通过set注入的。
          * @see org.apache.dubbo.registry.zookeeper.ZookeeperRegistryFactory
-         * step2
          * @see AbstractRegistryFactory#getRegistry(URL)
+         * @see org.apache.dubbo.registry.zookeeper.ZookeeperRegistryFactory#createRegistry(URL)
          */
         Registry registry = registryFactory.getRegistry(registryUrl);
 
         /**
-         * step1
          * @see org.apache.dubbo.registry.zookeeper.ZookeeperRegistry
-         * step2
          * @see AbstractRegistry#register(URL)
          */
         registry.register(registeredProviderUrl);

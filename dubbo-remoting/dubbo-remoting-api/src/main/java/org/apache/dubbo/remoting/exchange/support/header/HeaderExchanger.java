@@ -35,6 +35,7 @@ public class HeaderExchanger implements Exchanger {
     @Override
     public ExchangeClient connect(URL url, ExchangeHandler handler) throws RemotingException {
         /**
+         * HeaderExchangeClient 负责发送心跳
          * 此处的handler指向的是
          * @see org.apache.dubbo.rpc.protocol.dubbo.DubboProtocol#requestHandler
          *
@@ -47,6 +48,7 @@ public class HeaderExchanger implements Exchanger {
     @Override
     public ExchangeServer bind(URL url, ExchangeHandler handler) throws RemotingException {
         /**
+         * HeaderExchangeServer 负责接收心跳
          * 此处的handler指向的是
          * @see org.apache.dubbo.rpc.protocol.dubbo.DubboProtocol#requestHandler
          */

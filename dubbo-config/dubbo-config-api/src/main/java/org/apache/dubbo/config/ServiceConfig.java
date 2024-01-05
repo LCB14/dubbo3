@@ -690,8 +690,8 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         // scope = none，不导出服务
         if (!SCOPE_NONE.equalsIgnoreCase(scope)) {
             // export to local if the config is not remote (export to remote only when config is remote)
-            // scope != remote，导出到本地
             if (!SCOPE_REMOTE.equalsIgnoreCase(scope)) {
+                // scope != remote，导出到本地
                 exportLocal(url);
             }
 
