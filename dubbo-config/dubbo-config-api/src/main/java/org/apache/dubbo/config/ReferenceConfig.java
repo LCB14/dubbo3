@@ -268,12 +268,14 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
     }
 
     public synchronized T get() {
+        // 检查和更新参数，和服务提供者类似，把ReferenceBean里的属性的值更新为优先级最高的参数值
         checkAndUpdateSubConfigs();
 
         if (destroyed) {
             throw new IllegalStateException("The invoker of ReferenceConfig(" + url + ") has already destroyed!");
         }
         if (ref == null) {
+            // 调用init()去生成代理对象ref
             init();
         }
         return ref;
@@ -387,10 +389,8 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
             // 生成本地引用 URL，协议为 injvm
             URL url = new URL(LOCAL_PROTOCOL, LOCALHOST_VALUE, 0, interfaceClass.getName()).addParameters(map);
             /**
-             * step1
+             * InjvmProtocol 的父类 AbstractProtocol
              * @see AbstractProtocol#refer(Class, URL)
-             * step2
-             * @see InjvmProtocol#protocolBindingRefer(Class, URL)
              */
             invoker = REF_PROTOCOL.refer(interfaceClass, url);
             if (logger.isInfoEnabled()) {
