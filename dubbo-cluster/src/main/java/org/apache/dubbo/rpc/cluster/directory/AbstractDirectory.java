@@ -49,6 +49,9 @@ public abstract class AbstractDirectory<T> implements Directory<T> {
 
     private volatile URL consumerUrl;
 
+    /**
+     * 路由链
+     */
     protected RouterChain<T> routerChain;
 
     public AbstractDirectory(URL url) {
@@ -59,6 +62,13 @@ public abstract class AbstractDirectory<T> implements Directory<T> {
         this(url, url, routerChain);
     }
 
+    /**
+     * url 信息参考：
+     * zookeeper://127.0.0.1:2181/org.apache.dubbo.registry.RegistryService?application=demo-consumer
+     * &dubbo=2.0.2&pid=32579&qos.port=33333&refer=application=demo-consumer&check=false&dubbo=2.0.2
+     * &interface=org.apache.dubbo.demo.DemoService&lazy=false&methods=sayHello&pid=32579&qos.port=33333
+     * &register.ip=192.168.199.139&side=consumer&sticky=false&timestamp=1704527904557&timestamp=1704527904809
+     */
     public AbstractDirectory(URL url, URL consumerUrl, RouterChain<T> routerChain) {
         if (url == null) {
             throw new IllegalArgumentException("url == null");
@@ -72,6 +82,7 @@ public abstract class AbstractDirectory<T> implements Directory<T> {
         }
 
         this.consumerUrl = consumerUrl;
+
         setRouterChain(routerChain);
     }
 

@@ -466,6 +466,7 @@ public class DubboProtocol extends AbstractProtocol {
             shareClients = getSharedClient(url, connections);
         }
 
+        // 按参数 connections 指定的数字调用 initClient(url) 得到ExchangeClient
         ExchangeClient[] clients = new ExchangeClient[connections];
         for (int i = 0; i < clients.length; i++) {
             if (useShareConnect) {
@@ -615,11 +616,12 @@ public class DubboProtocol extends AbstractProtocol {
 
         // 添加编解码和心跳包参数到 url 中
         url = url.addParameter(CODEC_KEY, DubboCodec.NAME);
+
         // enable heartbeat by default
         url = url.addParameterIfAbsent(HEARTBEAT_KEY, String.valueOf(DEFAULT_HEARTBEAT));
 
         // BIO is not allowed since it has severe performance issue.
-        // 检测客户端类型是否存在，不存在则抛出异常
+        // 检测指定的客户端类型对应的网络传输拓展点是否存在，不存在则抛出异常
         if (str != null && str.length() > 0 && !ExtensionLoader.getExtensionLoader(Transporter.class).hasExtension(str)) {
             throw new RpcException("Unsupported client type: " + str + "," +
                     " supported client type is " + StringUtils.join(ExtensionLoader.getExtensionLoader(Transporter.class).getSupportedExtensions(), " "));

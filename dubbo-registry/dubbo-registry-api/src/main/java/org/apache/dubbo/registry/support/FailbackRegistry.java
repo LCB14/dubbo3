@@ -292,6 +292,9 @@ public abstract class FailbackRegistry extends AbstractRegistry {
         removeFailedSubscribed(url, listener);
         try {
             // Sending a subscription request to the server side
+            /**
+             * @see org.apache.dubbo.registry.zookeeper.ZookeeperRegistry#doSubscribe(URL, NotifyListener)
+             */
             doSubscribe(url, listener);
         } catch (Exception e) {
             Throwable t = e;

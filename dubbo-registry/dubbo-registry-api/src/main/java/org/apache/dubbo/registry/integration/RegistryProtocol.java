@@ -448,10 +448,9 @@ public class RegistryProtocol implements Protocol {
 
         /**
          * 启动zk客户端
-         * step1
          * @see AbstractRegistryFactory#getRegistry(URL)
-         * step2
          * @see org.apache.dubbo.registry.zookeeper.ZookeeperRegistryFactory#createRegistry(URL)
+         * @see org.apache.dubbo.registry.zookeeper.ZookeeperRegistry#ZookeeperRegistry(URL, org.apache.dubbo.remoting.zookeeper.ZookeeperTransporter)
          */
         Registry registry = registryFactory.getRegistry(url);
         if (RegistryService.class.equals(type)) {
@@ -467,6 +466,7 @@ public class RegistryProtocol implements Protocol {
 
         // 获取 group 配置（group 配置决定 doRefer 第一个参数的类型。）
         String group = qs.get(GROUP_KEY);
+        // 消费者引入了多个group中的服务
         if (group != null && group.length() > 0) {
             if ((COMMA_SPLIT_PATTERN.split(group)).length > 1 || "*".equals(group)) {
                 // 通过 SPI 加载 MergeableCluster 实例，并调用 doRefer 继续执行服务引用逻辑
@@ -474,6 +474,10 @@ public class RegistryProtocol implements Protocol {
             }
         }
 
+        /**
+         * 如果服务引用者没有引用多个组的服务，cluster 值参考：
+         * org.apache.dubbo.rpc.cluster.support.FailoverCluster
+         */
         return doRefer(cluster, registry, type, url);
     }
 
@@ -498,8 +502,9 @@ public class RegistryProtocol implements Protocol {
         Map<String, String> parameters = new HashMap<String, String>(directory.getUrl().getParameters());
 
         /**
-         * 生成服务消费者链接, 数据参考：
-         * consumer://192.168.17.153/org.apache.dubbo.demo.DemoService?application=demo-consumer&check=false&dubbo=2.0.2&interface=org.apache.dubbo.demo.DemoService
+         * subscribeUrl 信息参考：
+         * consumer://192.168.17.153/org.apache.dubbo.demo.DemoService?application=demo-consumer&check=false
+         * &dubbo=2.0.2&interface=org.apache.dubbo.demo.DemoService
          * &lazy=false&methods=sayHello&pid=9851&qos.port=33333&side=consumer&sticky=false&timestamp=1668506070653
          */
         URL subscribeUrl = new URL(CONSUMER_PROTOCOL, parameters.remove(REGISTER_IP_KEY), 0, type.getName(), parameters);

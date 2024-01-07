@@ -109,6 +109,7 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
     private volatile URL registeredConsumerUrl;
 
     /**
+     * 动态配置
      * override rules
      * Priority: override>-D>consumer>provider
      * Rule one: for a certain provider <ip:port,timeout=100>
@@ -118,12 +119,25 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
 
     // Map<url, Invoker> cache service url to invoker mapping.
     private volatile Map<String, Invoker<T>> urlInvokerMap; // The initial value is null and the midway may be assigned to null, please use the local variable reference
+
+    /**
+     * 服务目录当前缓存的服务提供者Invoker
+     */
     private volatile List<Invoker<T>> invokers;
 
     // Set<invokerUrls> cache invokeUrls to invokers mapping.
     private volatile Set<URL> cachedInvokerUrls; // The initial value is null and the midway may be assigned to null, please use the local variable reference
 
+    /**
+     * 监听本应用的动态配置，当应用的动态配置发生了修改后，会调用RegistryDirectory的refreshInvoker()方法
+     */
     private static final ConsumerConfigurationListener CONSUMER_CONFIGURATION_LISTENER = new ConsumerConfigurationListener();
+
+    /**
+     * 监听所引入的服务的动态配置，当服务的动态配置发生了修改后，会调用RegistryDirectory的refreshInvoker()方法
+     * 初始化位置参考：
+     * @see RegistryDirectory#subscribe(URL)
+     */
     private ReferenceConfigurationListener serviceConfigurationListener;
 
 
@@ -138,11 +152,29 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
             throw new IllegalArgumentException("registry serviceKey is null.");
         }
 
+        // 表示服务接口
         this.serviceType = serviceType;
-        // serviceKey 数据参考：org.apache.dubbo.registry.RegistryService
+
+        // 表示引入的服务key，serviceclass+version+group，serviceKey 数据参考：org.apache.dubbo.registry.RegistryService
         this.serviceKey = url.getServiceKey();
+
+        // 表示引入的服务的参数配置
         this.queryMap = StringUtils.parseQueryString(url.getParameterAndDecoded(REFER_KEY));
+
+        /**
+         * url 信息参考：
+         * zookeeper://127.0.0.1:2181/org.apache.dubbo.registry.RegistryService?application=demo-consumer
+         * &dubbo=2.0.2&pid=32641&qos.port=33333&refer=application=demo-consumer&check=false&dubbo=2.0.2
+         * &interface=org.apache.dubbo.demo.DemoService&lazy=false&methods=sayHello&pid=32641&qos.port=33333
+         * &register.ip=192.168.199.139&side=consumer&sticky=false&timestamp=1704528255651&timestamp=1704528255903
+         *
+         * directoryUrl 信息参考：
+         * zookeeper://127.0.0.1:2181/org.apache.dubbo.registry.RegistryService?application=demo-consumer&check=false
+         * &dubbo=2.0.2&interface=org.apache.dubbo.demo.DemoService&lazy=false&methods=sayHello&pid=32626
+         * &qos.port=33333&register.ip=192.168.199.139&side=consumer&sticky=false&timestamp=1704528193876
+         */
         this.overrideDirectoryUrl = this.directoryUrl = turnRegistryUrlToConsumerUrl(url);
+
         String group = directoryUrl.getParameter(GROUP_KEY, "");
         this.multiGroup = group != null && (ANY_VALUE.equals(group) || group.contains(","));
     }
@@ -169,10 +201,28 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
         this.registry = registry;
     }
 
+    /**
+     * url 信息参考：
+     * consumer://192.168.199.139/org.apache.dubbo.demo.DemoService?application=demo-consumer
+     * &category=providers,configurators,routers&check=false&dubbo=2.0.2&interface=org.apache.dubbo.demo.DemoService
+     * &lazy=false&methods=sayHello&pid=32917&qos.port=33333&side=consumer&sticky=false&timestamp=1704531507064
+     */
     public void subscribe(URL url) {
         setConsumerUrl(url);
+
+        /**
+         * 监听应用、引入的服务动态配置，最后本质还是调用服务目录的 refreshInvoker 方法
+         * @see RegistryDirectory#refreshInvoker(List)
+         */
         CONSUMER_CONFIGURATION_LISTENER.addNotifyListener(this);
         serviceConfigurationListener = new ReferenceConfigurationListener(this, url);
+
+        /**
+         * RegistryDirectory本身也是一个监听器，它会监听所引入的服务提供者、服务动态配置（老版本）、服务路由
+         * 这里就是将RegistryDirectory进行注册。
+         * @see org.apache.dubbo.registry.support.FailbackRegistry#subscribe
+         * @see org.apache.dubbo.registry.zookeeper.ZookeeperRegistry#doSubscribe
+         */
         registry.subscribe(url, this);
     }
 
@@ -209,6 +259,13 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
         }
     }
 
+    /**
+     * RegistryDirectory本身也是一个监听器，它会监听所引入的服务提供者、服务动态配置（老版本）、服务路由.
+     * 1、接收到"/dubbo/org.apache.dubbo.demo.DemoService/configurators"节点数据变化后，会生成configurators
+     * 2、接收到"/dubbo/org.apache.dubbo.demo.DemoService/routers"节点数据变化后，会生成Router并添加到routerChain中
+     * 3、接收到"/dubbo/org.apache.dubbo.demo.DemoService/providers"节点数据变化后，会调用refreshOverrideAndInvoker()方法。
+     *    这个方法就是用来针对每个服务提供者来生成Invoker的。
+     */
     @Override
     public synchronized void notify(List<URL> urls) {
         // categoryUrls 将会包含三个List集合，分别用于存放配置url、路由 url，服务提供者 url
@@ -261,7 +318,15 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
 
     private void refreshOverrideAndInvoker(List<URL> urls) {
         // mock zookeeper://xxx?mock=return null
+        // 利用Configurators重写目录地址，即在注册中心URL基础上把当前引入服务的参数作为URL的Parameters；
         overrideDirectoryUrl();
+
+        /**
+         * 1、从注册中心获取到的providers节点下的服务URL，调用toInvokers(invokerUrls)方法得到Invoker;
+         * 2、先按Protocol进行过滤，并且调用DubboProtocol.refer方法得到Invoker；
+         * 3、将得到的invokers设置到RouterChain上，并且调用RouterChain上所有的routers的notify(invokers)方法，实际上这里只有TagRouter的notify方法有用；
+         * 4、再把属于同一个group中的invoker合并起来，这样Invoker就生成好了；
+         */
         refreshInvoker(urls);
     }
 
@@ -309,7 +374,13 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
                 return;
             }
 
-            // 将 url 转成 Invoker
+            /**
+             * 将 url 转成 Invoker，url 信息参考：
+             * dubbo://192.168.199.139:20880/org.apache.dubbo.demo.DemoService?anyhost=true&application=demo-provider
+             * &bean.name=org.apache.dubbo.demo.DemoService&deprecated=false&dubbo=2.0.2&dynamic=true&generic=false
+             * &interface=org.apache.dubbo.demo.DemoService&methods=sayHello&pid=32573&release=&sayHello.0.callback=false
+             * &sayHello.retries=2&sayHello.timeout=3000&side=provider&timestamp=1704527866335
+             */
             Map<String, Invoker<T>> newUrlInvokerMap = toInvokers(invokerUrls);// Translate url list to Invoker map
 
             /**
@@ -327,10 +398,14 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
             }
 
             List<Invoker<T>> newInvokers = Collections.unmodifiableList(new ArrayList<>(newUrlInvokerMap.values()));
+
             // pre-route and build cache, notice that route cache should build on original Invoker list.
             // toMergeMethodInvokerMap() will wrap some invokers having different groups, those wrapped invokers not should be routed.
+            // 标签路由被注册的调用入口
             routerChain.setInvokers(newInvokers);
+
             this.invokers = multiGroup ? toMergeInvokerList(newInvokers) : newInvokers;
+
             this.urlInvokerMap = newUrlInvokerMap;
 
             try {
@@ -483,9 +558,7 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
                         /**
                          * protocol 存在包装实现类，调试时需注意！！
                          *
-                         * step 1
                          * @see AbstractProtocol#refer(Class, URL)
-                         * step 2
                          * @see org.apache.dubbo.rpc.protocol.dubbo.DubboProtocol#protocolBindingRefer(Class, URL)
                          */
                         invoker = new InvokerDelegate<>(protocol.refer(serviceType, url), url, providerUrl);
@@ -594,6 +667,7 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
             destroyAllInvokers();
             return;
         }
+
         // check deleted invoker
         List<String> deleted = null;
         if (oldUrlInvokerMap != null) {
@@ -737,11 +811,20 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
 
     private void overrideDirectoryUrl() {
         // merge override parameters
+        /**
+         * directoryUrl 信息参考：
+         * zookeeper://127.0.0.1:2181/org.apache.dubbo.registry.RegistryService?application=demo-consumer&check=false
+         * &dubbo=2.0.2&interface=org.apache.dubbo.demo.DemoService&lazy=false&methods=sayHello&pid=36187&qos.port=33333
+         * &register.ip=192.168.199.139&side=consumer&sticky=false&timestamp=1704593017865
+         */
         this.overrideDirectoryUrl = directoryUrl;
+
         List<Configurator> localConfigurators = this.configurators; // local reference
         doOverrideUrl(localConfigurators);
+
         List<Configurator> localAppDynamicConfigurators = CONSUMER_CONFIGURATION_LISTENER.getConfigurators(); // local reference
         doOverrideUrl(localAppDynamicConfigurators);
+
         if (serviceConfigurationListener != null) {
             List<Configurator> localDynamicConfigurators = serviceConfigurationListener.getConfigurators(); // local reference
             doOverrideUrl(localDynamicConfigurators);
@@ -781,6 +864,10 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
         ReferenceConfigurationListener(RegistryDirectory directory, URL url) {
             this.directory = directory;
             this.url = url;
+            /**
+             * 监听地址参考：
+             * /dubbo/config/dubbo/org.apache.dubbo.demo.DemoService:1.1.1:g1.configurators
+             */
             this.initWith(DynamicConfiguration.getRuleKey(url) + CONFIGURATORS_SUFFIX);
         }
 
@@ -795,6 +882,10 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
         List<RegistryDirectory> listeners = new ArrayList<>();
 
         ConsumerConfigurationListener() {
+            /**
+             * 监听地址参考：
+             * /dubbo/config/dubbo/dubbo-demo-consumer-application.configurators
+             */
             this.initWith(ApplicationModel.getApplication() + CONFIGURATORS_SUFFIX);
         }
 

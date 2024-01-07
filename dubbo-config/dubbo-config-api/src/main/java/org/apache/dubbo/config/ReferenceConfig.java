@@ -465,9 +465,7 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
                  * dubbo://localhost:20880/org.apache.dubbo.demo.DemoService?application=demo-consumer&check=false&interface=org.apache.dubbo.demo.DemoService
                  * &lazy=false&pid=46055&qos.port=33333&register.ip=192.168.199.139&remote.application=&side=consumer&sticky=false
                  *
-                 * step1
                  * @see AbstractProtocol#refer(Class, URL)
-                 * step2
                  * @see org.apache.dubbo.rpc.protocol.dubbo.DubboProtocol#protocolBindingRefer(Class, URL)
                  *
                  * 远程调用，通过 RegistryProtocol 的 refer 构建 Invoker 实例，url 数据参考如下：

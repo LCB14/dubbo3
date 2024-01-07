@@ -42,8 +42,22 @@ public class RouterChain<T> {
 
     // Fixed router instances: ConfigConditionRouter, TagRouter, e.g., the rule for each instance may change but the
     // instance will never delete or recreate.
+    /**
+     * 每个Router自己本身也是一个监听器，负责监听对应的路径
+     *   a. AppRouter：应用路由，监听的路径为"/dubbo/config/dubbo/dubbo-demo-consumer-application.condition-router"
+     *   b. ServiceRouter: 服务路由，监听的路径为"/dubbo/config/dubbo/org.apache.dubbo.demo.DemoService:1.1.1:g1.condition-router"
+     *   c. TagRouter: 标签路由，标签路由和应用路由、服务路由有所区别，应用路由和服务路由都是在消费者启动，在构造路由链时会进行监听器的绑定，
+     *   但是标签路由不是消费者启动的时候绑定监听器的，是在引入服务时，获取到服务的提供者URL之后，才会去监听.tag-router节点中的内容，
+     *   监听的路径为"/dubbo/config/dubbo/dubbo-demo-provider-application.tag-router"
+     */
     private List<Router> builtinRouters = Collections.emptyList();
 
+    /**
+     * url 信息参考：
+     * consumer://192.168.199.139/org.apache.dubbo.demo.DemoService?application=demo-consumer&check=false&dubbo=2.0.2
+     * &interface=org.apache.dubbo.demo.DemoService&lazy=false&methods=sayHello&pid=31099&qos.port=33333&side=consumer
+     * &sticky=false&timestamp=1704510602150
+     */
     public static <T> RouterChain<T> buildChain(URL url) {
         return new RouterChain<>(url);
     }

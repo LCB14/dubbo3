@@ -30,6 +30,10 @@ public class ServiceRouter extends ListenableRouter {
     private static final int SERVICE_ROUTER_DEFAULT_PRIORITY = 140;
 
     public ServiceRouter(DynamicConfiguration configuration, URL url) {
+        /**
+         * 注册自己为监听器，监听路径参考：
+         * /dubbo/config/dubbo/org.apache.dubbo.demo.DemoService:1.1.1:g1.condition-router
+         */
         super(configuration, url, DynamicConfiguration.getRuleKey(url));
         this.priority = SERVICE_ROUTER_DEFAULT_PRIORITY;
     }

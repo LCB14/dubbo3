@@ -31,7 +31,12 @@ public class AppRouter extends ListenableRouter {
     private static final int APP_ROUTER_DEFAULT_PRIORITY = 150;
 
     public AppRouter(DynamicConfiguration configuration, URL url) {
+        /**
+         * 注册自己为监听器，监听路径参考：
+         * /dubbo/config/dubbo/dubbo-demo-consumer-application.condition-router
+         */
         super(configuration, url, url.getParameter(CommonConstants.APPLICATION_KEY));
+
         this.priority = APP_ROUTER_DEFAULT_PRIORITY;
     }
 }

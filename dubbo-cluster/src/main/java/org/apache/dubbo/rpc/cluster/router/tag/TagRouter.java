@@ -31,6 +31,7 @@ import org.apache.dubbo.rpc.Invocation;
 import org.apache.dubbo.rpc.Invoker;
 import org.apache.dubbo.rpc.RpcException;
 import org.apache.dubbo.rpc.cluster.Constants;
+import org.apache.dubbo.rpc.cluster.RouterChain;
 import org.apache.dubbo.rpc.cluster.router.AbstractRouter;
 import org.apache.dubbo.rpc.cluster.router.tag.model.TagRouterRule;
 import org.apache.dubbo.rpc.cluster.router.tag.model.TagRuleParser;
@@ -57,6 +58,12 @@ public class TagRouter extends AbstractRouter implements ConfigurationListener {
     private TagRouterRule tagRouterRule;
     private String application;
 
+    /**
+     *  标签路由和应用路由、服务路由有所区别，应用路由和服务路由都是在消费者启动，在构造路由链时会进行监听器的绑定，
+     *  但是标签路由不是消费者启动的时候绑定监听器的，是在引入服务时，
+     *  获取到服务的提供者URL之后，才会去监听.tag-router节点中的内容，监听的路径为
+     *  "/dubbo/config/dubbo/dubbo-demo-provider-application.tag-router"
+     */
     public TagRouter(DynamicConfiguration configuration, URL url) {
         super(configuration, url);
         this.priority = TAG_ROUTER_DEFAULT_PRIORITY;
@@ -230,6 +237,11 @@ public class TagRouter extends AbstractRouter implements ConfigurationListener {
         this.application = app;
     }
 
+    /**
+     * 调用位置参考：
+     * @see org.apache.dubbo.registry.integration.RegistryDirectory#refreshInvoker(java.util.List)
+     * @see RouterChain#setInvokers(List)
+     */
     @Override
     public <T> void notify(List<Invoker<T>> invokers) {
         if (CollectionUtils.isEmpty(invokers)) {
