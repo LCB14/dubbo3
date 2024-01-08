@@ -457,11 +457,14 @@ public class DubboProtocol extends AbstractProtocol {
         // 如果未配置 connections，则共享连接
         if (connections == 0) {
             useShareConnect = true;
+
             /**
              * The xml configuration should have a higher priority than properties.
              */
             String shareConnectionsStr = url.getParameter(SHARE_CONNECTIONS_KEY, (String) null);
-            connections = Integer.parseInt(StringUtils.isBlank(shareConnectionsStr) ? ConfigUtils.getProperty(SHARE_CONNECTIONS_KEY, DEFAULT_SHARE_CONNECTIONS) : shareConnectionsStr);
+            connections = Integer.parseInt(StringUtils.isBlank(shareConnectionsStr)
+                    ? ConfigUtils.getProperty(SHARE_CONNECTIONS_KEY, DEFAULT_SHARE_CONNECTIONS) : shareConnectionsStr);
+
             // getSharedClient 方法中也会调用 initClient 方法
             shareClients = getSharedClient(url, connections);
         }

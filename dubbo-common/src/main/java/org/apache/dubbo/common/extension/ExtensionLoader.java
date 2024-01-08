@@ -211,7 +211,9 @@ public class ExtensionLoader<T> {
         List<T> exts = new ArrayList<>();
         List<String> names = values == null ? new ArrayList<>(0) : Arrays.asList(values);
         if (!names.contains(REMOVE_VALUE_PREFIX + DEFAULT_KEY)) {
+            // 提前加载 type 属性对应的拓展点信息
             getExtensionClasses();
+
             /**
              * cachedActivates 初始化位置
              * @see ExtensionLoader#loadClass(Map, java.net.URL, Class, String)
