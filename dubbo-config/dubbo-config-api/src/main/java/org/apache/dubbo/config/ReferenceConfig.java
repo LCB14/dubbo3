@@ -417,8 +417,11 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
                         if (REGISTRY_PROTOCOL.equals(url.getProtocol())) {
                             /**
                              * 添加 refer 参数到 url 中，并将 url 添加到 urls 中，将 map 转换为查询字符串，并作为 refer 参数的值。
+                             *
                              * StringUtils.toQueryString(map) 数据参考：
-                             * application=democonsumer&check=false&dubbo=2.0.2&interface=org.apache.dubbo.demo.DemoService&lazy=false&methods=sayHello&pid=9483&qos.port=33333&register.ip=192.168.20.233&side=consumer&sticky=false&timestamp=1661246288438
+                             * application=democonsumer&check=false&dubbo=2.0.2&interface=org.apache.dubbo.demo.DemoService
+                             * &lazy=false&methods=sayHello&pid=9483&qos.port=33333&register.ip=192.168.20.233&side=consumer
+                             * &sticky=false&timestamp=1661246288438
                              */
                             urls.add(url.addParameterAndEncoded(REFER_KEY, StringUtils.toQueryString(map)));
                         } else {
@@ -461,19 +464,19 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
 
             if (urls.size() == 1) {
                 /**
-                 * 服务直连，通过 DubboProtocol 父类 AbstractProtocol 的 refer 构建 Invoker 实例，url 数据参考如下：
-                 * dubbo://localhost:20880/org.apache.dubbo.demo.DemoService?application=demo-consumer&check=false&interface=org.apache.dubbo.demo.DemoService
+                 * 两种情况：
+                 * 1、服务直连，通过 DubboProtocol 父类 AbstractProtocol 的 refer 构建 Invoker 实例，url 数据参考如下：
+                 * dubbo://localhost:20880/org.apache.dubbo.demo.DemoService?application=demo-consumer&check=false
+                 * &interface=org.apache.dubbo.demo.DemoService
                  * &lazy=false&pid=46055&qos.port=33333&register.ip=192.168.199.139&remote.application=&side=consumer&sticky=false
-                 *
                  * @see AbstractProtocol#refer(Class, URL)
                  * @see org.apache.dubbo.rpc.protocol.dubbo.DubboProtocol#protocolBindingRefer(Class, URL)
                  *
-                 * 远程调用，通过 RegistryProtocol 的 refer 构建 Invoker 实例，url 数据参考如下：
+                 * 2、远程调用，通过 RegistryProtocol 的 refer 构建 Invoker 实例，url 数据参考如下：
                  * registry://127.0.0.1:2181/org.apache.dubbo.registry.RegistryService?application=demo-consumer&dubbo=2.0.2&pid=45850
                  * &qos.port=33333&refer=application=demo-consumer&check=false&dubbo=2.0.2&interface=org.apache.dubbo.demo.DemoService
                  * &lazy=false&methods=sayHello&pid=45850&qos.port=33333&register.ip=192.168.199.139&side=consumer&sticky=false
                  * &timestamp=1668523739215&registry=zookeeper&timestamp=1668523739548
-                 *
                  * @see RegistryProtocol#refer(Class, URL)
                  */
                 invoker = REF_PROTOCOL.refer(interfaceClass, urls.get(0));
@@ -485,6 +488,7 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
                     /**
                      * ref_protocol 调用 refer 构建 Invoker，ref_protocol 会在运行时，根据 url 协议头加载指定的 Protocol 实例，并调用实例的 refer 方法
                      *
+                     * @see AbstractProtocol#refer(Class, URL)
                      * @see org.apache.dubbo.rpc.protocol.dubbo.DubboProtocol#protocolBindingRefer(Class, URL)
                      * or
                      * @see RegistryProtocol#refer(Class, URL)
@@ -500,6 +504,7 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
                 if (registryURL != null) {
                     // use RegistryAwareCluster only when register's CLUSTER is available
                     // 如果注册中心链接不为空，则将使用 AvailableCluster
+                    // CLUSTER.join 自适应拓展名的获取会通过getParameter方法取此处放入的值
                     URL u = registryURL.addParameter(CLUSTER_KEY, RegistryAwareCluster.NAME);
                     // The invoker wrap relation would be: RegistryAwareClusterInvoker(StaticDirectory) -> FailoverClusterInvoker(RegistryDirectory, will execute route) -> Invoker
                     // 创建 StaticDirectory 实例，并由 Cluster 对多个 Invoker 进行合并

@@ -64,6 +64,10 @@ public class DubboInvoker<T> extends AbstractInvoker<T> {
         this(serviceType, url, clients, null);
     }
 
+    /**
+     * clients 属性初始化位置：
+     * @see org.apache.dubbo.rpc.protocol.dubbo.DubboProtocol#protocolBindingRefer(java.lang.Class, org.apache.dubbo.common.URL)
+     */
     public DubboInvoker(Class<T> serviceType, URL url, ExchangeClient[] clients, Set<Invoker<?>> invokers) {
         super(serviceType, url, new String[]{INTERFACE_KEY, GROUP_KEY, TOKEN_KEY, TIMEOUT_KEY});
         this.clients = clients;
