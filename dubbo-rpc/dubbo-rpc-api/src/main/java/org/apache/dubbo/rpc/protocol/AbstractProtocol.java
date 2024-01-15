@@ -89,7 +89,11 @@ public abstract class AbstractProtocol implements Protocol {
     @Override
     public <T> Invoker<T> refer(Class<T> type, URL url) throws RpcException {
         /**
+         * 本地引入参考：
          * @see org.apache.dubbo.rpc.protocol.injvm.InjvmProtocol#protocolBindingRefer(java.lang.Class, org.apache.dubbo.common.URL)
+         *
+         * 远程引入参考：
+         * @see org.apache.dubbo.rpc.protocol.dubbo.DubboProtocol#protocolBindingRefer(Class, URL)
          */
         return new AsyncToSyncInvoker<>(protocolBindingRefer(type, url));
     }

@@ -23,6 +23,7 @@ import org.apache.dubbo.common.utils.StringUtils;
 import org.apache.dubbo.rpc.Invocation;
 import org.apache.dubbo.rpc.Invoker;
 import org.apache.dubbo.rpc.RpcException;
+import org.apache.dubbo.rpc.cluster.Cluster;
 import org.apache.dubbo.rpc.cluster.Directory;
 import org.apache.dubbo.rpc.cluster.Router;
 import org.apache.dubbo.rpc.cluster.RouterChain;
@@ -50,7 +51,8 @@ public abstract class AbstractDirectory<T> implements Directory<T> {
     private volatile URL consumerUrl;
 
     /**
-     * 路由链
+     * 路由链，初始化位置参考
+     * org.apache.dubbo.registry.integration.RegistryProtocol#doRefer(Cluster, org.apache.dubbo.registry.Registry, Class, URL)
      */
     protected RouterChain<T> routerChain;
 
