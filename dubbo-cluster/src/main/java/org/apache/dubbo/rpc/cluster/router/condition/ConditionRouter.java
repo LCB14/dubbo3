@@ -73,6 +73,7 @@ public class ConditionRouter extends AbstractRouter {
         this.priority = url.getParameter(PRIORITY_KEY, 0);
         this.force = url.getParameter(FORCE_KEY, false);
         this.enabled = url.getParameter(ENABLED_KEY, true);
+
         init(url.getParameterAndDecoded(RULE_KEY));
     }
 
@@ -81,6 +82,7 @@ public class ConditionRouter extends AbstractRouter {
             if (rule == null || rule.trim().length() == 0) {
                 throw new IllegalArgumentException("Illegal route rule!");
             }
+
             rule = rule.replace("consumer.", "").replace("provider.", "");
             int i = rule.indexOf("=>");
 

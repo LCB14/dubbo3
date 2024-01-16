@@ -461,6 +461,10 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
             }
 
             try {
+                /**
+                 * 条件路由参考：
+                 * @see org.apache.dubbo.rpc.cluster.router.condition.ConditionRouter#ConditionRouter(org.apache.dubbo.common.URL)
+                 */
                 Router router = ROUTER_FACTORY.getRouter(url);
                 if (!routers.contains(router)) {
                     routers.add(router);
