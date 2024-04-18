@@ -806,7 +806,9 @@ public class ExtensionLoader<T> {
             String[] names = NAME_SEPARATOR.split(name);
 
             if (ArrayUtils.isNotEmpty(names)) {
+                // 缓存被@Activate注解修饰的拓展实现类
                 cacheActivateClass(clazz, names[0]);
+
                 for (String n : names) {
                     cacheName(clazz, n);
                     saveInExtensionClass(extensionClasses, clazz, n);
