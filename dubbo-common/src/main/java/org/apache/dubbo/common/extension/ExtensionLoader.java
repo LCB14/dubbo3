@@ -352,6 +352,7 @@ public class ExtensionLoader<T> {
             return getDefaultExtension();
         }
 
+        // 如果有两个线程同时来获取name的扩展对象，那么只会有一个线程会进行创建。因为同一个name对应的锁对象holder是同一个。
         final Holder<Object> holder = getOrCreateHolder(name);
         Object instance = holder.get();
         if (instance == null) {
