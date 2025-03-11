@@ -17,6 +17,7 @@
 package org.apache.dubbo.common.extension;
 
 import org.apache.dubbo.common.URL;
+import org.apache.dubbo.common.extension.factory.SpiExtensionFactory;
 import org.apache.dubbo.common.extension.support.ActivateComparator;
 import org.apache.dubbo.common.logger.Logger;
 import org.apache.dubbo.common.logger.LoggerFactory;
@@ -580,6 +581,9 @@ public class ExtensionLoader<T> {
          * objectFactory 初始化位置
          * @see ExtensionLoader#getExtensionLoader(Class)
          * @see ExtensionLoader#ExtensionLoader(Class)
+         *
+         * objectFactory 初始值：
+         * @see SpiExtensionFactory#getExtension(Class, String)
          */
         if (objectFactory == null) {
             return instance;
