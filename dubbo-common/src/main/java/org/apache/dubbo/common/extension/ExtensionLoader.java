@@ -617,7 +617,7 @@ public class ExtensionLoader<T> {
                      * SPI 接口 A 的 @Adaptive 注解修饰实现 X，依赖 SPI 接口 B 的 @Adaptive 注解修饰实现 Y。
                      * SPI 接口 B 的 @Adaptive 注解修饰实现 Y，依赖于SPI接口 A 的 @Adaptive 注解修饰实现 X。
                      * 这时获取 SPI 接口 A 的 @Adaptive 注解修饰的实现类 X 的时候不会产生循环依赖吗？
-                     * 会的！！
+                     * 会的！！直到栈溢出，抛出 StackOverflowError 异常。
                      * @see org.lcb.test.SpiTest#main(String[])
                      *
                      */
