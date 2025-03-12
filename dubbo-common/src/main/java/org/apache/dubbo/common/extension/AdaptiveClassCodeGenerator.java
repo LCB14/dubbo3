@@ -128,7 +128,7 @@ public class AdaptiveClassCodeGenerator {
          *         if (extName == null)
          *             throw new IllegalStateException("Failed to get extension (org.apache.dubbo.rpc.cluster.LoadBalance) name from url (" + url.toString() + ") use keys([loadbalance])");
          *
-         *        org.apache.dubbo.rpc.cluster.LoadBalance extension = (org.apache.dubbo.rpc.cluster.LoadBalance) ExtensionLoader.getExtensionLoader(org.apache.dubbo.rpc.cluster.LoadBalance.class).getExtension(extName);
+         *         org.apache.dubbo.rpc.cluster.LoadBalance extension = (org.apache.dubbo.rpc.cluster.LoadBalance) ExtensionLoader.getExtensionLoader(org.apache.dubbo.rpc.cluster.LoadBalance.class).getExtension(extName);
          *         return extension.select(arg0, arg1, arg2);
          *     }
          * }
