@@ -13,5 +13,8 @@ public class SpiTest {
 
         Man man = (Man)adaptiveExtension;
         man.dog.say();
+
+        BigDog bigDog = (BigDog)man.dog;
+        bigDog.person.sayHello();
     }
 }
