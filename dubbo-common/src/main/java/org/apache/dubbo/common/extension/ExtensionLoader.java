@@ -622,7 +622,7 @@ public class ExtensionLoader<T> {
                      *
                      */
                     Object object = objectFactory.getExtension(pt, property);
-                    System.out.println("SPI 触发循环依赖 -- " + property);
+//                    System.out.println("SPI 触发循环依赖 -- " + property);
                     if (object != null) {
                         method.invoke(instance, object);
                     }
