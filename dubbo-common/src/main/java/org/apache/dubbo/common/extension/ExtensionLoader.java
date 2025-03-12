@@ -612,8 +612,13 @@ public class ExtensionLoader<T> {
                     // 获取setXxx方法名称的xxx部分。
                     String property = getSetterProperty(method);
                     /**
-                     * 正因为调用的是 getAdaptiveExtension 方法且SPI接口不能仅有一种实现即@Adaptive注解修饰的实现，dubbo spi 的依赖注入才不存在循环依赖问题。
                      * @see org.apache.dubbo.common.extension.factory.SpiExtensionFactory#getExtension(java.lang.Class, java.lang.String)
+                     *
+                     * SPI 接口 A 的 @Adaptive 注解修饰实现 X，依赖 SPI 接口 B 的 @Adaptive 注解修饰实现 Y。
+                     * SPI 接口 B 的 @Adaptive 注解修饰实现 Y，依赖于SPI接口 A 的 @Adaptive 注解修饰实现 X。
+                     * 这时获取 SPI 接口 A 的 @Adaptive 注解修饰的实现类 X 的时候不会产生循环依赖吗？
+                     * @see org.lcb.test.SpiTest#main(String[])
+                     *
                      */
                     Object object = objectFactory.getExtension(pt, property);
                     if (object != null) {

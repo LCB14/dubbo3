@@ -1,0 +1,2 @@
+miniDog = org.lcb.test.MiniDog
+bigDog  = org.lcb.test.BigDog
